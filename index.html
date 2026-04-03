@@ -1481,23 +1481,43 @@ function parseChineseTime(str) {
 
 function parseHoursFromText(text) {
   const results = [];
-  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>1);
-  let currentDay = '';
+  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>0);
+
+  const dayRegex = /星期[一二三四五六日天]|週[一二三四五六日天]|周[一二三四五六日天]/;
+  const timeRangeRegex = /([上下]午\s*\d{1,2}(?::\d{2})?(?:\s*[時时])?|\d{1,2}:\d{2})\s*[-–~至]\s*([上下]午\s*\d{1,2}(?::\d{2})?(?:\s*[時时])?|\d{1,2}:\d{2}(?:\s*[時时])?)/;
+
+  // 分兩種格式：混合格式 vs 星期在前/時間在後
+  const dayNames = [];
+  const timeLines = [];
+  let foundFirstTime = false;
 
   for(const line of lines) {
-    if(/新增或編輯|評論|最新動態|關於|菜單|相片|總覽|休息中|展開/.test(line)) continue;
-
-    const dayM = line.match(/星期[一二三四五六日天]|週[一二三四五六日天]|周[一二三四五六日天]/);
-    if(dayM) currentDay = dayM[0];
-
-    if(/公休|休息|不營業|已關閉/.test(line) && currentDay) {
-      results.push({days:currentDay, open:'', close:'', note:'公休'});
-      continue;
+    if(!foundFirstTime) {
+      if(timeRangeRegex.test(line)) {
+        foundFirstTime = true;
+        timeLines.push(line);
+      } else if(dayRegex.test(line)) {
+        dayNames.push(line.match(dayRegex)[0]);
+      }
+    } else {
+      timeLines.push(line);
     }
+  }
 
-    const pat = /([上下]午\s*\d{1,2}(?::\d{2})?(?:\s*[時时])?|\d{1,2}:\d{2})\s*[-–~至]\s*([上下]午\s*\d{1,2}(?::\d{2})?(?:\s*[時时])?|\d{1,2}:\d{2}(?:\s*[時时])?)/g;
-    let m;
-    while((m = pat.exec(line)) !== null) {
+  // 從 timeLines 建立時段群組（以「營業時間可能不同」或「公休」分隔）
+  const timeGroups = [];
+  let cur = {times:[], note:''};
+
+  for(const line of timeLines) {
+    if(/營業時間可能不同/.test(line)) {
+      cur.note = '營業時間可能不同';
+      timeGroups.push({...cur});
+      cur = {times:[], note:''};
+    } else if(/公休|休息|不營業|已關閉/.test(line)) {
+      timeGroups.push({times:[], note:'公休'});
+      cur = {times:[], note:''};
+    } else if(timeRangeRegex.test(line)) {
+      const m = line.match(timeRangeRegex);
       let open = parseChineseTime(m[1]);
       let close = parseChineseTime(m[2]);
       if(open && close && !/[上下]午|晚/.test(m[1])) {
@@ -1505,12 +1525,31 @@ function parseHoursFromText(text) {
         const ch = parseInt(close.split(':')[0]);
         if(ch > 12 && oh < 12) open = `${oh+12}:${open.split(':')[1]}`;
       }
-      if(open && close && currentDay) {
-        results.push({days:currentDay, open, close, note:''});
-      }
+      if(open && close) cur.times.push({open, close});
     }
   }
+  if(cur.times.length > 0 || cur.note) timeGroups.push(cur);
 
+  if(dayNames.length === 0 || timeGroups.length === 0) return results;
+
+  // 計算每天的時段數（取第一個有時間的群組的時段數）
+  const slotsPerDay = (timeGroups.find(g=>g.times.length>0)?.times.length) || 1;
+  const allTimes = timeGroups.flatMap(g=>
+    g.times.length > 0
+      ? g.times.map(t=>({...t, note:g.note}))
+      : [{open:'', close:'', note:g.note}]
+  );
+
+  // 對應每天和時段
+  dayNames.forEach((day, i) => {
+    const start = i * slotsPerDay;
+    for(let j = 0; j < slotsPerDay; j++) {
+      const t = allTimes[start + j];
+      if(t) results.push({days:day, open:t.open, close:t.close, note:t.note||''});
+    }
+  });
+
+  // 去重
   const seen = new Set();
   return results.filter(r=>{
     const k = `${r.days}|${r.open}|${r.close}`;
