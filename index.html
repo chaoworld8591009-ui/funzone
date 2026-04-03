@@ -1009,6 +1009,23 @@ window.closeLightbox = function() {
   lightboxPhotos = [];
 };
 
+// 燈箱手指滑動
+(function(){
+  let lbStartX=0, lbStartY=0;
+  const lb = document.getElementById('lightbox');
+  lb.addEventListener('touchstart', e=>{
+    lbStartX = e.touches[0].clientX;
+    lbStartY = e.touches[0].clientY;
+  },{passive:true});
+  lb.addEventListener('touchend', e=>{
+    const dx = lbStartX - e.changedTouches[0].clientX;
+    const dy = Math.abs(e.changedTouches[0].clientY - lbStartY);
+    if(Math.abs(dx) > 50 && dy < 80 && lightboxPhotos.length > 1) {
+      lightboxNav(dx > 0 ? 1 : -1);
+    }
+  },{passive:true});
+})();
+
 window.addMediaType = function(id, type, mediaKind) {
   const inp = document.getElementById('photoInput');
   inp.accept = mediaKind === 'video' ? 'video/*' : 'image/*';
