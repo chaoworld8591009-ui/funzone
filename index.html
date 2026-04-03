@@ -1400,7 +1400,7 @@ window.openAddItem = function() {
     <div id="hoursWrap"></div>
     <div style="display:flex;gap:6px;margin-bottom:10px;">
       <div class="hours-add-btn" style="flex:1;margin-bottom:0" onclick="addHourRow()">＋ 新增時段</div>
-      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="detectHoursFromPhoto()">📷 拍照自動偵測</div>
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="pasteHoursText()">📋 貼上文字解析</div>
     </div>
     <label class="modal-label">地址（選填）</label>
     <input class="modal-input" id="mAddr" placeholder="例：台中市西區民權路"/>
@@ -1465,82 +1465,84 @@ window.removeHourRow = function(i) {
   renderHoursWrap();
 };
 
-// AI 拍照偵測營業時間
-window.detectHoursFromPhoto = function() {
-  const inp = document.getElementById('photoInput');
-  inp.accept = 'image/*';
-  inp.multiple = false;
-  inp.onchange = async function(e) {
-    const file = e.target.files[0];
-    if(!file) return;
+// ===== 貼上文字解析營業時間 =====
 
-    // 顯示偵測中狀態
-    const wrap = document.getElementById('hoursWrap');
-    if(wrap) wrap.innerHTML = '<div style="text-align:center;padding:12px;color:var(--blue);font-size:13px">🤖 AI 分析中，請稍候...</div>';
+function parseChineseTime(str) {
+  if(!str) return '';
+  const isPM = /下午|晚/.test(str);
+  const isAM = /上午/.test(str);
+  const m = str.match(/(\d{1,2})(?::(\d{2}))?(?:\s*[時时])?/);
+  if(!m) return '';
+  let h = parseInt(m[1]), min = m[2] ? parseInt(m[2]) : 0;
+  if(isPM && h < 12) h += 12;
+  if(isAM && h === 12) h = 0;
+  return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
 
-    // 讀圖轉 base64
-    const base64 = await new Promise(res=>{
-      const r = new FileReader();
-      r.onload = ev => res(ev.target.result.split(',')[1]);
-      r.readAsDataURL(file);
-    });
+function parseHoursFromText(text) {
+  const results = [];
+  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>1);
+  let currentDay = '';
 
-    try {
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: {type:'base64', media_type: file.type||'image/jpeg', data: base64}
-              },
-              {
-                type: 'text',
-                text: `請分析這張圖片中的營業時間資訊，回傳 JSON 陣列格式。
-每個元素包含：
-- days: 星期說明（例如「週一至週五」「星期六」「例假日」）
-- open: 開始時間，24小時制 HH:MM 格式（例如「11:30」）
-- close: 結束時間，24小時制 HH:MM 格式（例如「21:00」）
-- note: 備註（選填，例如「公休」「營業時間可能不同」）
+  for(const line of lines) {
+    if(/新增或編輯|評論|最新動態|關於|菜單|相片|總覽|休息中|展開/.test(line)) continue;
 
-如果同一天有多個時段（例如午休），請分成多筆。
-只回傳 JSON 陣列，不要任何其他文字或 markdown。
-範例格式：[{"days":"週一至週五","open":"11:30","close":"14:30"},{"days":"週一至週五","open":"17:30","close":"21:00"}]`
-              }
-            ]
-          }]
-        })
-      });
-      const data = await resp.json();
-      const text = data.content.map(c=>c.text||'').join('').trim();
-      const cleaned = text.replace(/```json|```/g,'').trim();
-      const parsed = JSON.parse(cleaned);
+    const dayM = line.match(/星期[一二三四五六日天]|週[一二三四五六日天]|周[一二三四五六日天]/);
+    if(dayM) currentDay = dayM[0];
 
-      if(Array.isArray(parsed) && parsed.length > 0) {
-        pickHours = parsed.map(h=>({
-          days: h.days||'',
-          open: h.open||'',
-          close: h.close||'',
-          note: h.note||''
-        }));
-        renderHoursWrap();
-      } else {
-        if(wrap) wrap.innerHTML = '';
-        alert('⚠️ 無法辨識，請手動輸入或換一張更清楚的照片');
-      }
-    } catch(err) {
-      console.error(err);
-      if(wrap) wrap.innerHTML = '';
-      alert('⚠️ 偵測失敗，請重試或手動輸入');
+    if(/公休|休息|不營業|已關閉/.test(line) && currentDay) {
+      results.push({days:currentDay, open:'', close:'', note:'公休'});
+      continue;
     }
-    e.target.value = '';
-  };
-  inp.click();
+
+    const pat = /([上下]午\s*\d{1,2}(?::\d{2})?(?:\s*[時时])?|\d{1,2}:\d{2})\s*[-–~至]\s*([上下]午\s*\d{1,2}(?::\d{2})?(?:\s*[時时])?|\d{1,2}:\d{2}(?:\s*[時时])?)/g;
+    let m;
+    while((m = pat.exec(line)) !== null) {
+      let open = parseChineseTime(m[1]);
+      let close = parseChineseTime(m[2]);
+      if(open && close && !/[上下]午|晚/.test(m[1])) {
+        const oh = parseInt(open.split(':')[0]);
+        const ch = parseInt(close.split(':')[0]);
+        if(ch > 12 && oh < 12) open = `${oh+12}:${open.split(':')[1]}`;
+      }
+      if(open && close && currentDay) {
+        results.push({days:currentDay, open, close, note:''});
+      }
+    }
+  }
+
+  const seen = new Set();
+  return results.filter(r=>{
+    const k = `${r.days}|${r.open}|${r.close}`;
+    if(seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+}
+
+window.pasteHoursText = function() {
+  openModal(`<div class="modal-title">📋 貼上營業時間文字</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+      從 Google Maps 或任何地方複製營業時間文字，貼到下方，自動解析成時段。
+    </div>
+    <textarea class="modal-input" id="mHoursText" rows="8" placeholder="星期一 上午11:30 - 下午2:30&#10;5:30 - 下午9時&#10;星期二 上午11:30 - 下午2:30..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doParseHoursText()">解析</div>
+    </div>`);
+  setTimeout(()=>{ const t=document.getElementById('mHoursText'); if(t) t.focus(); },100);
+};
+
+window.doParseHoursText = function() {
+  const text = document.getElementById('mHoursText').value;
+  if(!text.trim()) return;
+  const parsed = parseHoursFromText(text);
+  if(parsed.length > 0) {
+    pickHours = parsed;
+    closeModal();
+    renderHoursWrap();
+  } else {
+    alert('無法解析，請確認格式包含星期和時間。\n\n範例：\n星期一 上午11:30 - 下午2:30');
+  }
 };
 
 function getHoursFromPick() {
@@ -1583,7 +1585,7 @@ window.openEditItem = function(id) {
     <div id="hoursWrap"></div>
     <div style="display:flex;gap:6px;margin-bottom:10px;">
       <div class="hours-add-btn" style="flex:1;margin-bottom:0" onclick="addHourRow()">＋ 新增時段</div>
-      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="detectHoursFromPhoto()">📷 拍照自動偵測</div>
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="pasteHoursText()">📋 貼上文字解析</div>
     </div>
     <label class="modal-label">地址</label>
     <input class="modal-input" id="mAddr" value="${esc(item.address||'')}"/>
