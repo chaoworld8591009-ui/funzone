@@ -1,1412 +1,1351 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>你fun鬆了嗎</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="我的收藏"/>
+<title>我的收藏</title>
 <style>
-/* ════════════════════════════════════
-   GLOBAL RESET & VARIABLES
-════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
-  --neon:#00E96A;
-  --neon-dark:#059347;
-  --neon-glow:rgba(0,233,106,.4);
-  --bg:#070D14;
-  --bg2:#0C1520;
-  --bg3:#1B2A3E;
-  --white:rgba(255,255,255,1);
-  --txt:rgba(255,255,255,1);
-  --txt2:rgba(255,255,255,.65);
-  --txt3:rgba(255,255,255,.38);
-  --txt4:rgba(255,255,255,.18);
-  --border:rgba(255,255,255,.12);
-  --border2:rgba(255,255,255,.22);
-  --border3:rgba(255,255,255,.38);
-  --neon-border:rgba(0,233,106,.35);
-  --err:#FF5B6B;
-  --warn:#FFB700;
-  --inp-bg:#162535;
+  --bg:#0a0a0a;--card:#161616;--card2:#1c1c1c;--border:#252525;--border2:#2a2a2a;
+  --text:#fff;--muted:#888;--muted2:#555;
+  --amber:#FF9500;--amber-bg:#1e1200;
+  --green:#30D158;--green-bg:#0a1a0a;
+  --blue:#4DA6FF;--blue-bg:#001525;
+  --red:#FF453A;--red-bg:#1a0808;
+  --purple:#BF5AF2;--purple-bg:#160025;
+  --yellow:#FFD60A;--yellow-bg:#1a1500;
 }
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Microsoft JhengHei","PingFang TC",sans-serif;overflow:hidden;}
+.app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;}
+.header{padding:16px 20px 10px;display:flex;align-items:center;gap:12px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.header-back{color:var(--amber);font-size:16px;cursor:pointer;padding:4px 8px 4px 0;}
+.header-title{flex:1;font-size:18px;font-weight:700;}
+.header-action{color:var(--amber);font-size:14px;cursor:pointer;}
+.page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.bottom-nav{background:var(--card);border-top:0.5px solid var(--border);display:flex;flex-shrink:0;}
+.nav-btn{flex:1;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.nav-ico{font-size:18px;line-height:1;}
+.nav-lbl{font-size:10px;color:var(--muted);}
+.nav-btn.active .nav-lbl{color:var(--amber);}
+.list-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.list-item:active{background:var(--card);}
+.list-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;}
+.list-body{flex:1;min-width:0;}
+.list-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-sub{font-size:12px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.list-arrow{color:var(--muted2);font-size:18px;}
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;display:inline-block;white-space:nowrap;}
+.tag-loc{background:var(--blue-bg);color:var(--blue);}
+.tag-eat{background:var(--amber-bg);color:var(--amber);}
+.tag-play{background:var(--green-bg);color:var(--green);}
+.tag-buy{background:var(--purple-bg);color:var(--purple);}
+.tag-go{background:var(--red-bg);color:var(--red);}
+.tag-shop{background:var(--blue-bg);color:var(--blue);}
+.stars{color:var(--amber);font-size:12px;}
+.section-hdr{font-size:11px;color:var(--muted2);padding:10px 20px 4px;text-transform:uppercase;letter-spacing:0.5px;}
+.filter-bar{display:flex;gap:8px;padding:10px 20px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:0.5px solid var(--border);}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-pill{font-size:12px;padding:5px 14px;border-radius:20px;white-space:nowrap;cursor:pointer;border:0.5px solid var(--border2);color:var(--muted);background:transparent;flex-shrink:0;}
+.filter-pill.active{background:var(--amber);color:#000;border-color:var(--amber);font-weight:700;}
+.photo-swiper{width:100%;height:220px;position:relative;overflow:hidden;flex-shrink:0;background:var(--card2);}
+.photo-swiper-track{display:flex;height:100%;transition:transform 0.3s ease;}
+.photo-swiper-slide{min-width:100%;height:100%;flex-shrink:0;}
+.photo-swiper-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.slide-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;}
+.photo-swiper-overlay{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,var(--bg));pointer-events:none;z-index:1;}
+.photo-dots{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;}
+.photo-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);}
+.photo-dot.on{background:#fff;}
+.photo-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;z-index:2;}
+.photo-add-btn{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,0.6);color:var(--amber);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
+.photo-del-btn{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.6);color:var(--red);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
 
-html,body{
-  height:100%;width:100%;
-  background:var(--bg);
-  font-family:'Noto Sans TC','Outfit',sans-serif;
-  color:var(--txt);
-  overflow:hidden;
-}
+/* 全螢幕燈箱 */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.lightbox.hidden{display:none;}
+.lightbox-media{max-width:100%;max-height:85vh;object-fit:contain;border-radius:4px;}
+.lightbox-close{position:absolute;top:16px;right:16px;color:#fff;font-size:28px;cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.15);border-radius:50%;}
+.lightbox-prev,.lightbox-next{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:32px;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.15);border-radius:50%;}
+.lightbox-prev{left:10px;}
+.lightbox-next{right:10px;}
+.lightbox-count{position:absolute;bottom:20px;color:rgba(255,255,255,0.6);font-size:13px;}
 
-/* ════════════════════════════════════
-   APP SHELL
-════════════════════════════════════ */
-#app{
-  width:100%;height:100vh;
-  max-width:430px;
-  margin:0 auto;
-  position:relative;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  background:var(--bg);
-}
+/* 影片樣式 */
+.photo-swiper-slide video{width:100%;height:100%;object-fit:cover;display:block;}
+.media-type-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;z-index:2;}
+.detail-body{padding:16px 20px;flex:1;overflow-y:auto;}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.detail-name{font-size:22px;font-weight:700;margin-bottom:6px;}
+.detail-stars-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.detail-star{font-size:26px;cursor:pointer;color:var(--muted2);}
+.detail-star.on{color:var(--amber);}
+.detail-section{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;margin-top:12px;}
+.detail-val{font-size:14px;color:#ccc;line-height:1.6;}
+.detail-link{font-size:14px;color:var(--blue);word-break:break-all;cursor:pointer;}
+.detail-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
+.detail-btn{padding:12px;border-radius:12px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;}
+.btn-nav{background:var(--blue-bg);color:var(--blue);}
+.btn-link{background:var(--blue-bg);color:var(--blue);}
+.btn-edit{background:var(--yellow-bg);color:var(--yellow);}
+.btn-done{background:var(--green-bg);color:var(--green);}
+.btn-del{background:var(--red-bg);color:var(--red);}
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
+.modal-wrap.hidden{display:none;}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:16px;text-align:center;}
+.modal-input{width:100%;background:var(--card2);border:0.5px solid var(--border2);border-radius:10px;padding:12px;font-size:15px;color:var(--text);margin-bottom:10px;font-family:inherit;}
+.modal-input::placeholder{color:var(--muted2);}
+.modal-label{font-size:12px;color:var(--muted);margin-bottom:4px;display:block;}
+.modal-btns{display:flex;gap:8px;margin-top:4px;}
+.modal-btn{flex:1;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;border:none;font-family:inherit;}
+.modal-btn-cancel{background:var(--card2);color:var(--muted);}
+.modal-btn-ok{background:var(--amber);color:#000;}
+.modal-btn-danger{background:var(--red-bg);color:var(--red);}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.emoji-opt{font-size:24px;padding:6px;border-radius:8px;cursor:pointer;border:1px solid transparent;}
+.emoji-opt.sel{border-color:var(--amber);background:var(--amber-bg);}
+.star-picker{display:flex;gap:4px;margin-bottom:12px;}
+.star-pick{font-size:28px;cursor:pointer;color:var(--muted2);}
+.star-pick.on{color:var(--amber);}
+.photo-upload{width:100%;background:var(--card2);border:0.5px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--muted);font-size:14px;margin-bottom:10px;}
+.photo-preview{width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block;}
+.edit-list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);}
+.edit-list-name{flex:1;font-size:14px;}
+.edit-btn{font-size:13px;padding:5px 10px;border-radius:8px;cursor:pointer;border:none;font-family:inherit;}
+.edit-btn-del{background:var(--red-bg);color:var(--red);}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:15px;line-height:2;}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:14px;}
 
-/* BG EFFECTS */
-.bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0;max-width:430px;left:50%;transform:translateX(-50%);}
-.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,233,106,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,233,106,.025) 1px,transparent 1px);background-size:28px 28px;}
-.bg-blob1{position:absolute;width:320px;height:320px;border-radius:50%;background:rgba(0,233,106,.055);filter:blur(65px);top:-120px;right:-80px;animation:blob1 9s ease-in-out infinite;}
-.bg-blob2{position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(0,60,255,.04);filter:blur(60px);bottom:80px;left:-80px;animation:blob2 11s ease-in-out infinite;}
-.bg-scan{position:absolute;height:1px;width:100%;background:linear-gradient(90deg,transparent,rgba(0,233,106,.12),transparent);animation:scan 6s linear infinite;}
+/* Login page */
+.login-page{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 20px;gap:20px;}
+.login-logo{font-size:60px;margin-bottom:10px;}
+.login-title{font-size:28px;font-weight:700;}
+.login-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.6;}
+.login-btn{width:100%;max-width:320px;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;}
+.login-btn-google{background:#fff;color:#333;}
+.login-btn-email{background:var(--amber);color:#000;}
+.login-divider{color:var(--muted);font-size:13px;}
 
-@keyframes blob1{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
-@keyframes blob2{0%,100%{transform:translateY(0)}50%{transform:translateY(13px)}}
-@keyframes scan{from{top:-1px}to{top:102%}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-@keyframes expShine{0%{left:-100%}100%{left:200%}}
-@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
-
-/* ════════════════════════════════════
-   SCREENS
-════════════════════════════════════ */
-.screen{
-  display:none;flex:1;flex-direction:column;
-  position:relative;z-index:1;overflow:hidden;
-}
-.screen.active{display:flex;}
-
-/* Stagger animation classes */
-.screen.active .s1{animation:fadeUp .35s cubic-bezier(.22,.68,0,1.15) both;}
-.screen.active .s2{animation:fadeUp .35s .06s cubic-bezier(.22,.68,0,1.15) both;}
-.screen.active .s3{animation:fadeUp .35s .12s cubic-bezier(.22,.68,0,1.15) both;}
-.screen.active .s4{animation:fadeUp .35s .18s cubic-bezier(.22,.68,0,1.15) both;}
-.screen.active .s5{animation:fadeUp .35s .24s cubic-bezier(.22,.68,0,1.15) both;}
-
-/* STATUS BAR */
-.status-bar{
-  padding:10px 22px 5px;
-  font-size:11px;font-weight:500;
-  display:flex;justify-content:space-between;
-  flex-shrink:0;color:var(--txt3);
-  font-family:'Outfit',sans-serif;
-  background:rgba(7,13,20,.6);
-}
-
-/* TOP BAR */
-.topbar{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 16px 12px;flex-shrink:0;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  background:rgba(7,13,20,.72);
-  backdrop-filter:blur(10px);
-}
-.topbar-title{font-size:15px;font-weight:700;flex:1;color:var(--txt);font-family:'Outfit',sans-serif;letter-spacing:.3px;}
-.topbar-title.brand{font-size:17px;font-weight:800;}
-.topbar-title.brand .fun{color:var(--neon);}
-
-/* BACK BUTTON */
-.btn-back-icon{
-  width:36px;height:36px;border-radius:10px;
-  background:var(--neon);border:none;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;
-  font-size:18px;font-weight:900;color:#060D12;
-  font-family:'Outfit',sans-serif;line-height:1;
-  box-shadow:0 3px 12px rgba(0,233,106,.45);
-  transition:all .15s;
-}
-.btn-back-icon:active{transform:scale(.9);}
-
-/* SCROLL AREA */
-.scroll{flex:1;overflow-y:auto;padding:16px;}
-.scroll::-webkit-scrollbar{display:none;}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  display:flex;flex-shrink:0;
-  background:rgba(8,16,26,.94);
-  border-top:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(12px);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.nav-item{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;padding:8px 0 11px;
-  cursor:pointer;gap:3px;position:relative;
-}
-.nav-item .nav-ico{font-size:20px;line-height:1;transition:transform .15s;}
-.nav-item .nav-lbl{font-size:10px;color:var(--txt3);font-family:'Outfit',sans-serif;font-weight:500;transition:color .15s;}
-.nav-item.active .nav-lbl{color:var(--neon);}
-.nav-item.active .nav-ico{transform:translateY(-1px);}
-.nav-item.active::after{
-  content:'';position:absolute;bottom:0;
-  left:50%;transform:translateX(-50%);
-  width:22px;height:2.5px;background:var(--neon);
-  border-radius:2px 2px 0 0;
-  box-shadow:0 0 8px var(--neon-glow);
-}
-.nav-badge{
-  position:absolute;top:5px;right:calc(50% - 18px);
-  width:7px;height:7px;border-radius:50%;
-  background:var(--err);border:1.5px solid var(--bg);
-}
-
-/* ════════════════════════════════════
-   INPUTS
-════════════════════════════════════ */
-.inp{
-  display:block;width:100%;
-  padding:14px 16px;border-radius:13px;
-  border:2px solid var(--border2);
-  background:var(--inp-bg);
-  color:var(--txt);font-size:14px;
-  font-family:'Noto Sans TC',sans-serif;
-  outline:none;transition:border-color .2s,box-shadow .2s;
-  margin-bottom:10px;
-}
-.inp::placeholder{color:var(--txt4);}
-.inp:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(0,233,106,.14);}
-
-.inp-group{position:relative;margin-bottom:10px;}
-.inp-group .inp{margin-bottom:0;padding-right:64px;}
-.inp-group-suffix{
-  position:absolute;right:0;top:0;height:100%;width:62px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;color:var(--neon);
-  cursor:pointer;font-family:'Outfit',sans-serif;
-  border-left:1.5px solid rgba(255,255,255,.12);
-  border-radius:0 13px 13px 0;
-  background:rgba(0,233,106,.1);
-  transition:background .18s;
-}
-.inp-group-suffix:hover{background:rgba(0,233,106,.2);}
-
-.phone-row{display:flex;gap:8px;margin-bottom:10px;}
-.phone-prefix{
-  padding:14px 11px;border-radius:13px;
-  border:2px solid var(--border2);
-  background:var(--inp-bg);color:var(--txt);
-  font-size:13px;cursor:pointer;flex-shrink:0;
-  font-family:'Noto Sans TC',sans-serif;outline:none;
-}
-.phone-prefix:focus{border-color:var(--neon);}
-
-/* ════════════════════════════════════
-   BUTTONS
-════════════════════════════════════ */
-.btn{
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  width:100%;padding:15px;border-radius:14px;
-  font-size:14px;font-weight:800;cursor:pointer;
-  font-family:'Outfit',sans-serif;letter-spacing:.4px;
-  border:none;transition:all .18s;margin-bottom:9px;
-  position:relative;overflow:hidden;
-}
-.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 55%);pointer-events:none;}
-.btn:active{transform:scale(.97);}
-.btn:hover{transform:translateY(-1px);}
-
-.btn-neon{background:var(--neon);color:#060D12;box-shadow:0 5px 20px rgba(0,233,106,.42);}
-.btn-neon:hover{box-shadow:0 7px 26px rgba(0,233,106,.6);}
-
-.btn-white{background:#FFFFFF;color:#0A1525;box-shadow:0 4px 16px rgba(255,255,255,.18);}
-.btn-white:hover{background:#F0FFF6;}
-
-.btn-green-outline{background:#0C1E14;color:var(--neon);border:2.5px solid var(--neon);box-shadow:0 0 0 0 var(--neon-glow);}
-.btn-green-outline:hover{background:#122516;}
-
-.btn-ghost{background:rgba(255,255,255,.1);color:var(--txt);border:2px solid var(--border3);}
-.btn-ghost:hover{background:rgba(255,255,255,.18);}
-
-.btn-danger-ghost{background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);border:2px solid var(--border2);}
-.btn-danger-ghost:hover{background:rgba(255,255,255,.13);}
-
-.btn-purple{background:#6C5CE7;color:#fff;box-shadow:0 4px 18px rgba(108,92,231,.42);}
-.btn-purple:hover{background:#7D6EF0;}
-
-.btn-sm{
-  padding:7px 14px;border-radius:20px;
-  font-size:11px;font-weight:700;cursor:pointer;
-  border:none;font-family:'Outfit',sans-serif;
-  transition:all .15s;display:inline-flex;
-  align-items:center;gap:4px;
-}
-.btn-sm-neon{background:var(--neon);color:#060D12;}
-.btn-sm-gray{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1.5px solid var(--border);}
-
-/* Quick Action 2-column */
-.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.quick-create{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  padding:15px 10px;border-radius:14px;
-  background:var(--neon);color:#060D12;border:none;
-  font-size:13px;font-weight:900;cursor:pointer;
-  font-family:'Outfit',sans-serif;
-  box-shadow:0 5px 20px rgba(0,233,106,.45);
-  transition:all .18s;
-}
-.quick-create:hover{transform:translateY(-2px);box-shadow:0 7px 26px rgba(0,233,106,.6);}
-.quick-match{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  padding:15px 10px;border-radius:14px;
-  background:#FFFFFF;color:#060D12;border:none;
-  font-size:13px;font-weight:900;cursor:pointer;
-  font-family:'Outfit',sans-serif;
-  box-shadow:0 5px 20px rgba(255,255,255,.2);
-  transition:all .18s;
-}
-.quick-match:hover{transform:translateY(-2px);}
-
-/* ════════════════════════════════════
-   TYPOGRAPHY HELPERS
-════════════════════════════════════ */
-.sec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.sec-title{font-size:11px;font-weight:600;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;font-family:'Outfit',sans-serif;}
-.sec-link{font-size:11px;color:var(--neon);font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
-.field-label{font-size:11px;font-weight:600;color:rgba(0,233,106,.82);letter-spacing:1.5px;text-transform:uppercase;font-family:'Outfit',sans-serif;margin-bottom:7px;}
-.lnk{color:var(--neon);cursor:pointer;font-weight:600;}
-.terms{font-size:11px;color:var(--txt4);line-height:1.6;text-align:center;margin-top:10px;font-family:'Noto Sans TC',sans-serif;}
-.terms span{color:var(--neon);cursor:pointer;}
-.divider{display:flex;align-items:center;gap:10px;margin:6px 0 13px;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.12);}
-.divider span{font-size:11px;color:var(--txt4);font-family:'Outfit',sans-serif;letter-spacing:.5px;}
-
-/* ALERTS */
-.alert-err{display:none;font-size:12px;color:var(--err);background:rgba(255,91,107,.12);border:1.5px solid rgba(255,91,107,.35);border-radius:10px;padding:10px 13px;margin-bottom:10px;font-family:'Noto Sans TC',sans-serif;line-height:1.5;}
-.alert-err.show{display:block;}
-.alert-ok{display:none;font-size:12px;color:var(--neon);background:rgba(0,233,106,.1);border:1.5px solid rgba(0,233,106,.32);border-radius:10px;padding:10px 13px;margin-bottom:10px;font-family:'Noto Sans TC',sans-serif;}
-.alert-ok.show{display:block;}
-.info-card{background:rgba(0,233,106,.08);border:1.5px solid rgba(0,233,106,.25);border-radius:12px;padding:13px 14px;margin-bottom:14px;font-size:12px;color:var(--txt2);font-family:'Noto Sans TC',sans-serif;line-height:1.75;}
-.info-card strong{color:var(--neon);}
-.warn-card{background:rgba(255,183,0,.08);border:1.5px solid rgba(255,183,0,.28);border-radius:12px;padding:11px 13px;margin-bottom:14px;font-size:12px;color:rgba(255,220,100,.9);font-family:'Noto Sans TC',sans-serif;line-height:1.6;}
-.announce-card{background:rgba(255,183,0,.07);border:1.5px solid rgba(255,183,0,.2);border-radius:12px;padding:10px 13px;margin-bottom:12px;display:flex;gap:9px;align-items:flex-start;}
-
-/* OTP */
-.otp-row{display:flex;gap:7px;justify-content:center;margin:8px 0 16px;}
-.otp-box{
-  width:46px;height:56px;border-radius:12px;
-  border:2px solid var(--border2);
-  background:var(--inp-bg);
-  font-size:24px;font-weight:700;text-align:center;
-  color:var(--txt);outline:none;transition:all .2s;
-  font-family:'Outfit',sans-serif;
-}
-.otp-box:focus{border-color:var(--neon);background:#1a3040;box-shadow:0 0 0 3px rgba(0,233,106,.14);}
-.otp-box.filled{border-color:var(--neon);background:rgba(0,233,106,.12);color:var(--neon);}
-
-/* STEPS */
-.steps{display:flex;align-items:center;margin-bottom:20px;}
-.step{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:'Outfit',sans-serif;transition:all .3s;}
-.step.done{background:var(--neon);color:#070D14;}
-.step.curr{background:var(--neon);color:#070D14;box-shadow:0 0 16px var(--neon-glow);outline:3px solid rgba(0,233,106,.2);outline-offset:1px;}
-.step.pend{background:#1B2A3E;color:var(--txt4);border:2px solid var(--border);}
-.step-line{flex:1;height:2px;background:rgba(255,255,255,.08);}
-.step-line.done{background:var(--neon);}
-
-/* ════════════════════════════════════
-   CARDS & COMPONENTS
-════════════════════════════════════ */
-.card{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;}
-.card-body{padding:13px;}
-
-/* AVATAR */
-.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;font-family:'Outfit',sans-serif;position:relative;}
-.av.online::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--neon);border:2px solid var(--bg);position:absolute;bottom:0;right:0;animation:pulse 2s ease-in-out infinite;}
-
-/* LEVEL BADGE */
-.lv-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;}
-.lv-common{background:rgba(255,255,255,.1);border:1.5px solid var(--border2);color:var(--txt2);}
-.lv-rare{background:rgba(55,138,221,.18);border:1.5px solid #378ADD;color:#85B7EB;}
-.lv-epic{background:rgba(127,119,221,.18);border:1.5px solid #7F77DD;color:#AFA9EC;}
-.lv-legend{background:rgba(255,183,0,.15);border:1.5px solid #FFB700;color:#FFB700;}
-.lv-max{background:rgba(0,233,106,.18);border:1.5px solid var(--neon);color:var(--neon);box-shadow:0 0 10px rgba(0,233,106,.25);}
-
-/* EXP BAR */
-.exp-wrap{background:rgba(255,255,255,.08);border-radius:20px;height:7px;overflow:hidden;position:relative;}
-.exp-fill{height:100%;border-radius:20px;background:var(--neon);position:relative;overflow:hidden;transition:width .6s cubic-bezier(.22,.68,0,1.1);}
-.exp-fill::after{content:'';position:absolute;top:0;height:100%;width:40px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:expShine 2s linear infinite;}
-
-/* STAT MINI CARDS */
-.stat-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
-.stat-mini{background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:12px;padding:10px 7px;text-align:center;}
-.stat-mini-val{font-size:19px;font-weight:800;color:var(--txt);font-family:'Outfit',sans-serif;line-height:1.1;}
-.stat-mini-lbl{font-size:10px;color:var(--txt3);margin-top:3px;font-family:'Outfit',sans-serif;}
-
-/* FRIEND SCROLL */
-.friend-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
-.friend-scroll::-webkit-scrollbar{display:none;}
-.friend-item{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;cursor:pointer;}
-.friend-item-name{font-size:10px;color:var(--txt3);font-family:'Outfit',sans-serif;}
-
-/* BANNER */
-.banner{border-radius:15px;overflow:hidden;margin-bottom:14px;cursor:pointer;}
-.banner-inner{padding:16px;display:flex;align-items:center;gap:14px;border:1.5px solid rgba(0,233,106,.3);background:#0C1E14;}
-.banner-icon{font-size:44px;line-height:1;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(0,233,106,.4));}
-.badge-hot{display:inline-flex;padding:3px 8px;border-radius:20px;background:rgba(255,91,107,.18);border:1px solid rgba(255,91,107,.4);font-size:10px;font-weight:700;color:var(--err);font-family:'Outfit',sans-serif;margin-top:6px;}
-
-/* GAME CARDS */
-.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.game-card{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:14px;padding:13px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:5px;}
-.game-card:hover{border-color:rgba(0,233,106,.35);background:rgba(0,233,106,.05);}
-.game-card:active{transform:scale(.97);}
-.game-card.selected{border-color:var(--neon);background:rgba(0,233,106,.07);}
-.game-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;}
-.game-name{font-size:13px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;}
-.game-desc{font-size:11px;color:var(--txt3);}
-.tag{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;font-family:'Outfit',sans-serif;align-self:flex-start;}
-.tag-neon{background:rgba(0,233,106,.15);border:1px solid rgba(0,233,106,.3);color:var(--neon);}
-.tag-gray{background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--txt3);}
-
-/* RANK ITEMS */
-.rank-list{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:13px;padding:4px 12px;}
-.rank-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.rank-row:last-child{border:none;}
-.rank-row.me{background:rgba(0,233,106,.07);border-radius:8px;padding:8px 10px;margin:3px 0;border:none;}
-.rank-score{font-size:13px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;}
-
-/* FRIEND CARDS */
-.friend-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;}
-.fc-name{font-size:13px;font-weight:600;color:var(--txt);}
-.fc-status{font-size:11px;color:var(--txt3);margin-top:1px;}
-
-/* ITEM CARDS */
-.item-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px;}
-.item-card{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:13px;padding:12px 8px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;overflow:hidden;}
-.item-card:hover{transform:translateY(-2px);}
-.item-card.owned{border-color:rgba(0,233,106,.35);background:rgba(0,233,106,.05);}
-.item-card.equipped{border-color:var(--neon);background:rgba(0,233,106,.1);box-shadow:0 0 12px rgba(0,233,106,.18);}
-.item-card.locked{opacity:.42;pointer-events:none;}
-.item-ico{font-size:28px;line-height:1;}
-.item-name{font-size:11px;font-weight:600;color:var(--txt);font-family:'Outfit',sans-serif;text-align:center;}
-.item-rarity{font-size:9px;font-weight:700;font-family:'Outfit',sans-serif;padding:2px 7px;border-radius:20px;}
-.rar-c{background:rgba(255,255,255,.1);color:var(--txt3);}
-.rar-r{background:rgba(55,138,221,.15);color:#85B7EB;}
-.rar-e{background:rgba(127,119,221,.18);color:#AFA9EC;}
-.rar-l{background:rgba(255,183,0,.15);color:var(--warn);}
-.equipped-dot{position:absolute;top:6px;right:6px;width:14px;height:14px;border-radius:50%;background:var(--neon);display:flex;align-items:center;justify-content:center;font-size:8px;color:#060D12;font-weight:900;}
-.lock-overlay{position:absolute;inset:0;background:rgba(7,13,20,.58);display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;}
-
-/* SHOP ITEMS */
-.shop-item{display:flex;align-items:center;gap:12px;padding:12px 13px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:13px;margin-bottom:9px;}
-.shop-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
-.price-btn{display:flex;align-items:center;gap:3px;padding:6px 11px;border-radius:20px;background:var(--neon);color:#060D12;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;border:none;}
-.price-owned{padding:6px 11px;border-radius:20px;background:rgba(0,233,106,.12);border:1.5px solid rgba(0,233,106,.3);color:var(--neon);font-size:11px;font-weight:700;font-family:'Outfit',sans-serif;}
-
-/* DAILY LOGIN */
-.daily-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px;}
-.daily-box{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);cursor:pointer;}
-.daily-box .d-day{font-size:9px;color:var(--txt3);font-family:'Outfit',sans-serif;}
-.daily-box .d-reward{font-size:15px;line-height:1;}
-.daily-box.claimed{background:rgba(0,233,106,.1);border-color:rgba(0,233,106,.32);}
-.daily-box.today{background:rgba(0,233,106,.18);border-color:var(--neon);box-shadow:0 0 10px rgba(0,233,106,.28);}
-.daily-box.locked{opacity:.3;pointer-events:none;}
-
-/* LEVEL SEGMENT */
-.lv-segment{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:11px;}
-
-/* ROOM */
-.room-code-box{background:rgba(0,233,106,.08);border:2px solid rgba(0,233,106,.3);border-radius:14px;padding:15px;text-align:center;margin-bottom:12px;}
-.room-code{font-size:36px;font-weight:900;color:var(--neon);letter-spacing:10px;font-family:'Outfit',sans-serif;text-shadow:0 0 20px rgba(0,233,106,.45);}
-.player-slot{display:flex;align-items:center;gap:9px;padding:10px 12px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;}
-.player-slot.empty{border-style:dashed;opacity:.4;}
-.slot-badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;}
-.sb-host{background:rgba(0,233,106,.15);color:var(--neon);border:1px solid rgba(0,233,106,.3);}
-.sb-ready{background:rgba(55,138,221,.15);color:#85B7EB;border:1px solid rgba(55,138,221,.3);}
-
-/* PROFILE MENU */
-.profile-row{display:flex;align-items:center;gap:10px;padding:13px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;}
-.profile-row:last-child{border:none;}
-
-/* QUEST */
-.quest-item{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;}
-
-/* FILTER PILLS */
-.pill-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:13px;}
-.pill-row::-webkit-scrollbar{display:none;}
-.pill{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:'Outfit',sans-serif;white-space:nowrap;}
-.pill.on{background:var(--neon);color:#060D12;}
-.pill.off{background:rgba(255,255,255,.1);border:1.5px solid var(--border2);color:var(--txt);}
-
-/* TOGGLE */
-.toggle-track{width:40px;height:22px;border-radius:11px;background:var(--neon);position:relative;cursor:pointer;flex-shrink:0;box-shadow:0 0 10px rgba(0,233,106,.28);}
-.toggle-thumb{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;right:2px;}
-
-/* DEMO HINT */
-.demo-hint{text-align:center;margin-top:10px;padding:9px 14px;background:rgba(255,255,255,.06);border:1.5px solid var(--border2);border-radius:10px;}
-.demo-hint span{font-size:12px;color:var(--txt2);font-family:'Noto Sans TC',sans-serif;}
-.demo-hint strong{color:var(--neon);letter-spacing:4px;font-family:'Outfit',sans-serif;}
-
-/* RESEND COOLDOWN */
-.resend-cd{display:none;text-align:center;padding:10px;background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;font-size:13px;color:var(--txt2);font-family:'Outfit',sans-serif;}
-
-/* NOTIF CARD */
-.notif-card{border-radius:12px;padding:12px 13px;margin-bottom:9px;display:flex;gap:9px;align-items:flex-start;}
-.notif-card.unread{background:rgba(0,233,106,.08);border:1.5px solid rgba(0,233,106,.22);}
-.notif-card.read{background:rgba(255,255,255,.04);border:1.5px solid var(--border);opacity:.65;}
-
-/* ════════════════════════════════════
-   SPLASH / LOGIN HERO
-════════════════════════════════════ */
-.splash-hero{
-  background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;flex:1;padding:36px 24px 10px;
-}
-.logo-wrap{position:relative;margin-bottom:22px;}
-.logo-box{width:96px;height:96px;border-radius:28px;background:rgba(0,233,106,.08);border:1.5px solid rgba(0,233,106,.28);display:flex;align-items:center;justify-content:center;}
-.logo-corner{position:absolute;width:15px;height:15px;}
-.logo-corner.tl{top:-2px;left:-2px;border-top:2.5px solid var(--neon);border-left:2.5px solid var(--neon);border-radius:4px 0 0 0;}
-.logo-corner.br{bottom:-2px;right:-2px;border-bottom:2.5px solid var(--neon);border-right:2.5px solid var(--neon);border-radius:0 0 4px 0;}
-.brand-name{font-family:'Outfit',sans-serif;font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;text-align:center;}
-.brand-name .fun{color:var(--neon);text-shadow:0 0 24px rgba(0,233,106,.65),0 0 48px rgba(0,233,106,.28);}
-.brand-sub{font-size:11px;color:var(--txt4);letter-spacing:3px;text-transform:uppercase;font-family:'Outfit',sans-serif;margin-top:5px;}
-
-/* LINE BUTTON SPECIAL */
-.btn-line-card{cursor:pointer;margin-bottom:11px;}
-.btn-line-inner{display:flex;align-items:center;gap:12px;padding:15px 17px;border-radius:16px;background:#fff;box-shadow:0 4px 22px rgba(255,255,255,.16);transition:all .18s;}
-.btn-line-inner:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,255,255,.24);}
-.line-l{width:40px;height:40px;border-radius:11px;background:#06C755;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;font-family:'Outfit',sans-serif;flex-shrink:0;}
-.btn-phone-card{cursor:pointer;margin-bottom:16px;}
-.btn-phone-inner{display:flex;align-items:center;gap:12px;padding:15px 17px;border-radius:16px;background:rgba(0,233,106,.1);border:2px solid rgba(0,233,106,.45);box-shadow:0 4px 16px rgba(0,233,106,.18);transition:all .18s;}
-.btn-phone-inner:hover{background:rgba(0,233,106,.17);transform:translateY(-2px);}
-.ll-dark{width:20px;height:20px;border-radius:5px;background:#070D14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--neon);flex-shrink:0;}
-
-/* PLAYER CARD (home) */
-.player-hero-card{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:14px;}
+/* Friends page */
+.friend-card{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.friend-avatar{width:44px;height:44px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+.friend-avatar img{width:100%;height:100%;object-fit:cover;}
+.friend-body{flex:1;}
+.friend-name{font-size:15px;font-weight:600;}
+.friend-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.friend-action{color:var(--amber);font-size:13px;}
+.profile-section{padding:20px;border-bottom:0.5px solid var(--border);}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;overflow:hidden;}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-name{text-align:center;font-size:20px;font-weight:700;margin-bottom:4px;}
+.profile-email{text-align:center;font-size:13px;color:var(--muted);}
+.profile-id{text-align:center;font-size:12px;color:var(--muted2);margin-top:4px;}
+.sync-badge{position:absolute;top:10px;right:60px;background:var(--green-bg);color:var(--green);font-size:11px;padding:3px 8px;border-radius:20px;}
+.sync-badge.syncing{background:var(--amber-bg);color:var(--amber);}
 </style>
 </head>
 <body>
+<div class="app" id="app">
+  <div class="header" id="header">
+    <div class="header-back" id="headerBack" style="display:none">‹</div>
+    <div class="header-title" id="headerTitle">我的收藏</div>
+    <div class="header-action" id="headerAction"></div>
+  </div>
+  <div class="page" id="pageContent"></div>
+  <div class="bottom-nav" id="bottomNav" style="display:none"></div>
+</div>
+<div class="modal-wrap hidden" id="modalWrap">
+  <div class="modal" id="modalBody"></div>
+</div>
+<input type="file" id="photoInput" accept="image/*" style="display:none"/>
+<input type="file" id="videoInput" accept="video/*" style="display:none"/>
 
-<div class="bg-layer">
-  <div class="bg-grid"></div>
-  <div class="bg-scan"></div>
-  <div class="bg-blob1"></div>
-  <div class="bg-blob2"></div>
+<!-- 全螢幕燈箱 -->
+<div class="lightbox hidden" id="lightbox">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <div class="lightbox-prev" id="lbPrev" onclick="lightboxNav(-1)">‹</div>
+  <div id="lightboxMedia"></div>
+  <div class="lightbox-next" id="lbNext" onclick="lightboxNav(1)">›</div>
+  <div class="lightbox-count" id="lbCount"></div>
 </div>
 
-<div id="app">
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-<!-- ════ SPLASH ════ -->
-<div class="screen active" id="sc-splash" style="background:var(--bg);">
-  <div class="splash-hero">
-    <div class="logo-wrap s1">
-      <div class="logo-box"><span style="font-size:52px;filter:drop-shadow(0 0 14px rgba(0,233,106,.5));">🎮</span></div>
-      <div class="logo-corner tl"></div>
-      <div class="logo-corner br"></div>
-    </div>
-    <div class="s2" style="text-align:center;margin-bottom:7px;">
-      <div class="brand-name">你<span class="fun">fun</span>鬆了嗎</div>
-      <div class="brand-sub">Play · Connect · Win</div>
-    </div>
-    <div class="s3" style="display:flex;gap:7px;margin-top:13px;flex-wrap:wrap;justify-content:center;">
-      <span style="padding:4px 10px;border-radius:20px;background:rgba(0,233,106,.1);border:1px solid rgba(0,233,106,.22);font-size:11px;font-weight:600;color:var(--neon);font-family:'Outfit',sans-serif;">🕹️ 多款遊戲</span>
-      <span style="padding:4px 10px;border-radius:20px;background:rgba(0,233,106,.1);border:1px solid rgba(0,233,106,.22);font-size:11px;font-weight:600;color:var(--neon);font-family:'Outfit',sans-serif;">👥 好友連線</span>
-      <span style="padding:4px 10px;border-radius:20px;background:rgba(0,233,106,.1);border:1px solid rgba(0,233,106,.22);font-size:11px;font-weight:600;color:var(--neon);font-family:'Outfit',sans-serif;">🏆 積分排行</span>
-    </div>
-  </div>
-  <div style="padding:12px 20px 38px;">
-    <div class="btn-line-card s4" onclick="goTo('sc-line-login')">
-      <div class="btn-line-inner">
-        <div class="line-l">L</div>
-        <div style="flex:1;"><div style="font-size:15px;font-weight:800;color:#111;font-family:'Outfit',sans-serif;">LINE 帳號快速登入</div><div style="font-size:11px;color:#999;margin-top:2px;">最快速 · 一鍵完成 ⚡</div></div>
-        <div style="width:28px;height:28px;border-radius:8px;background:#06C755;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;">›</div>
-      </div>
-    </div>
-    <div class="btn-phone-card s5" onclick="goTo('sc-phone-login')">
-      <div class="btn-phone-inner">
-        <div style="width:40px;height:40px;border-radius:11px;background:rgba(0,233,106,.18);border:1.5px solid rgba(0,233,106,.45);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📱</div>
-        <div style="flex:1;"><div style="font-size:15px;font-weight:800;color:#fff;font-family:'Outfit',sans-serif;">手機號碼登入</div><div style="font-size:11px;color:rgba(0,233,106,.75);margin-top:2px;">收取簡訊驗證碼 📨</div></div>
-        <div style="width:28px;height:28px;border-radius:8px;background:var(--neon);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#060D12;">›</div>
-      </div>
-    </div>
-    <div class="s5" style="display:flex;justify-content:center;align-items:center;gap:8px;">
-      <span style="font-size:12px;color:var(--txt2);">還沒帳號？</span>
-      <span style="font-size:13px;color:var(--neon);font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;" onclick="goTo('sc-reg1')">立即註冊 →</span>
-      <span style="color:var(--txt4);">·</span>
-      <span style="font-size:12px;color:var(--txt2);cursor:pointer;" onclick="goTo('sc-forgot')">忘記密碼？</span>
-    </div>
-    <div style="text-align:center;margin-top:8px;"><span style="font-size:10px;color:rgba(255,255,255,.12);cursor:pointer;letter-spacing:.5px;" onclick="goTo('sc-admin')">管理員入口</span></div>
-  </div>
-</div>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkHCehPV2vA6npTAXnENIfX07GqmZRDio",
+  authDomain: "my-collection-app-c51f4.firebaseapp.com",
+  projectId: "my-collection-app-c51f4",
+  storageBucket: "my-collection-app-c51f4.firebasestorage.app",
+  messagingSenderId: "27195030094",
+  appId: "1:27195030094:web:14a4ffec9b541fb5db611f"
+};
 
-<!-- ════ LINE LOGIN ════ -->
-<div class="screen" id="sc-line-login">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-splash')">‹</div><div class="topbar-title">LINE 登入</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:26px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(6,199,85,.14);border:2px solid #06C755;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;">
-        <div style="width:56px;height:56px;border-radius:15px;background:#06C755;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#fff;font-family:'Outfit',sans-serif;">L</div>
-      </div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:6px;font-family:'Outfit',sans-serif;">LINE 快速登入</div>
-      <div style="font-size:13px;color:var(--txt2);line-height:1.7;">使用你的 LINE 帳號<br>快速加入你fun鬆了嗎</div>
-    </div>
-    <div class="info-card s2">只會取得你的 <strong>名稱</strong> 和 <strong>頭像</strong>，不會取得其他個人資料。</div>
-    <button class="btn btn-neon s3" onclick="goTo('sc-home')"><div class="ll-dark">L</div>以 LINE 帳號繼續</button>
-    <div class="divider s4"><span>或選擇其他方式</span></div>
-    <button class="btn btn-white s4" onclick="goTo('sc-phone-login')">📱 改用手機號碼登入</button>
-    <div class="terms">繼續即代表你同意 <span>服務條款</span> 與 <span>隱私政策</span></div>
-  </div>
-</div>
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
 
-<!-- ════ PHONE LOGIN ════ -->
-<div class="screen" id="sc-phone-login">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-splash')">‹</div><div class="topbar-title">手機號碼登入</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:26px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(0,233,106,.1);border:2px solid rgba(0,233,106,.35);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;">📱</div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:5px;font-family:'Outfit',sans-serif;">輸入手機號碼</div>
-      <div style="font-size:13px;color:var(--txt2);line-height:1.6;">我們將發送 6 位數驗證碼到你的手機</div>
-    </div>
-    <div class="field-label s2">手機號碼</div>
-    <div class="phone-row s2">
-      <select class="phone-prefix"><option>🇹🇼 +886</option><option>🇯🇵 +81</option><option>🇺🇸 +1</option><option>🇭🇰 +852</option></select>
-      <input class="inp" id="phone-num" placeholder="0912 345 678" type="tel" style="flex:1;margin:0;">
-    </div>
-    <div class="alert-err" id="phone-err">請輸入正確的手機號碼</div>
-    <button class="btn btn-neon s3" onclick="sendOTP()" style="margin-top:4px;"><span style="font-size:16px;">📨</span>發送驗證碼</button>
-    <div class="divider s4"><span>或選擇</span></div>
-    <button class="btn btn-white s4" onclick="goTo('sc-line-login')"><div class="ll-dark">L</div>改用 LINE 登入</button>
-    <div style="display:flex;justify-content:center;gap:16px;margin-top:10px;font-size:12px;color:var(--txt2);">
-      <span>沒有帳號？<span class="lnk" onclick="goTo('sc-reg1')"> 立即註冊</span></span>
-      <span class="lnk" onclick="goTo('sc-forgot')">忘記密碼？</span>
-    </div>
-  </div>
-</div>
+// ===== STATE =====
+let currentUser = null;
+let userProfile = null;
+let items = [];
+let shopItems = [];
+let countries = [];
+let shopCats = [];
+let CATS = [{id:'eat',label:'好吃',emoji:'🍜',cls:'tag-eat'},{id:'play',label:'好玩',emoji:'🏞',cls:'tag-play'},{id:'buy',label:'好買',emoji:'🏪',cls:'tag-buy'},{id:'go',label:'想去',emoji:'📍',cls:'tag-go'}];
+let friends = [];
+let friendRequests = [];
+let viewingUid = null; // null = own, uid = friend's
+let nav = {page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null};
+let pickStars=0, pickEmoji='🌏', pickPhotos=[], editingId=null;
+const EMOJIS=['🇹🇼','🇯🇵','🇰🇷','🇺🇸','🇬🇧','🇫🇷','🇮🇹','🇩🇪','🇹🇭','🇸🇬','🇦🇺','🇨🇳','🍜','🍕','🍣','🍦','🧋','☕','🍺','🌮','🥗','🏖','🏞','🎬','🎵','🎮','🎨','🛍','👗','👟','💄','💍','📍','🌏','🏨','🚗','✈️','🏔','⭐','🎁'];
+const DEFAULT_COUNTRIES = [{id:'tw',name:'台灣',emoji:'🇹🇼',regions:['台中','台北','高雄']},{id:'jp',name:'日本',emoji:'🇯🇵',regions:['東京','大阪','京都']}];
+const DEFAULT_SHOPCATS = [{id:'clothes',label:'衣服',emoji:'👗'},{id:'shoes',label:'鞋子',emoji:'👟'},{id:'beauty',label:'美妝',emoji:'💄'},{id:'food',label:'食品',emoji:'🍜'},{id:'other',label:'其他',emoji:'📦'}];
 
-<!-- ════ OTP ════ -->
-<div class="screen" id="sc-otp">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-phone-login')">‹</div><div class="topbar-title">輸入驗證碼</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:22px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(0,233,106,.1);border:2px solid rgba(0,233,106,.35);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;">💬</div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:6px;font-family:'Outfit',sans-serif;">輸入驗證碼</div>
-      <div style="font-size:13px;color:var(--txt2);line-height:1.7;">已發送至<span style="color:var(--neon);font-weight:700;"> 0912 345 678</span></div>
-    </div>
-    <div class="otp-row s2">
-      <input class="otp-box" id="o1" maxlength="1" oninput="otpIn(this,'o2')">
-      <input class="otp-box" id="o2" maxlength="1" oninput="otpIn(this,'o3')">
-      <input class="otp-box" id="o3" maxlength="1" oninput="otpIn(this,'o4')">
-      <input class="otp-box" id="o4" maxlength="1" oninput="otpIn(this,'o5')">
-      <input class="otp-box" id="o5" maxlength="1" oninput="otpIn(this,'o6')">
-      <input class="otp-box" id="o6" maxlength="1" oninput="otpIn(this,null)">
-    </div>
-    <div class="alert-err" id="otp-err">驗證碼錯誤，請再試一次</div>
-    <div class="alert-ok" id="otp-ok">✓ 驗證成功！正在登入...</div>
-    <button class="btn btn-neon s3" onclick="verifyOTP()"><span style="font-size:16px;">🔓</span>驗證並登入</button>
-    <button class="btn btn-white s4" id="resend-btn" onclick="startResend()"><span style="font-size:15px;">🔁</span>重新發送驗證碼</button>
-    <div class="resend-cd" id="resend-cd"><span id="rcd">60</span> 秒後可重新發送</div>
-    <div class="demo-hint"><span>Demo 驗證碼：</span><strong>1 2 3 4 5 6</strong></div>
-  </div>
-</div>
+// ===== AUTH =====
+onAuthStateChanged(auth, async (user) => {
+  if(user) {
+    currentUser = user;
+    await loadUserProfile();
+    await loadUserData();
+    showMainApp();
+  } else {
+    currentUser = null;
+    showLoginPage();
+  }
+});
 
-<!-- ════ FORGOT ════ -->
-<div class="screen" id="sc-forgot">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-splash')">‹</div><div class="topbar-title">找回密碼</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:26px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(255,183,0,.1);border:2px solid rgba(255,183,0,.35);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;">🔐</div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:6px;font-family:'Outfit',sans-serif;">找回你的密碼</div>
-      <div style="font-size:13px;color:var(--txt2);line-height:1.7;">輸入手機號碼，我們將發送驗證碼<br>讓你重設密碼</div>
-    </div>
-    <div class="field-label s2">手機號碼</div>
-    <div class="phone-row s2">
-      <select class="phone-prefix"><option>🇹🇼 +886</option><option>🇯🇵 +81</option><option>🇺🇸 +1</option></select>
-      <input class="inp" id="forgot-phone" placeholder="0912 345 678" type="tel" style="flex:1;margin:0;">
-    </div>
-    <div class="alert-err" id="forgot-err">請輸入正確的手機號碼</div>
-    <button class="btn btn-neon s3" onclick="sendForgot()" style="margin-top:4px;"><span style="font-size:16px;">📨</span>發送驗證碼</button>
-    <button class="btn btn-white s4" onclick="goTo('sc-splash')"><span style="font-size:15px;">←</span>返回登入</button>
-  </div>
-</div>
-
-<!-- ════ FORGOT OTP ════ -->
-<div class="screen" id="sc-forgot-otp">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-forgot')">‹</div><div class="topbar-title">驗證身份</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:22px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(0,233,106,.1);border:2px solid rgba(0,233,106,.35);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;">💬</div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:6px;font-family:'Outfit',sans-serif;">輸入驗證碼</div>
-      <div style="font-size:13px;color:var(--txt2);">已發送至<span style="color:var(--neon);font-weight:700;"> 0912 345 678</span></div>
-    </div>
-    <div class="otp-row s2">
-      <input class="otp-box" id="f1" maxlength="1" oninput="fotpIn(this,'f2')">
-      <input class="otp-box" id="f2" maxlength="1" oninput="fotpIn(this,'f3')">
-      <input class="otp-box" id="f3" maxlength="1" oninput="fotpIn(this,'f4')">
-      <input class="otp-box" id="f4" maxlength="1" oninput="fotpIn(this,'f5')">
-      <input class="otp-box" id="f5" maxlength="1" oninput="fotpIn(this,'f6')">
-      <input class="otp-box" id="f6" maxlength="1" oninput="fotpIn(this,null)">
-    </div>
-    <div class="alert-err" id="fotp-err">驗證碼錯誤，請再試一次</div>
-    <button class="btn btn-neon s3" onclick="doForgotOTP()"><span style="font-size:16px;">✅</span>確認驗證</button>
-    <div class="demo-hint"><span>Demo 驗證碼：</span><strong>1 2 3 4 5 6</strong></div>
-  </div>
-</div>
-
-<!-- ════ RESET PW ════ -->
-<div class="screen" id="sc-reset">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-forgot-otp')">‹</div><div class="topbar-title">設定新密碼</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:26px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(0,233,106,.1);border:2px solid rgba(0,233,106,.35);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;">🔏</div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:5px;font-family:'Outfit',sans-serif;">設定新密碼</div>
-      <div style="font-size:13px;color:var(--txt2);">請輸入新密碼（至少 8 位）</div>
-    </div>
-    <div class="field-label s2">新密碼</div>
-    <div class="inp-group s2"><input class="inp" id="pw1" type="password" placeholder="輸入新密碼" style="margin:0;"><div class="inp-group-suffix" onclick="tpw('pw1',this)">顯示</div></div>
-    <div class="field-label s2" style="margin-top:4px;">確認新密碼</div>
-    <div class="inp-group s2"><input class="inp" id="pw2" type="password" placeholder="再輸入一次" style="margin:0;"><div class="inp-group-suffix" onclick="tpw('pw2',this)">顯示</div></div>
-    <div class="alert-err" id="reset-err">兩次密碼不一致</div>
-    <button class="btn btn-neon s3" onclick="doReset()" style="margin-top:12px;"><span style="font-size:16px;">🔐</span>確認重設密碼</button>
-  </div>
-</div>
-
-<!-- ════ REGISTER 1 ════ -->
-<div class="screen" id="sc-reg1">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-splash')">‹</div><div class="topbar-title">加入你fun鬆了嗎</div></div>
-  <div class="scroll">
-    <div class="steps s1"><div class="step curr">1</div><div class="step-line"></div><div class="step pend">2</div><div class="step-line"></div><div class="step pend">3</div></div>
-    <div class="s1" style="margin-bottom:20px;"><div style="font-size:18px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:3px;">選擇註冊方式</div><div style="font-size:12px;color:var(--txt4);">步驟 1 / 3</div></div>
-    <button class="btn btn-neon s2" onclick="goTo('sc-reg2')" style="margin-bottom:10px;"><div class="ll-dark">L</div>用 LINE 帳號建立</button>
-    <button class="btn btn-white s3" onclick="goTo('sc-reg2')"><span style="font-size:16px;">📱</span>用手機號碼建立</button>
-    <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--txt2);">已有帳號？<span class="lnk" onclick="goTo('sc-splash')"> 返回登入</span></div>
-  </div>
-</div>
-
-<!-- ════ REGISTER 2 ════ -->
-<div class="screen" id="sc-reg2">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-reg1')">‹</div><div class="topbar-title">加入你fun鬆了嗎</div></div>
-  <div class="scroll">
-    <div class="steps s1"><div class="step done">✓</div><div class="step-line done"></div><div class="step curr">2</div><div class="step-line"></div><div class="step pend">3</div></div>
-    <div class="s1" style="margin-bottom:16px;"><div style="font-size:18px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:3px;">手機號碼驗證</div><div style="font-size:12px;color:var(--txt4);">步驟 2 / 3</div></div>
-    <div class="field-label s2">手機號碼</div>
-    <div class="phone-row s2"><select class="phone-prefix"><option>🇹🇼 +886</option><option>🇯🇵 +81</option><option>🇺🇸 +1</option></select><input class="inp" placeholder="手機號碼" type="tel" style="flex:1;margin:0;"></div>
-    <button class="btn btn-neon s3" onclick="goTo('sc-reg-otp')" style="margin-top:6px;"><span style="font-size:16px;">📨</span>發送驗證碼</button>
-  </div>
-</div>
-
-<!-- ════ REGISTER OTP ════ -->
-<div class="screen" id="sc-reg-otp">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-reg2')">‹</div><div class="topbar-title">加入你fun鬆了嗎</div></div>
-  <div class="scroll">
-    <div class="steps s1"><div class="step done">✓</div><div class="step-line done"></div><div class="step curr">2</div><div class="step-line"></div><div class="step pend">3</div></div>
-    <div class="s1" style="margin-bottom:14px;"><div style="font-size:18px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:3px;">輸入驗證碼</div><div style="font-size:12px;color:var(--txt4);">已發送至 0912 345 678</div></div>
-    <div class="otp-row s2"><input class="otp-box" maxlength="1"><input class="otp-box" maxlength="1"><input class="otp-box" maxlength="1"><input class="otp-box" maxlength="1"><input class="otp-box" maxlength="1"><input class="otp-box" maxlength="1"></div>
-    <button class="btn btn-neon s3" onclick="goTo('sc-reg3')"><span style="font-size:16px;">✅</span>確認驗證</button>
-  </div>
-</div>
-
-<!-- ════ REGISTER 3 ════ -->
-<div class="screen" id="sc-reg3">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-reg-otp')">‹</div><div class="topbar-title">加入你fun鬆了嗎</div></div>
-  <div class="scroll">
-    <div class="steps s1"><div class="step done">✓</div><div class="step-line done"></div><div class="step done">✓</div><div class="step-line done"></div><div class="step curr">3</div></div>
-    <div class="s1" style="margin-bottom:16px;"><div style="font-size:18px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:3px;">設定你的帳號</div><div style="font-size:12px;color:var(--txt4);">步驟 3 / 3 · 最後一步！</div></div>
-    <div class="field-label s2">遊戲暱稱</div>
-    <input class="inp s2" placeholder="其他玩家看到的名字">
-    <div class="field-label s2">帳號 ID <span style="font-weight:400;color:var(--txt4);letter-spacing:0;">（唯一，英數）</span></div>
-    <div class="inp-group s2"><input class="inp" placeholder="player_yourname" style="margin:0;"><div class="inp-group-suffix">檢查</div></div>
-    <button class="btn btn-neon s3" onclick="goTo('sc-reg-done')" style="margin-top:12px;"><span style="font-size:16px;">🚀</span>完成，進入遊戲！</button>
-    <div class="terms">建立帳號即代表你同意 <span>服務條款</span> 與 <span>隱私政策</span></div>
-  </div>
-</div>
-
-<!-- ════ REGISTER DONE ════ -->
-<div class="screen" id="sc-reg-done" style="background:var(--bg);">
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;">
-    <div class="s1" style="position:relative;margin-bottom:22px;">
-      <div style="width:90px;height:90px;border-radius:50%;background:rgba(0,233,106,.1);border:2px solid rgba(0,233,106,.32);display:flex;align-items:center;justify-content:center;font-size:46px;">🎉</div>
-      <div style="position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(0,233,106,.14);animation:spin 8s linear infinite;border-top-color:var(--neon);"></div>
-    </div>
-    <div class="s2" style="font-size:22px;font-weight:800;color:var(--txt);margin-bottom:7px;font-family:'Outfit',sans-serif;">帳號建立成功！</div>
-    <div class="s2" style="font-size:13px;color:var(--txt2);margin-bottom:6px;line-height:1.8;">歡迎加入</div>
-    <div class="s2" style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:28px;">你<span style="color:var(--neon);text-shadow:0 0 18px rgba(0,233,106,.6);">fun</span>鬆了嗎</div>
-    <button class="btn btn-neon s3" onclick="goTo('sc-home')" style="max-width:240px;"><span style="font-size:16px;">🎮</span>進入遊戲大廳</button>
-  </div>
-</div>
-
-<!-- ════ ADMIN LOGIN ════ -->
-<div class="screen" id="sc-admin">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-splash')">‹</div><div class="topbar-title">管理員登入</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:520px;">
-    <div class="s1" style="text-align:center;margin-bottom:22px;">
-      <div style="width:76px;height:76px;border-radius:22px;background:rgba(108,92,231,.16);border:2px solid rgba(108,92,231,.45);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;">🔐</div>
-      <div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:5px;font-family:'Outfit',sans-serif;">管理員專用入口</div>
-      <div style="font-size:12px;color:var(--txt2);">你fun鬆了嗎 · 後台管理系統</div>
-    </div>
-    <div class="warn-card s2">⚠️ 此頁面僅供管理員使用，請勿分享此入口。</div>
-    <div class="field-label s2">管理員帳號</div>
-    <input class="inp s2" id="adm-u" placeholder="輸入管理員帳號">
-    <div class="field-label s2">管理員密碼</div>
-    <div class="inp-group s2"><input class="inp" id="adm-p" type="password" placeholder="輸入管理員密碼" style="margin:0;"><div class="inp-group-suffix" onclick="tpw('adm-p',this)">顯示</div></div>
-    <div class="alert-err s2" id="adm-err" style="margin-top:4px;">帳號或密碼錯誤</div>
-    <button class="btn btn-purple s3" onclick="doAdmin()" style="margin-top:10px;"><span style="font-size:16px;">🛡️</span>驗證並進入後台</button>
-    <button class="btn btn-white s4" onclick="goTo('sc-splash')"><span style="font-size:15px;">←</span>返回玩家登入</button>
-    <div class="demo-hint"><span>Demo：</span><strong style="letter-spacing:2px;font-size:12px;">admin / 1234</strong></div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════
-     LOBBY SCREENS
-════════════════════════════════════ -->
-
-<!-- ════ HOME ════ -->
-<div class="screen" id="sc-home">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar">
-    <span style="font-size:21px;filter:drop-shadow(0 0 8px rgba(0,233,106,.4));">🎮</span>
-    <div class="topbar-title brand">你<span class="fun">fun</span>鬆了嗎</div>
-    <span style="font-size:17px;cursor:pointer;" onclick="goTo('sc-notif')">🔔</span>
-    <div class="av" style="width:28px;height:28px;font-size:11px;background:var(--neon);color:#060D12;cursor:pointer;margin-left:2px;" onclick="goTo('sc-profile')">我</div>
-  </div>
-  <div class="scroll">
-    <!-- Player hero card with level -->
-    <div class="player-hero-card s1">
-      <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px;">
-        <div style="position:relative;">
-          <div class="av" style="width:50px;height:50px;font-size:18px;background:var(--neon);color:#060D12;">我</div>
-          <div style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--warn);border:2px solid var(--bg);border-radius:20px;padding:1px 7px;font-size:9px;font-weight:900;color:#060D12;white-space:nowrap;font-family:'Outfit',sans-serif;">Lv.42</div>
-        </div>
-        <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
-            <span style="font-size:14px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;">玩家一號</span>
-            <span class="lv-epic">⚔️ 精英</span>
-          </div>
-          <div style="font-size:10px;color:var(--txt3);margin-bottom:5px;">Lv.42 · 還差 580 EXP 升 Lv.43</div>
-          <div class="exp-wrap"><div class="exp-fill" style="width:68%;"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:3px;">
-            <span style="font-size:9px;color:var(--txt4);">1,420 / 2,000 EXP</span>
-            <span style="font-size:9px;color:var(--neon);font-weight:600;">68%</span>
-          </div>
-        </div>
-        <div style="text-align:center;cursor:pointer;" onclick="goTo('sc-items')">
-          <div style="font-size:22px;">🎒</div>
-          <div style="font-size:9px;color:var(--txt4);margin-top:1px;">物品</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">
-        <div class="stat-mini"><div class="stat-mini-val">1,240</div><div class="stat-mini-lbl">積分</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" style="color:var(--warn);">42<span style="font-size:10px;color:var(--txt4);">/250</span></div><div class="stat-mini-lbl">等級</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" style="color:var(--neon);">#12</div><div class="stat-mini-lbl">排名</div></div>
-      </div>
-    </div>
-    <!-- Daily login nudge -->
-    <div class="announce-card s2">
-      <span style="font-size:15px;flex-shrink:0;">📅</span>
-      <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:rgba(255,183,0,.9);">今日登入獎勵待領取！</div><div style="font-size:11px;color:var(--txt3);margin-top:1px;">連續第 7 天 · +500 EXP +100 積分</div></div>
-      <button class="btn-sm btn-sm-neon" onclick="goTo('sc-daily')" style="flex-shrink:0;">領取</button>
-    </div>
-    <!-- Online friends -->
-    <div class="sec-header s3"><div class="sec-title">線上好友</div><div class="sec-link" onclick="goTo('sc-friends')">全部 ›</div></div>
-    <div class="friend-scroll s3">
-      <div class="friend-item"><div class="av online" style="width:44px;height:44px;font-size:14px;background:#378ADD;">明</div><div class="friend-item-name">小明</div></div>
-      <div class="friend-item"><div class="av online" style="width:44px;height:44px;font-size:14px;background:#D4537E;">花</div><div class="friend-item-name">阿花</div></div>
-      <div class="friend-item"><div class="av online" style="width:44px;height:44px;font-size:14px;background:#1D9E75;">雄</div><div class="friend-item-name">大雄</div></div>
-      <div class="friend-item"><div class="av" style="width:44px;height:44px;font-size:14px;background:#333;">香</div><div class="friend-item-name">靜香</div></div>
-    </div>
-    <!-- Featured game -->
-    <div class="sec-header s4"><div class="sec-title">熱門遊戲</div><div class="sec-link" onclick="goTo('sc-games')">全部 ›</div></div>
-    <div class="banner s4" onclick="goTo('sc-room-create')">
-      <div class="banner-inner">
-        <div class="banner-icon">🐍</div>
-        <div><div style="font-size:16px;font-weight:800;color:var(--txt);font-family:'Outfit',sans-serif;">貪吃蛇對戰版</div><div style="font-size:11px;color:rgba(0,233,106,.75);margin-top:2px;">多人即時對戰 · 最多 4 人</div><div class="badge-hot">🔥 本週最熱門</div></div>
-      </div>
-    </div>
-    <!-- Quick actions -->
-    <div class="sec-header s5"><div class="sec-title">快速開始</div></div>
-    <div class="quick-grid s5">
-      <button class="quick-create" onclick="goTo('sc-room-create')"><span style="font-size:18px;">🚪</span><span>建立房間</span></button>
-      <button class="quick-match" onclick="goTo('sc-matchmaking')"><span style="font-size:18px;">🔍</span><span>隨機配對</span></button>
-    </div>
-    <!-- Leaderboard preview -->
-    <div class="sec-header"><div class="sec-title">本週排行榜</div><div class="sec-link" onclick="goTo('sc-leaderboard')">完整 ›</div></div>
-    <div class="rank-list">
-      <div class="rank-row"><span style="font-size:15px;width:22px;text-align:center;">🥇</span><div class="av" style="width:30px;height:30px;font-size:10px;background:#7F77DD;">志</div><div style="flex:1;font-size:12px;font-weight:600;color:var(--txt);">志明</div><div class="rank-score" style="color:var(--warn);font-size:12px;">3,820</div></div>
-      <div class="rank-row"><span style="font-size:15px;width:22px;text-align:center;">🥈</span><div class="av" style="width:30px;height:30px;font-size:10px;background:#D4537E;">婷</div><div style="flex:1;font-size:12px;font-weight:600;color:var(--txt);">小婷</div><div class="rank-score" style="font-size:12px;">3,410</div></div>
-      <div class="rank-row"><span style="font-size:15px;width:22px;text-align:center;">🥉</span><div class="av" style="width:30px;height:30px;font-size:10px;background:#378ADD;">明</div><div style="flex:1;font-size:12px;font-weight:600;color:var(--txt);">小明</div><div class="rank-score" style="font-size:12px;">2,980</div></div>
-    </div>
-  </div>
-  <div class="bottom-nav">
-    <div class="nav-item active" onclick="navTo('sc-home',this)"><div class="nav-ico">🏠</div><div class="nav-lbl">首頁</div></div>
-    <div class="nav-item" onclick="navTo('sc-games',this)"><div class="nav-ico">🎮</div><div class="nav-lbl">遊戲庫</div></div>
-    <div class="nav-item" onclick="navTo('sc-friends',this)"><div class="nav-ico">👥</div><div class="nav-lbl">好友</div><div class="nav-badge"></div></div>
-    <div class="nav-item" onclick="navTo('sc-items',this)"><div class="nav-ico">🎒</div><div class="nav-lbl">物品</div></div>
-    <div class="nav-item" onclick="navTo('sc-profile',this)"><div class="nav-ico">👤</div><div class="nav-lbl">我的</div></div>
-  </div>
-</div>
-
-<!-- ════ GAMES ════ -->
-<div class="screen" id="sc-games">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="topbar-title" style="font-size:16px;font-weight:800;">遊戲庫</div></div>
-  <div class="scroll">
-    <div class="pill-row s1">
-      <div class="pill on">全部</div>
-      <div class="pill off">多人</div>
-      <div class="pill off">單人</div>
-      <div class="pill off">🔥 熱門</div>
-      <div class="pill off">✨ 新上架</div>
-      <div class="pill off">益智</div>
-      <div class="pill off">動作</div>
-    </div>
-    <div class="banner s2" onclick="goTo('sc-room-create')">
-      <div class="banner-inner"><div class="banner-icon">🐍</div><div><div style="font-size:15px;font-weight:800;color:var(--txt);font-family:'Outfit',sans-serif;">貪吃蛇對戰版</div><div style="font-size:11px;color:rgba(0,233,106,.75);margin-top:2px;">多人即時 · 最多 4 人</div><div class="badge-hot">🔥 本週最熱門</div></div></div>
-    </div>
-    <div class="sec-header s3"><div class="sec-title">上架遊戲</div></div>
-    <div class="game-grid s3">
-      <div class="game-card" onclick="goTo('sc-room-create')"><div class="game-icon" style="background:rgba(0,233,106,.12);border:1.5px solid rgba(0,233,106,.25);">🐍</div><div class="game-name">貪吃蛇</div><div class="game-desc">多人即時對戰</div><span class="tag tag-neon">多人 · 動作</span></div>
-      <div class="game-card" onclick="goTo('sc-room-create')"><div class="game-icon" style="background:rgba(255,91,107,.1);">🧱</div><div class="game-name">打磚塊</div><div class="game-desc">挑戰高分記錄</div><span class="tag tag-gray">單人 · 動作</span></div>
-      <div class="game-card" onclick="goTo('sc-room-create')"><div class="game-icon" style="background:rgba(127,119,221,.12);">⭕</div><div class="game-name">井字棋</div><div class="game-desc">vs AI 或朋友</div><span class="tag tag-gray">2人 · 益智</span></div>
-      <div class="game-card" onclick="goTo('sc-room-create')"><div class="game-icon" style="background:rgba(255,183,0,.1);">❓</div><div class="game-name">知識王</div><div class="game-desc">搶答益智問答</div><span class="tag tag-neon">多人 · 益智</span></div>
-    </div>
-    <div class="sec-header s4"><div class="sec-title">即將上架</div></div>
-    <div class="game-grid s4">
-      <div class="game-card" style="opacity:.35;pointer-events:none;"><div class="game-icon" style="background:rgba(255,255,255,.05);">🃏</div><div class="game-name">撲克牌</div><span class="tag tag-gray">敬請期待</span></div>
-      <div class="game-card" style="opacity:.35;pointer-events:none;"><div class="game-icon" style="background:rgba(255,255,255,.05);">♟️</div><div class="game-name">西洋棋</div><span class="tag tag-gray">敬請期待</span></div>
-    </div>
-  </div>
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="navTo('sc-home',this)"><div class="nav-ico">🏠</div><div class="nav-lbl">首頁</div></div>
-    <div class="nav-item active" onclick="navTo('sc-games',this)"><div class="nav-ico">🎮</div><div class="nav-lbl">遊戲庫</div></div>
-    <div class="nav-item" onclick="navTo('sc-friends',this)"><div class="nav-ico">👥</div><div class="nav-lbl">好友</div><div class="nav-badge"></div></div>
-    <div class="nav-item" onclick="navTo('sc-items',this)"><div class="nav-ico">🎒</div><div class="nav-lbl">物品</div></div>
-    <div class="nav-item" onclick="navTo('sc-profile',this)"><div class="nav-ico">👤</div><div class="nav-lbl">我的</div></div>
-  </div>
-</div>
-
-<!-- ════ FRIENDS ════ -->
-<div class="screen" id="sc-friends">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar">
-    <div class="topbar-title" style="font-size:16px;font-weight:800;">好友</div>
-    <div style="width:32px;height:32px;border-radius:9px;background:var(--neon);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:900;color:#060D12;">＋</div>
-  </div>
-  <div class="scroll">
-    <input class="inp s1" placeholder="🔍 搜尋好友名稱或 ID" style="margin-bottom:12px;">
-    <div class="sec-header s2"><div class="sec-title">線上中 (3)</div></div>
-    <div class="friend-card s2"><div class="av online" style="width:40px;height:40px;font-size:13px;background:#378ADD;">明</div><div style="flex:1;"><div class="fc-name">小明 <span class="lv-rare" style="font-size:9px;padding:1px 6px;">Lv.28</span></div><div class="fc-status">🎮 在大廳等待中</div></div><button class="btn-sm btn-sm-neon" onclick="goTo('sc-room-create')">邀請</button></div>
-    <div class="friend-card s2"><div class="av online" style="width:40px;height:40px;font-size:13px;background:#D4537E;">花</div><div style="flex:1;"><div class="fc-name">阿花 <span class="lv-rare" style="font-size:9px;padding:1px 6px;">Lv.19</span></div><div class="fc-status">🐍 玩貪吃蛇中</div></div><button class="btn-sm btn-sm-gray">遊戲中</button></div>
-    <div class="friend-card s3"><div class="av online" style="width:40px;height:40px;font-size:13px;background:#1D9E75;">雄</div><div style="flex:1;"><div class="fc-name">大雄 <span class="lv-common" style="font-size:9px;padding:1px 6px;">Lv.8</span></div><div class="fc-status">🎮 在大廳等待中</div></div><button class="btn-sm btn-sm-neon">邀請</button></div>
-    <div class="sec-header s4" style="margin-top:8px;"><div class="sec-title">離線 (2)</div></div>
-    <div class="friend-card s4" style="opacity:.48;"><div class="av" style="width:40px;height:40px;font-size:13px;background:#333;">香</div><div style="flex:1;"><div class="fc-name">靜香</div><div class="fc-status">2 小時前上線</div></div></div>
-    <div class="friend-card s4" style="opacity:.48;"><div class="av" style="width:40px;height:40px;font-size:13px;background:#444;">虎</div><div style="flex:1;"><div class="fc-name">胖虎</div><div class="fc-status">昨天上線</div></div></div>
-    <div class="sec-header s5" style="margin-top:8px;"><div class="sec-title">好友邀請 (1)</div></div>
-    <div class="friend-card s5" style="border-left:3px solid var(--neon);border-radius:0 12px 12px 0;"><div class="av" style="width:40px;height:40px;font-size:13px;background:#7F77DD;">偉</div><div style="flex:1;"><div class="fc-name">小偉</div><div class="fc-status">想加你為好友</div></div><div style="display:flex;gap:5px;"><button class="btn-sm btn-sm-neon">接受</button><button class="btn-sm btn-sm-gray">拒絕</button></div></div>
-  </div>
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="navTo('sc-home',this)"><div class="nav-ico">🏠</div><div class="nav-lbl">首頁</div></div>
-    <div class="nav-item" onclick="navTo('sc-games',this)"><div class="nav-ico">🎮</div><div class="nav-lbl">遊戲庫</div></div>
-    <div class="nav-item active" onclick="navTo('sc-friends',this)"><div class="nav-ico">👥</div><div class="nav-lbl">好友</div></div>
-    <div class="nav-item" onclick="navTo('sc-items',this)"><div class="nav-ico">🎒</div><div class="nav-lbl">物品</div></div>
-    <div class="nav-item" onclick="navTo('sc-profile',this)"><div class="nav-ico">👤</div><div class="nav-lbl">我的</div></div>
-  </div>
-</div>
-
-<!-- ════ ITEMS ════ -->
-<div class="screen" id="sc-items">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar">
-    <div class="topbar-title" style="font-size:16px;font-weight:800;">🎒 物品欄</div>
-    <button onclick="goTo('sc-shop')" style="padding:6px 13px;border-radius:20px;background:var(--neon);color:#060D12;border:none;font-size:11px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;">🛒 商店</button>
-  </div>
-  <div class="scroll">
-    <div class="pill-row s1">
-      <div class="pill on">全部</div>
-      <div class="pill off">頭貼框</div>
-      <div class="pill off">稱號</div>
-      <div class="pill off">特效</div>
-      <div class="pill off">表情</div>
-    </div>
-    <div class="sec-header s2"><div class="sec-title">頭貼框</div></div>
-    <div class="item-grid s2">
-      <div class="item-card equipped" onclick="goTo('sc-item-detail')"><div class="equipped-dot">✓</div><div class="item-ico">🌟</div><div class="item-name">星光框</div><div class="item-rarity rar-e">史詩</div></div>
-      <div class="item-card owned"><div class="item-ico">🔥</div><div class="item-name">火焰框</div><div class="item-rarity rar-r">稀有</div></div>
-      <div class="item-card owned"><div class="item-ico">💎</div><div class="item-name">鑽石框</div><div class="item-rarity rar-l">傳說</div></div>
-      <div class="item-card locked"><div class="lock-overlay">🔒</div><div class="item-ico">🌈</div><div class="item-name">彩虹框</div><div class="item-rarity rar-l">傳說</div></div>
-    </div>
-    <div class="sec-header s3"><div class="sec-title">稱號</div></div>
-    <div class="item-grid s3">
-      <div class="item-card equipped"><div class="equipped-dot">✓</div><div class="item-ico">⚔️</div><div class="item-name">精英玩家</div><div class="item-rarity rar-e">史詩</div></div>
-      <div class="item-card owned"><div class="item-ico">🐍</div><div class="item-name">蛇王</div><div class="item-rarity rar-r">稀有</div></div>
-      <div class="item-card locked"><div class="lock-overlay">🔒</div><div class="item-ico">👑</div><div class="item-name">遊戲霸主</div><div class="item-rarity rar-l">傳說</div></div>
-    </div>
-    <div class="sec-header s4"><div class="sec-title">遊戲特效 / 表情</div></div>
-    <div class="item-grid s4">
-      <div class="item-card owned"><div class="item-ico">✨</div><div class="item-name">勝利閃光</div><div class="item-rarity rar-r">稀有</div></div>
-      <div class="item-card locked"><div class="lock-overlay">🔒</div><div class="item-ico">💥</div><div class="item-name">爆炸特效</div><div class="item-rarity rar-e">史詩</div></div>
-      <div class="item-card locked"><div class="lock-overlay">🔒</div><div class="item-ico">😂</div><div class="item-name">大笑表情</div><div class="item-rarity rar-c">普通</div></div>
-      <div class="item-card locked"><div class="lock-overlay">🔒</div><div class="item-ico">🌊</div><div class="item-name">水波紋</div><div class="item-rarity rar-c">普通</div></div>
-    </div>
-  </div>
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="navTo('sc-home',this)"><div class="nav-ico">🏠</div><div class="nav-lbl">首頁</div></div>
-    <div class="nav-item" onclick="navTo('sc-games',this)"><div class="nav-ico">🎮</div><div class="nav-lbl">遊戲庫</div></div>
-    <div class="nav-item" onclick="navTo('sc-friends',this)"><div class="nav-ico">👥</div><div class="nav-lbl">好友</div><div class="nav-badge"></div></div>
-    <div class="nav-item active" onclick="navTo('sc-items',this)"><div class="nav-ico">🎒</div><div class="nav-lbl">物品</div></div>
-    <div class="nav-item" onclick="navTo('sc-profile',this)"><div class="nav-ico">👤</div><div class="nav-lbl">我的</div></div>
-  </div>
-</div>
-
-<!-- ════ ITEM DETAIL ════ -->
-<div class="screen" id="sc-item-detail">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-items')">‹</div><div class="topbar-title">物品詳情</div></div>
-  <div class="scroll">
-    <div class="s1" style="background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;">
-      <div style="font-size:64px;margin-bottom:10px;filter:drop-shadow(0 0 16px rgba(127,119,221,.55));">🌟</div>
-      <div style="font-size:18px;font-weight:800;color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:6px;">星光框</div>
-      <span class="item-rarity rar-e" style="font-size:12px;padding:4px 12px;">✨ 史詩稀有</span>
-      <div style="margin-top:12px;font-size:12px;color:var(--txt2);line-height:1.6;">閃爍星光環繞頭像四周，<br>彰顯你的不凡地位。</div>
-    </div>
-    <div class="card s2">
-      <div class="card-body" style="padding:0;">
-        <div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-size:12px;color:var(--txt3);">類型</span><span style="font-size:12px;font-weight:600;color:var(--txt);">頭貼框</span></div>
-        <div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-size:12px;color:var(--txt3);">稀有度</span><span style="font-size:12px;font-weight:600;color:#AFA9EC;">史詩</span></div>
-        <div style="display:flex;justify-content:space-between;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-size:12px;color:var(--txt3);">取得方式</span><span style="font-size:12px;font-weight:600;color:var(--txt);">Lv.40 升等獎勵</span></div>
-        <div style="display:flex;justify-content:space-between;padding:10px 13px;"><span style="font-size:12px;color:var(--txt3);">狀態</span><span style="font-size:12px;font-weight:700;color:var(--neon);">已裝備 ✓</span></div>
-      </div>
-    </div>
-    <button class="btn btn-white s3">✅ 已裝備中</button>
-    <button class="btn btn-ghost s3" onclick="goTo('sc-items')">← 返回物品欄</button>
-  </div>
-</div>
-
-<!-- ════ SHOP ════ -->
-<div class="screen" id="sc-shop">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-items')">‹</div><div class="topbar-title">🛒 積分商店</div><div style="font-size:12px;font-weight:700;color:var(--neon);font-family:'Outfit',sans-serif;">💰 1,240</div></div>
-  <div class="scroll">
-    <div class="info-card s1" style="font-size:11px;">💡 用積分兌換專屬物品！打遊戲賺積分，打造你的專屬風格。後續活動也有限定物品！</div>
-    <div class="sec-header s2"><div class="sec-title">頭貼框</div></div>
-    <div class="shop-item s2"><div class="shop-icon" style="background:rgba(255,183,0,.12);border:1.5px solid rgba(255,183,0,.3);">👑</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">黃金王冠框</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">傳說稀有 · 閃亮金色光芒</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><button class="price-btn">💰 3,000</button></div></div>
-    <div class="shop-item s2"><div class="shop-icon" style="background:rgba(55,138,221,.12);border:1.5px solid rgba(55,138,221,.3);">❄️</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">冰晶框</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">稀有 · 晶瑩剔透冰藍色</div></div><div><button class="price-btn">💰 1,500</button></div></div>
-    <div class="shop-item s2"><div class="shop-icon" style="background:rgba(255,91,107,.1);border:1.5px solid rgba(255,91,107,.2);">🌹</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">玫瑰框</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">普通 · 浪漫粉紅花邊</div></div><div><div class="price-owned">已擁有</div></div></div>
-    <div class="sec-header s3"><div class="sec-title">稱號</div></div>
-    <div class="shop-item s3"><div class="shop-icon" style="background:rgba(127,119,221,.15);border:1.5px solid rgba(127,119,221,.3);">🧙</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">遊戲大師</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">史詩稱號 · 超強氣場</div></div><div><button class="price-btn">💰 2,000</button></div></div>
-    <div class="shop-item s3"><div class="shop-icon" style="background:rgba(0,233,106,.1);border:1.5px solid rgba(0,233,106,.25);">⚡</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">閃電俠</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">稀有稱號 · 快速反應</div></div><div><button class="price-btn">💰 800</button></div></div>
-    <div class="sec-header s4"><div class="sec-title">特效 / 表情</div></div>
-    <div class="shop-item s4"><div class="shop-icon" style="background:rgba(255,183,0,.1);border:1.5px solid rgba(255,183,0,.25);">🎆</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">煙火勝利特效</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">傳說 · 勝利時放煙火</div></div><div><button class="price-btn">💰 5,000</button></div></div>
-    <div class="shop-item s4"><div class="shop-icon" style="background:rgba(255,91,107,.1);border:1.5px solid rgba(255,91,107,.2);">😂</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--txt);">大笑表情包</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">普通 · 搞笑滿點</div></div><div><button class="price-btn">💰 300</button></div></div>
-  </div>
-</div>
-
-<!-- ════ DAILY LOGIN ════ -->
-<div class="screen" id="sc-daily">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-home')">‹</div><div class="topbar-title">📅 每日登入獎勵</div></div>
-  <div class="scroll">
-    <div class="s1" style="text-align:center;padding:14px 0 16px;">
-      <div style="font-size:32px;margin-bottom:6px;">🎁</div>
-      <div style="font-size:17px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;">連續登入第 7 天！</div>
-      <div style="font-size:12px;color:var(--txt3);margin-top:3px;">持續登入可獲得更豐富的獎勵</div>
-    </div>
-    <div class="daily-grid s2">
-      <div class="daily-box claimed"><div class="d-day">Day 1</div><div class="d-reward">⭐</div><div style="font-size:8px;color:var(--neon);">+50</div></div>
-      <div class="daily-box claimed"><div class="d-day">Day 2</div><div class="d-reward">💰</div><div style="font-size:8px;color:var(--neon);">+100</div></div>
-      <div class="daily-box claimed"><div class="d-day">Day 3</div><div class="d-reward">⭐</div><div style="font-size:8px;color:var(--neon);">+100</div></div>
-      <div class="daily-box claimed"><div class="d-day">Day 4</div><div class="d-reward">🎒</div><div style="font-size:8px;color:var(--neon);">物品</div></div>
-      <div class="daily-box claimed"><div class="d-day">Day 5</div><div class="d-reward">💰</div><div style="font-size:8px;color:var(--neon);">+200</div></div>
-      <div class="daily-box claimed"><div class="d-day">Day 6</div><div class="d-reward">⭐</div><div style="font-size:8px;color:var(--neon);">+200</div></div>
-      <div class="daily-box today"><div class="d-day" style="color:var(--neon);">Day 7</div><div class="d-reward">🎁</div><div style="font-size:8px;color:var(--neon);font-weight:700;">+500!</div></div>
-    </div>
-    <div class="s3" style="background:rgba(0,233,106,.08);border:2px solid rgba(0,233,106,.25);border-radius:14px;padding:16px;text-align:center;margin-bottom:14px;">
-      <div style="font-size:36px;margin-bottom:8px;">🎁</div>
-      <div style="font-size:14px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;margin-bottom:4px;">今日獎勵</div>
-      <div style="font-size:24px;font-weight:900;color:var(--neon);font-family:'Outfit',sans-serif;">+500 EXP</div>
-      <div style="font-size:11px;color:var(--txt3);margin-top:3px;">+100 積分</div>
-    </div>
-    <button class="btn btn-neon s4"><span style="font-size:16px;">🎁</span>領取今日獎勵</button>
-  </div>
-</div>
-
-<!-- ════ LEVEL PAGE ════ -->
-<div class="screen" id="sc-level">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-profile')">‹</div><div class="topbar-title">⭐ 等級系統</div></div>
-  <div class="scroll">
-    <div class="s1" style="background:rgba(255,183,0,.07);border:2px solid rgba(255,183,0,.28);border-radius:16px;padding:16px;text-align:center;margin-bottom:14px;">
-      <div style="font-size:46px;margin-bottom:6px;">⚔️</div>
-      <div style="font-size:24px;font-weight:900;color:var(--warn);font-family:'Outfit',sans-serif;margin-bottom:2px;">Lv. 42</div>
-      <div style="font-size:13px;color:var(--txt2);margin-bottom:10px;">精英玩家 · 還差 208 等達滿等</div>
-      <div class="exp-wrap" style="height:10px;"><div class="exp-fill" style="width:68%;"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:4px;"><span style="font-size:10px;color:var(--txt4);">1,420 EXP</span><span style="font-size:10px;color:var(--neon);">2,000 EXP (Lv.43)</span></div>
-    </div>
-    <div class="sec-header s2"><div class="sec-title">等級稱號分段</div></div>
-    <div class="s2" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-      <div class="lv-segment"><span style="font-size:18px;">🌱</span><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">新手</div><div style="font-size:11px;color:var(--txt4);">Lv.1 ~ 10</div></div><span class="lv-badge lv-common">普通</span></div>
-      <div class="lv-segment"><span style="font-size:18px;">⚡</span><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">進階玩家</div><div style="font-size:11px;color:var(--txt4);">Lv.11 ~ 30</div></div><span class="lv-badge lv-rare">稀有</span></div>
-      <div class="lv-segment" style="background:rgba(127,119,221,.1);border-color:rgba(127,119,221,.28);"><span style="font-size:18px;">⚔️</span><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">精英玩家 <span style="color:var(--neon);font-size:10px;">← 你在這</span></div><div style="font-size:11px;color:var(--txt4);">Lv.31 ~ 80</div></div><span class="lv-badge lv-epic">史詩</span></div>
-      <div class="lv-segment"><span style="font-size:18px;">👑</span><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">遊戲大師</div><div style="font-size:11px;color:var(--txt4);">Lv.81 ~ 150</div></div><span class="lv-badge lv-legend">傳說</span></div>
-      <div class="lv-segment"><span style="font-size:18px;">💎</span><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">傳奇霸主</div><div style="font-size:11px;color:var(--txt4);">Lv.151 ~ 249</div></div><span class="lv-badge lv-legend">傳說</span></div>
-      <div class="lv-segment" style="background:rgba(0,233,106,.07);border:2px solid rgba(0,233,106,.35);"><span style="font-size:18px;">🌈</span><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--neon);">MAX · 神話英雄</div><div style="font-size:11px;color:var(--txt4);">Lv.250 · 頂點</div></div><span class="lv-badge lv-max">MAX</span></div>
-    </div>
-    <div class="sec-header s3"><div class="sec-title">如何獲得 EXP</div></div>
-    <div class="card s3">
-      <div class="card-body" style="padding:0;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.06);"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🎮</span><div><div style="font-size:12px;font-weight:600;color:var(--txt);">每場遊戲</div><div style="font-size:10px;color:var(--txt4);">完成一場遊戲</div></div></div><span style="font-size:13px;font-weight:800;color:var(--neon);font-family:'Outfit',sans-serif;">+50~200</span></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.06);"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🏆</span><div><div style="font-size:12px;font-weight:600;color:var(--txt);">獲勝獎勵</div><div style="font-size:10px;color:var(--txt4);">贏得一場</div></div></div><span style="font-size:13px;font-weight:800;color:var(--neon);font-family:'Outfit',sans-serif;">+100~500</span></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.06);"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">📋</span><div><div style="font-size:12px;font-weight:600;color:var(--txt);">完成任務</div><div style="font-size:10px;color:var(--txt4);">每日 / 週任務</div></div></div><span style="font-size:13px;font-weight:800;color:var(--neon);font-family:'Outfit',sans-serif;">+200~1000</span></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">📅</span><div><div style="font-size:12px;font-weight:600;color:var(--txt);">每日登入</div><div style="font-size:10px;color:var(--txt4);">連續登入加倍</div></div></div><span style="font-size:13px;font-weight:800;color:var(--neon);font-family:'Outfit',sans-serif;">+50~500</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════ LEADERBOARD ════ -->
-<div class="screen" id="sc-leaderboard">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="topbar-title" style="font-size:16px;font-weight:800;">排行榜</div></div>
-  <div class="scroll">
-    <div class="pill-row s1">
-      <div class="pill on">本週</div><div class="pill off">本月</div><div class="pill off">總排行</div><div class="pill off">等級榜</div><div class="pill off">好友</div>
-    </div>
-    <div class="s2" style="display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:18px;">
-      <div style="text-align:center;"><div class="av" style="width:48px;height:48px;font-size:14px;background:#D4537E;margin:0 auto 4px;">婷</div><div style="font-size:11px;color:var(--txt);font-weight:600;">小婷</div><div style="font-size:22px;margin-top:3px;">🥈</div></div>
-      <div style="text-align:center;"><div class="av" style="width:58px;height:58px;font-size:18px;background:#7F77DD;margin:0 auto 4px;border:2px solid var(--warn);box-shadow:0 0 14px rgba(255,183,0,.4);">志</div><div style="font-size:12px;color:var(--txt);font-weight:700;">志明</div><div style="font-size:26px;margin-top:3px;">🥇</div></div>
-      <div style="text-align:center;"><div class="av" style="width:48px;height:48px;font-size:14px;background:#378ADD;margin:0 auto 4px;">明</div><div style="font-size:11px;color:var(--txt);font-weight:600;">小明</div><div style="font-size:22px;margin-top:3px;">🥉</div></div>
-    </div>
-    <div class="rank-list s3">
-      <div class="rank-row"><div style="font-size:14px;width:22px;text-align:center;">🥇</div><div class="av" style="width:30px;height:30px;font-size:10px;background:#7F77DD;">志</div><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">志明</div><span class="lv-legend" style="font-size:9px;padding:1px 5px;">Lv.98</span></div><div class="rank-score" style="color:var(--warn);font-size:12px;">3,820</div></div>
-      <div class="rank-row"><div style="font-size:14px;width:22px;text-align:center;">🥈</div><div class="av" style="width:30px;height:30px;font-size:10px;background:#D4537E;">婷</div><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">小婷</div><span class="lv-epic" style="font-size:9px;padding:1px 5px;">Lv.75</span></div><div class="rank-score" style="font-size:12px;">3,410</div></div>
-      <div class="rank-row"><div style="font-size:14px;width:22px;text-align:center;">🥉</div><div class="av" style="width:30px;height:30px;font-size:10px;background:#378ADD;">明</div><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">小明</div><span class="lv-epic" style="font-size:9px;padding:1px 5px;">Lv.63</span></div><div class="rank-score" style="font-size:12px;">2,980</div></div>
-      <div class="rank-row"><div style="font-size:12px;font-weight:700;width:22px;text-align:center;color:var(--txt3);">4</div><div class="av" style="width:30px;height:30px;font-size:10px;background:#1D9E75;">雄</div><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--txt);">大雄</div><span class="lv-rare" style="font-size:9px;padding:1px 5px;">Lv.34</span></div><div class="rank-score" style="font-size:12px;">2,640</div></div>
-      <div class="rank-row me"><div style="font-size:12px;font-weight:700;width:22px;text-align:center;color:var(--neon);">12</div><div class="av" style="width:30px;height:30px;font-size:10px;background:var(--neon);color:#060D12;">我</div><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--neon);">玩家一號（你）</div><span class="lv-epic" style="font-size:9px;padding:1px 5px;">Lv.42</span></div><div class="rank-score" style="color:var(--neon);font-size:12px;">1,240</div></div>
-    </div>
-  </div>
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="navTo('sc-home',this)"><div class="nav-ico">🏠</div><div class="nav-lbl">首頁</div></div>
-    <div class="nav-item" onclick="navTo('sc-games',this)"><div class="nav-ico">🎮</div><div class="nav-lbl">遊戲庫</div></div>
-    <div class="nav-item" onclick="navTo('sc-friends',this)"><div class="nav-ico">👥</div><div class="nav-lbl">好友</div><div class="nav-badge"></div></div>
-    <div class="nav-item" onclick="navTo('sc-items',this)"><div class="nav-ico">🎒</div><div class="nav-lbl">物品</div></div>
-    <div class="nav-item active" onclick="navTo('sc-profile',this)"><div class="nav-ico">👤</div><div class="nav-lbl">我的</div></div>
-  </div>
-</div>
-
-<!-- ════ PROFILE ════ -->
-<div class="screen" id="sc-profile">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="topbar-title" style="font-size:16px;font-weight:800;">我的</div><div style="font-size:17px;cursor:pointer;color:var(--txt3);">⚙️</div></div>
-  <div class="scroll">
-    <div class="s1" style="text-align:center;padding:14px 0 12px;">
-      <div style="position:relative;display:inline-block;margin-bottom:13px;">
-        <div style="width:70px;height:70px;border-radius:50%;background:var(--neon);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#060D12;font-family:'Outfit',sans-serif;box-shadow:0 0 20px rgba(0,233,106,.38);border:3px solid rgba(127,119,221,.55);">我</div>
-        <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);background:var(--warn);border:2px solid var(--bg);border-radius:20px;padding:1px 8px;font-size:10px;font-weight:900;color:#060D12;white-space:nowrap;font-family:'Outfit',sans-serif;">Lv.42</div>
-      </div>
-      <div style="font-size:16px;font-weight:700;color:var(--txt);font-family:'Outfit',sans-serif;">玩家一號</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;"><span class="lv-badge lv-epic">⚔️ 精英玩家</span></div>
-    </div>
-    <div class="s2" style="background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:13px;padding:12px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:var(--txt3);font-family:'Outfit',sans-serif;">等級進度 Lv.42 / 250</span><span style="font-size:11px;color:var(--neon);font-weight:700;font-family:'Outfit',sans-serif;">68%</span></div>
-      <div class="exp-wrap"><div class="exp-fill" style="width:68%;"></div></div>
-      <div style="text-align:right;margin-top:3px;"><span style="font-size:10px;color:var(--txt4);cursor:pointer;" onclick="goTo('sc-level')">查看等級系統 ›</span></div>
-    </div>
-    <div class="stat-grid3 s2">
-      <div class="stat-mini"><div class="stat-mini-val">1,240</div><div class="stat-mini-lbl">總積分</div></div>
-      <div class="stat-mini"><div class="stat-mini-val">38</div><div class="stat-mini-lbl">場次</div></div>
-      <div class="stat-mini"><div class="stat-mini-val" style="color:var(--neon);">62%</div><div class="stat-mini-lbl">勝率</div></div>
-    </div>
-    <div class="card s3">
-      <div class="card-body" style="padding:0;">
-        <div class="profile-row" onclick="goTo('sc-level')"><span style="font-size:17px;">⭐</span><span style="font-size:13px;font-weight:600;color:var(--txt);flex:1;">等級系統</span><span class="lv-badge lv-epic" style="font-size:10px;">Lv.42 / 250</span></div>
-        <div class="profile-row" onclick="goTo('sc-items')"><span style="font-size:17px;">🎒</span><span style="font-size:13px;font-weight:600;color:var(--txt);flex:1;">我的物品</span><span style="font-size:12px;color:var(--txt3);">7 件 ›</span></div>
-        <div class="profile-row" onclick="goTo('sc-shop')"><span style="font-size:17px;">🛒</span><span style="font-size:13px;font-weight:600;color:var(--txt);flex:1;">積分商店</span><span style="font-size:12px;color:var(--txt3);">›</span></div>
-        <div class="profile-row" onclick="goTo('sc-daily')"><span style="font-size:17px;">📅</span><span style="font-size:13px;font-weight:600;color:var(--txt);flex:1;">每日登入</span><span style="font-size:12px;color:var(--neon);">今日待領取！</span></div>
-        <div class="profile-row" onclick="goTo('sc-leaderboard')"><span style="font-size:17px;">🏆</span><span style="font-size:13px;font-weight:600;color:var(--txt);flex:1;">排行榜</span><span style="font-size:12px;color:var(--txt3);">#12 ›</span></div>
-        <div class="profile-row"><span style="font-size:17px;">⚙️</span><span style="font-size:13px;font-weight:600;color:var(--txt);flex:1;">帳號設定</span><span style="font-size:12px;color:var(--txt3);">›</span></div>
-        <div class="profile-row" onclick="goTo('sc-splash')"><span style="font-size:17px;">🚪</span><span style="font-size:13px;font-weight:600;color:var(--err);flex:1;">登出</span></div>
-      </div>
-    </div>
-  </div>
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="navTo('sc-home',this)"><div class="nav-ico">🏠</div><div class="nav-lbl">首頁</div></div>
-    <div class="nav-item" onclick="navTo('sc-games',this)"><div class="nav-ico">🎮</div><div class="nav-lbl">遊戲庫</div></div>
-    <div class="nav-item" onclick="navTo('sc-friends',this)"><div class="nav-ico">👥</div><div class="nav-lbl">好友</div><div class="nav-badge"></div></div>
-    <div class="nav-item" onclick="navTo('sc-items',this)"><div class="nav-ico">🎒</div><div class="nav-lbl">物品</div></div>
-    <div class="nav-item active" onclick="navTo('sc-profile',this)"><div class="nav-ico">👤</div><div class="nav-lbl">我的</div></div>
-  </div>
-</div>
-
-<!-- ════ ROOM CREATE ════ -->
-<div class="screen" id="sc-room-create">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-home')">‹</div><div class="topbar-title">建立房間</div></div>
-  <div class="scroll">
-    <div class="sec-header s1"><div class="sec-title">選擇遊戲</div></div>
-    <div class="game-grid s1">
-      <div class="game-card selected"><div class="game-icon" style="background:rgba(0,233,106,.15);">🐍</div><div class="game-name">貪吃蛇</div><span class="tag tag-neon">已選 ✓</span></div>
-      <div class="game-card"><div class="game-icon" style="background:rgba(127,119,221,.1);">⭕</div><div class="game-name">井字棋</div><span class="tag tag-gray">2人</span></div>
-      <div class="game-card"><div class="game-icon" style="background:rgba(255,91,107,.1);">🧱</div><div class="game-name">打磚塊</div><span class="tag tag-gray">單人</span></div>
-      <div class="game-card"><div class="game-icon" style="background:rgba(255,183,0,.1);">❓</div><div class="game-name">知識王</div><span class="tag tag-neon">多人</span></div>
-    </div>
-    <div class="sec-header s2"><div class="sec-title">房間設定</div></div>
-    <div class="card s2" style="margin-bottom:12px;">
-      <div class="card-body" style="padding:0;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px;border-bottom:1px solid rgba(255,255,255,.06);">
-          <div><div style="font-size:13px;font-weight:600;color:var(--txt);">最多玩家</div></div>
-          <div style="display:flex;gap:6px;">
-            <div style="padding:5px 12px;border-radius:8px;background:var(--neon);color:#060D12;font-size:12px;font-weight:800;cursor:pointer;">2</div>
-            <div style="padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.1);border:1.5px solid var(--border2);color:var(--txt);font-size:12px;font-weight:700;cursor:pointer;">3</div>
-            <div style="padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.1);border:1.5px solid var(--border2);color:var(--txt);font-size:12px;font-weight:700;cursor:pointer;">4</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px;">
-          <div style="font-size:13px;font-weight:600;color:var(--txt);">公開房間</div>
-          <div class="toggle-track"><div class="toggle-thumb"></div></div>
-        </div>
-      </div>
-    </div>
-    <button class="btn btn-neon s3" onclick="goTo('sc-room-wait')">🚪 建立房間</button>
-    <button class="btn btn-white s3" onclick="goTo('sc-matchmaking')">🔍 隨機配對</button>
-    <button class="btn btn-ghost s4" onclick="goTo('sc-home')">← 返回大廳</button>
-  </div>
-</div>
-
-<!-- ════ ROOM WAIT ════ -->
-<div class="screen" id="sc-room-wait">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-home')">‹</div><div class="topbar-title">🐍 等待玩家加入</div></div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <div class="scroll" style="flex:1;">
-      <div class="room-code-box s1"><div style="font-size:11px;color:var(--txt3);margin-bottom:5px;letter-spacing:1px;">房間代碼</div><div class="room-code">A7K3</div><div style="font-size:11px;color:var(--txt3);margin-top:5px;">傳送代碼給好友，等待加入</div></div>
-      <div class="sec-header s2"><div class="sec-title">玩家列表</div></div>
-      <div class="s2">
-        <div class="player-slot"><div class="av" style="width:36px;height:36px;font-size:12px;background:var(--neon);color:#060D12;">我</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--txt);">玩家一號</div><span class="lv-badge lv-epic" style="font-size:9px;padding:1px 5px;margin-top:2px;display:inline-block;">Lv.42</span></div><span class="slot-badge sb-host">房主</span></div>
-        <div class="player-slot"><div class="av" style="width:36px;height:36px;font-size:12px;background:#378ADD;">明</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--txt);">小明</div><span class="lv-badge lv-rare" style="font-size:9px;padding:1px 5px;margin-top:2px;display:inline-block;">Lv.28</span></div><span class="slot-badge sb-ready">準備好</span></div>
-        <div class="player-slot empty"><div style="width:36px;height:36px;border-radius:50%;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">＋</div><div style="font-size:12px;color:var(--txt4);">等待加入...</div></div>
-        <div class="player-slot empty"><div style="width:36px;height:36px;border-radius:50%;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">＋</div><div style="font-size:12px;color:var(--txt4);">等待加入...</div></div>
-      </div>
-    </div>
-    <div style="padding:12px 16px 16px;">
-      <button class="btn btn-neon" onclick="goTo('sc-home')">🎮 開始遊戲（2/4）</button>
-      <button class="btn btn-white" onclick="goTo('sc-friends')">👥 邀請好友</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ MATCHMAKING ════ -->
-<div class="screen" id="sc-matchmaking">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-home')">‹</div><div class="topbar-title">隨機配對</div></div>
-  <div class="scroll" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;text-align:center;">
-    <div class="s1" style="font-size:52px;margin-bottom:16px;animation:pulse 1.5s ease-in-out infinite;">🔍</div>
-    <div class="s2" style="font-size:18px;font-weight:700;color:var(--txt);margin-bottom:6px;font-family:'Outfit',sans-serif;">配對中...</div>
-    <div class="s2" style="font-size:12px;color:var(--txt3);margin-bottom:24px;">尋找積分相近的對手</div>
-    <div class="s3" style="display:flex;gap:16px;align-items:center;margin-bottom:20px;">
-      <div><div class="av" style="width:50px;height:50px;font-size:17px;background:var(--neon);color:#060D12;margin:0 auto 5px;">我</div><div style="font-size:11px;color:var(--txt3);">你（1,240）</div></div>
-      <div style="font-size:19px;color:var(--txt3);font-family:'Outfit',sans-serif;font-weight:700;">VS</div>
-      <div><div class="av" style="width:50px;height:50px;background:rgba(255,255,255,.08);border:1.5px dashed var(--border2);margin:0 auto 5px;font-size:22px;">?</div><div style="font-size:11px;color:var(--txt3);">尋找中...</div></div>
-    </div>
-    <div class="s4" style="font-size:12px;color:var(--txt3);margin-bottom:22px;">已等待 <span id="wt" style="color:var(--neon);font-weight:700;font-family:'Outfit',sans-serif;">0</span> 秒</div>
-    <button class="btn btn-white s4" style="max-width:200px;" onclick="goTo('sc-home')">取消配對</button>
-  </div>
-</div>
-
-<!-- ════ NOTIFICATION ════ -->
-<div class="screen" id="sc-notif">
-  <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
-  <div class="topbar"><div class="btn-back-icon" onclick="goTo('sc-home')">‹</div><div class="topbar-title">通知</div></div>
-  <div class="scroll">
-    <div class="notif-card unread s1"><div style="font-size:19px;flex-shrink:0;">🎮</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--txt);">小明邀請你加入房間</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">貪吃蛇 · 代碼 B3X9</div><div style="display:flex;gap:7px;margin-top:7px;"><button class="btn-sm btn-sm-neon" onclick="goTo('sc-room-wait')">加入</button><button class="btn-sm btn-sm-gray">拒絕</button></div></div><div style="font-size:10px;color:var(--txt4);">剛剛</div></div>
-    <div class="notif-card unread s2"><div style="font-size:19px;flex-shrink:0;">⭐</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--txt);">恭喜升級到 Lv.42！</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">獲得「星光框」頭貼框 🌟</div></div><div style="font-size:10px;color:var(--txt4);">1小時前</div></div>
-    <div class="notif-card read s3"><div style="font-size:19px;flex-shrink:0;">📅</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--txt);">今日登入獎勵待領取</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">連續第 7 天 · +500 EXP</div></div><div style="font-size:10px;color:var(--txt4);">今天</div></div>
-    <div class="notif-card read s4"><div style="font-size:19px;flex-shrink:0;">🏆</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--txt);">你在排行榜升到 #12！</div><div style="font-size:11px;color:var(--txt3);margin-top:2px;">繼續加油超越 #11</div></div><div style="font-size:10px;color:var(--txt4);">昨天</div></div>
-  </div>
-</div>
-
-</div><!-- /#app -->
-
-<script>
-// ════════════════════════════
-// NAVIGATION
-// ════════════════════════════
-let currentScreen = 'sc-splash';
-
-function goTo(id) {
-  const current = document.getElementById(currentScreen);
-  const next = document.getElementById(id);
-  if (!next) return;
-  if (current) current.classList.remove('active');
-  next.classList.add('active');
-  currentScreen = id;
-  // Scroll to top
-  const scroll = next.querySelector('.scroll');
-  if (scroll) scroll.scrollTop = 0;
-  // Matchmaking timer
-  clearInterval(wtTimer);
-  if (id === 'sc-matchmaking') startWtTimer();
+async function loadUserProfile() {
+  const d = await getDoc(doc(db,'users',currentUser.uid));
+  if(d.exists()) {
+    userProfile = d.data();
+  } else {
+    userProfile = {
+      uid: currentUser.uid,
+      name: currentUser.displayName || '新用戶',
+      email: currentUser.email,
+      photo: currentUser.photoURL || '',
+      friendCode: Math.random().toString(36).slice(2,8).toUpperCase(),
+      friends: [],
+      createdAt: Date.now()
+    };
+    await setDoc(doc(db,'users',currentUser.uid), userProfile);
+  }
 }
 
-function navTo(id, el) {
-  // Update nav active state
-  const navItems = el.closest('.bottom-nav').querySelectorAll('.nav-item');
-  navItems.forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-  goTo(id);
+// 修正國家 emoji：若為文字縮寫（如 TW/JP）則轉換為旗子 emoji
+function fixCountryEmoji(c) {
+  const emojiMap = {
+    'TW':'🇹🇼','JP':'🇯🇵','KR':'🇰🇷','US':'🇺🇸','GB':'🇬🇧','FR':'🇫🇷',
+    'IT':'🇮🇹','DE':'🇩🇪','TH':'🇹🇭','SG':'🇸🇬','AU':'🇦🇺','CN':'🇨🇳',
+    'HK':'🇭🇰','MO':'🇲🇴','VN':'🇻🇳','MY':'🇲🇾','ID':'🇮🇩','PH':'🇵🇭',
+    'IN':'🇮🇳','ES':'🇪🇸','PT':'🇵🇹','NL':'🇳🇱','CH':'🇨🇭','CA':'🇨🇦',
+    'MX':'🇲🇽','BR':'🇧🇷','AR':'🇦🇷','NZ':'🇳🇿',
+  };
+  if(c.emoji && emojiMap[c.emoji.toUpperCase()]) {
+    c.emoji = emojiMap[c.emoji.toUpperCase()];
+  }
+  return c;
 }
 
-// ════════════════════════════
-// LOGIN: PHONE OTP
-// ════════════════════════════
-function sendOTP() {
-  const v = document.getElementById('phone-num').value.trim();
-  const e = document.getElementById('phone-err');
-  if (!v || v.length < 8) { e.classList.add('show'); return; }
-  e.classList.remove('show');
-  goTo('sc-otp');
-  startResend();
+async function loadUserData() {
+  const uid = viewingUid || currentUser.uid;
+  const d = await getDoc(doc(db,'userData',uid));
+  if(d.exists()) {
+    const data = d.data();
+    countries = (data.countries || DEFAULT_COUNTRIES).map(fixCountryEmoji);
+    shopCats = data.shopCats || DEFAULT_SHOPCATS;
+    if(data.cats && data.cats.length) CATS = data.cats;
+  } else {
+    countries = DEFAULT_COUNTRIES;
+    shopCats = DEFAULT_SHOPCATS;
+    if(!viewingUid) await saveUserData();
+  }
+  // Load items
+  const itemsSnap = await getDocs(collection(db,'userData',uid,'items'));
+  items = itemsSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const shopSnap = await getDocs(collection(db,'userData',uid,'shopItems'));
+  shopItems = shopSnap.docs.map(d=>({id:d.id,...d.data()}));
+  // Load friends
+  if(!viewingUid) {
+    friends = userProfile.friends || [];
+  }
 }
 
-let resendTimer = null;
-function startResend() {
-  const btn = document.getElementById('resend-btn');
-  const cd = document.getElementById('resend-cd');
-  const txt = document.getElementById('rcd');
-  if (!btn) return;
-  btn.style.display = 'none';
-  if (cd) cd.style.display = 'block';
-  let s = 60;
-  clearInterval(resendTimer);
-  resendTimer = setInterval(() => {
-    if (txt) txt.textContent = --s;
-    if (s <= 0) {
-      clearInterval(resendTimer);
-      if (btn) btn.style.display = 'flex';
-      if (cd) cd.style.display = 'none';
-      if (txt) txt.textContent = 60;
+// Setup realtime listeners for own data
+let ownListeners = [];
+function setupOwnListeners() {
+  ownListeners.forEach(u=>u()); ownListeners=[];
+  const uid = currentUser.uid;
+  
+  // Listen to own items
+  ownListeners.push(onSnapshot(collection(db,'userData',uid,'items'), snap=>{
+    if(viewingUid) return;
+    items = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(nav.page !== 'detail') render();
+  }));
+  
+  // Listen to own shopItems
+  ownListeners.push(onSnapshot(collection(db,'userData',uid,'shopItems'), snap=>{
+    if(viewingUid) return;
+    shopItems = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(nav.page !== 'shopdetail') render();
+  }));
+  
+  // Listen to own userData (countries, cats etc)
+  ownListeners.push(onSnapshot(doc(db,'userData',uid), snap=>{
+    if(viewingUid || !snap.exists()) return;
+    const data = snap.data();
+    countries = (data.countries || DEFAULT_COUNTRIES).map(fixCountryEmoji);
+    shopCats = data.shopCats || DEFAULT_SHOPCATS;
+    if(data.cats && data.cats.length) CATS = data.cats;
+  }));
+  
+  // Listen to own profile (for friend code etc)
+  ownListeners.push(onSnapshot(doc(db,'users',uid), snap=>{
+    if(viewingUid || !snap.exists()) return;
+    userProfile = snap.data();
+    friends = userProfile.friends || [];
+  }));
+}
+
+async function saveUserData() {
+  if(viewingUid) return;
+  await setDoc(doc(db,'userData',currentUser.uid), {countries, shopCats, cats:CATS, updatedAt:Date.now()});
+}
+
+async function saveItem(item) {
+  if(viewingUid) return;
+  const {id, ...data} = item;
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,'items',id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,'items'), data);
+    item.id = ref.id;
+  }
+}
+async function deleteItemDB(id) {
+  if(viewingUid) return;
+  await deleteDoc(doc(db,'userData',currentUser.uid,'items',id));
+}
+async function saveShopItem(item) {
+  if(viewingUid) return;
+  const {id, ...data} = item;
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,'shopItems',id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,'shopItems'), data);
+    item.id = ref.id;
+  }
+}
+async function deleteShopItemDB(id) {
+  if(viewingUid) return;
+  await deleteDoc(doc(db,'userData',currentUser.uid,'shopItems',id));
+}
+
+// Store photo as base64 directly (no Storage needed)
+async function uploadPhoto(base64, path) {
+  return base64; // Return base64 directly
+}
+
+// ===== LOGIN PAGE =====
+function showLoginPage() {
+  document.getElementById('bottomNav').style.display='none';
+  document.getElementById('header').style.display='none';
+  document.getElementById('pageContent').innerHTML = `
+    <div class="login-page">
+      <div class="login-logo">🗂</div>
+      <div class="login-title">我的收藏</div>
+      <div class="login-sub">記錄你的好吃、好玩、好買<br>還可以看朋友的收藏！</div>
+      <button class="login-btn login-btn-google" onclick="loginGoogle()">
+        <span>G</span> 用 Google 帳號登入
+      </button>
+      <div class="login-divider">— 或 —</div>
+      <button class="login-btn login-btn-email" onclick="showEmailLogin()">
+        📧 用 Email 登入 / 註冊
+      </button>
+    </div>`;
+}
+
+window.loginGoogle = async function() {
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch(e) { alert('登入失敗：'+e.message); }
+};
+
+window.showEmailLogin = function() {
+  openModal(`<div class="modal-title">Email 登入 / 註冊</div>
+    <label class="modal-label">Email</label>
+    <input class="modal-input" id="mEmail" type="email" placeholder="your@email.com"/>
+    <label class="modal-label">密碼（至少6位）</label>
+    <input class="modal-input" id="mPwd" type="password" placeholder="••••••"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="doEmailLogin()">登入</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEmailRegister()">註冊</div>
+    </div>`);
+};
+
+window.doEmailLogin = async function() {
+  const email = document.getElementById('mEmail').value.trim();
+  const pwd = document.getElementById('mPwd').value;
+  try { await signInWithEmailAndPassword(auth, email, pwd); closeModal(); }
+  catch(e) { alert('登入失敗：'+e.message); }
+};
+
+window.doEmailRegister = async function() {
+  const email = document.getElementById('mEmail').value.trim();
+  const pwd = document.getElementById('mPwd').value;
+  try { await createUserWithEmailAndPassword(auth, email, pwd); closeModal(); }
+  catch(e) { alert('註冊失敗：'+e.message); }
+};
+
+// ===== MAIN APP =====
+function showMainApp() {
+  document.getElementById('header').style.display='flex';
+  document.getElementById('bottomNav').style.display='flex';
+  setupOwnListeners();
+  render();
+}
+
+function isReadOnly() { return !!viewingUid; }
+
+function render() {
+  renderHeader();
+  renderPage();
+  renderBottomNav();
+}
+
+function renderHeader() {
+  const back = document.getElementById('headerBack');
+  const title = document.getElementById('headerTitle');
+  const action = document.getElementById('headerAction');
+  back.style.display='none'; action.textContent=''; action.onclick=null;
+
+  const pages = {
+    'countries': ['我的收藏', null, isReadOnly()?null:'編輯', ()=>openEditCountries()],
+    'regions': ['', ()=>{ if(viewingUid){clearFriendListeners();viewingUid=null;loadUserData().then(()=>render());} else {nav.page='countries';render();} }, isReadOnly()?null:'編輯', ()=>openEditRegions()],
+    'cats': ['', ()=>{nav.page='regions';render();}, isReadOnly()?null:'編輯', ()=>openEditCats()],
+    'list': ['', ()=>{nav.page='cats';render();}, isReadOnly()?null:'＋', ()=>openAddItem()],
+    'alllist': ['全部收藏', ()=>{nav.page='regions';render();}, isReadOnly()?null:'＋', ()=>openAddItem()],
+    'detail': ['詳細', ()=>{nav.page=nav.prevPage||'list';render();}, isReadOnly()?null:'編輯', ()=>openEditItem(nav.itemId)],
+    'shop': ['🛒 網購', null, isReadOnly()?null:'編輯', ()=>openEditShopCats()],
+    'shopcat': ['', ()=>{nav.page='shop';render();}, isReadOnly()?null:'＋', ()=>openAddShop()],
+    'shopalllist': ['全部網購', ()=>{nav.page='shop';render();}, isReadOnly()?null:'＋', ()=>openAddShop()],
+    'shopdetail': ['詳細', ()=>{nav.page=nav.prevPage||'shopcat';render();}, isReadOnly()?null:'編輯', ()=>openEditShop(nav.itemId)],
+    'friends': ['好友收藏', null, '＋ 新增', ()=>openAddFriend()],
+    'profile': ['我的帳號', null, null, null],
+  };
+
+  const cfg = pages[nav.page];
+  if(!cfg) return;
+
+  let t = cfg[0];
+  if(nav.page==='regions') { const c=countries.find(x=>x.id===nav.country); t=(c?c.emoji+' '+c.name:''); }
+  if(nav.page==='cats') t='📍 '+nav.region;
+  if(nav.page==='list') { const cat=CATS.find(c=>c.id===nav.cat); t=cat?cat.emoji+' '+cat.label:''; }
+  if(nav.page==='shopcat') { const sc=shopCats.find(c=>c.id===nav.shopCat); t=sc?sc.emoji+' '+sc.label:''; }
+
+  if(isReadOnly() && ['countries','regions','cats','list','alllist','shop','shopcat','shopalllist'].includes(nav.page)) {
+    const fp = friends.find(f=>f.uid===viewingUid);
+    title.textContent = (fp?fp.name+'的':'朋友的')+' '+t;
+  } else {
+    title.textContent = t;
+  }
+
+  if(cfg[1]) { back.style.display='block'; back.onclick=cfg[1]; }
+  if(cfg[2]) { action.textContent=cfg[2]; action.onclick=cfg[3]; }
+}
+
+function renderPage() {
+  const p = document.getElementById('pageContent');
+  const pages = {
+    'countries': renderCountries,
+    'regions': renderRegions,
+    'cats': renderCats,
+    'list': renderList,
+    'alllist': renderAllList,
+    'detail': renderDetail,
+    'shop': renderShop,
+    'shopcat': renderShopCat,
+    'shopalllist': renderShopAllList,
+    'shopdetail': renderShopDetail,
+    'friends': renderFriends,
+    'profile': renderProfile,
+  };
+  p.innerHTML = (pages[nav.page]||renderCountries)();
+  setTimeout(initSwipers, 50);
+}
+
+function renderBottomNav() {
+  const btns = [
+    {ico:'🌏',lbl:'收藏',pages:['countries','regions','cats','list','alllist','detail']},
+    {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
+    {ico:'👥',lbl:'好友',pages:['friends']},
+    {ico:'👤',lbl:'我的',pages:['profile']},
+  ];
+  document.getElementById('bottomNav').innerHTML = btns.map(b=>{
+    const active = b.pages.includes(nav.page);
+    return `<div class="nav-btn${active?' active':''}" onclick="goNav('${b.pages[0]}')">
+      <div class="nav-ico">${b.ico}</div>
+      <div class="nav-lbl">${b.lbl}</div>
+    </div>`;
+  }).join('');
+}
+
+window.goNav = function(page) {
+  if(['countries','regions','cats','list','alllist','detail'].includes(page)) {
+    if(viewingUid) {
+      // Going back to own data - clear friend listeners and reload own data
+      clearFriendListeners();
+      viewingUid = null;
+      // 立即重置為自己的資料，避免短暫顯示朋友的資料
+      countries = DEFAULT_COUNTRIES;
+      items = [];
+      shopItems = [];
+      CATS = [{id:'eat',label:'好吃',emoji:'🍜',cls:'tag-eat'},{id:'play',label:'好玩',emoji:'🏞',cls:'tag-play'},{id:'buy',label:'好買',emoji:'🏪',cls:'tag-buy'},{id:'go',label:'想去',emoji:'📍',cls:'tag-go'}];
+      nav={page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null};
+      document.getElementById('pageContent').innerHTML = '<div class="loading">載入中...</div>';
+      loadUserData().then(()=>render());
+      return;
     }
-  }, 1000);
-}
-
-function otpIn(el, nextId) {
-  el.value ? el.classList.add('filled') : el.classList.remove('filled');
-  if (el.value && nextId) {
-    const n = document.getElementById(nextId);
-    if (n) n.focus();
-  } else if (el.value && !nextId) autoVerify();
-}
-
-function getOtpVal(ids) {
-  return ids.map(id => { const e = document.getElementById(id); return e ? e.value : ''; }).join('');
-}
-
-function autoVerify() {
-  const v = getOtpVal(['o1','o2','o3','o4','o5','o6']);
-  if (v === '123456') {
-    document.getElementById('otp-ok').classList.add('show');
-    document.getElementById('otp-err').classList.remove('show');
-    setTimeout(() => goTo('sc-home'), 1200);
   }
+  nav.page=page;
+  render();
+};
+
+// ===== COUNTRIES =====
+function renderCountries() {
+  let h = '<div class="section-hdr">— 選擇國家 —</div>';
+  if(!countries.length) return '<div class="empty">還沒有國家<br>'+(isReadOnly()?'':'按右上角開始新增！')+'</div>';
+  countries.forEach(c=>{
+    const cnt = items.filter(i=>i.country===c.id&&!i.done).length;
+    h += `<div class="list-item" onclick="goRegions('${c.id}')">
+      <div class="list-icon" style="background:#1a1a1a;font-size:28px">${c.emoji}</div>
+      <div class="list-body"><div class="list-name">${c.name}</div><div class="list-sub">${cnt} 筆收藏</div></div>
+      <div class="list-arrow">›</div></div>`;
+  });
+  return h;
 }
 
-function verifyOTP() {
-  const v = getOtpVal(['o1','o2','o3','o4','o5','o6']);
-  if (v === '123456') {
-    document.getElementById('otp-ok').classList.add('show');
-    document.getElementById('otp-err').classList.remove('show');
-    setTimeout(() => goTo('sc-home'), 1200);
+function renderRegions() {
+  const c = countries.find(x=>x.id===nav.country); if(!c) return '';
+  const allCnt = items.filter(i=>i.country===c.id&&!i.done).length;
+  let h = `<div class="list-item" style="background:var(--yellow-bg)" onclick="goAllList()">
+    <div class="list-icon" style="background:var(--yellow-bg);font-size:22px">📋</div>
+    <div class="list-body"><div class="list-name" style="color:var(--yellow)">${c.name}全部收藏</div>
+    <div class="list-sub" style="color:var(--muted)">不分地區 · ${allCnt} 筆</div></div>
+    <div class="list-arrow" style="color:var(--yellow)">›</div></div>`;
+  h += '<div class="section-hdr">— 依地區 —</div>';
+  (c.regions||[]).forEach(r=>{
+    const cnt = items.filter(i=>i.country===c.id&&i.region===r&&!i.done).length;
+    h += `<div class="list-item" onclick="goCats('${r}')">
+      <div class="list-icon" style="background:var(--blue-bg);font-size:20px">📍</div>
+      <div class="list-body"><div class="list-name">${r}</div><div class="list-sub">${cnt} 筆</div></div>
+      <div class="list-arrow">›</div></div>`;
+  });
+  return h;
+}
+
+function renderCats() {
+  return CATS.map(cat=>{
+    const cnt = items.filter(i=>i.country===nav.country&&i.region===nav.region&&i.cat===cat.id&&!i.done).length;
+    return `<div class="list-item" onclick="goList('${cat.id}')">
+      <div class="list-icon" style="background:${getCatBg(cat.id)};font-size:22px">${cat.emoji}</div>
+      <div class="list-body"><div class="list-name">${cat.label}</div><div class="list-sub">${cnt} 筆</div></div>
+      <div class="list-arrow">›</div></div>`;
+  }).join('');
+}
+
+function getCatBg(id){return{eat:'var(--amber-bg)',play:'var(--green-bg)',buy:'var(--purple-bg)',go:'var(--red-bg)'}[id]||'var(--card2)';}
+
+function getFilteredItems() {
+  let base = items.filter(i=>!i.done);
+  if(nav.page==='list') base = items.filter(i=>i.country===nav.country&&i.region===nav.region&&i.cat===nav.cat&&!i.done);
+  else if(nav.page==='alllist') {
+    base = items.filter(i=>i.country===nav.country&&!i.done);
+    if(nav.filter&&nav.filter!=='all') base = base.filter(i=>i.cat===nav.filter);
+  }
+  return base.sort((a,b)=>(b.stars||0)-(a.stars||0));
+}
+
+function renderListItem(item, from) {
+  const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
+  const starsStr = '★'.repeat(item.stars||0);
+  let sub = `<span class="stars" style="font-size:11px">${starsStr}</span>`;
+  if(from==='alllist') sub += ` <span class="tag tag-loc">📍${item.region}</span><span class="tag ${cat.cls}">${cat.label}</span>`;
+  if(item.note) sub += ` <span style="color:var(--muted);font-size:11px">${item.note.slice(0,15)}${item.note.length>15?'…':''}</span>`;
+  const hasPhoto = item.photos&&item.photos.length;
+  const thumb = hasPhoto?`background:var(--card2);`:`background:${getCatBg(item.cat)};`;
+  const icon = hasPhoto?`<img src="${item.photos[0]}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
+  return `<div class="list-item" onclick="goDetail('${item.id}','${from}')">
+    <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
+    <div class="list-body"><div class="list-name">${item.name}</div><div class="list-sub">${sub}</div></div>
+    <div class="list-arrow">›</div></div>`;
+}
+
+function renderList() {
+  const f = getFilteredItems();
+  if(!f.length) return `<div class="empty">還沒有收藏${isReadOnly()?'':('<br>按右上角 ＋ 新增！')}</div>`;
+  return `<div class="section-hdr">— 共 ${f.length} 筆 —</div>`+f.map(i=>renderListItem(i,'list')).join('');
+}
+
+function renderAllList() {
+  nav.filter = nav.filter||'all';
+  const f = getFilteredItems();
+  let h = '<div class="filter-bar">';
+  h += `<div class="filter-pill${nav.filter==='all'?' active':''}" onclick="setFilter('all')">全部</div>`;
+  CATS.forEach(cat=>{ h+=`<div class="filter-pill${nav.filter===cat.id?' active':''}" onclick="setFilter('${cat.id}')">${cat.emoji} ${cat.label}</div>`; });
+  h += '</div>';
+  if(!f.length) return h+'<div class="empty">這個分類還沒有收藏</div>';
+  h += `<div class="section-hdr">— 共 ${f.length} 筆 —</div>`;
+  return h + f.map(i=>renderListItem(i,'alllist')).join('');
+}
+
+function isVideo(url) { return url && (url.startsWith('data:video') || /\.(mp4|mov|webm|avi)$/i.test(url)); }
+
+function makeSlide(p, idx, itemId) {
+  if(isVideo(p)) {
+    return `<div class="photo-swiper-slide" onclick="openLightbox('${itemId}',${idx})">
+      <video src="${p}" playsinline muted loop autoplay style="width:100%;height:100%;object-fit:cover;pointer-events:none;"></video>
+      <div class="media-type-badge">▶ 影片</div>
+    </div>`;
+  }
+  return `<div class="photo-swiper-slide" onclick="openLightbox('${itemId}',${idx})"><img src="${p}"/></div>`;
+}
+
+function renderDetail() {
+  const item = items.find(i=>i.id===nav.itemId); if(!item) return '<div class="empty">找不到</div>';
+  const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
+  const c = countries.find(x=>x.id===item.country);
+  const photos = item.photos||[];
+  const slides = photos.length ? photos.map((p,i)=>makeSlide(p,i,item.id)).join('') :
+    `<div class="photo-swiper-slide"><div class="slide-emoji">${cat.emoji}</div></div>`;
+  const dots = photos.length>1 ? photos.map((_,i)=>`<div class="photo-dot${i===0?' on':''}" id="dot_${item.id}_${i}"></div>`).join('') : '';
+  const count = photos.length>1 ? `<div class="photo-count">1 / ${photos.length}</div>` : '';
+  let h = `<div class="photo-swiper" id="swiper_${item.id}" data-idx="0" data-count="${photos.length}" data-id="${item.id}" data-type="item" data-photos='${JSON.stringify(photos)}'>
+    <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
+    <div class="photo-swiper-overlay"></div>
+    ${dots?'<div class="photo-dots">'+dots+'</div>':''}${count}
+    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMedia('${item.id}','item')">📷 ＋媒體</div>`:''}
+    ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
+  </div>`;
+  const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setItemStar('${item.id}',${v})`)}">★</span>`).join('');
+  h += `<div class="detail-body">
+    <div class="detail-tags">
+      ${c?`<span class="tag" style="background:#1a1a1a;color:var(--muted)">${c.emoji} ${c.name}</span>`:''}
+      <span class="tag tag-loc">📍 ${item.region}</span>
+      <span class="tag ${cat.cls}">${cat.label}</span>
+    </div>
+    <div class="detail-name">${item.name}</div>
+    <div class="detail-stars-row">${starsHtml}</div>
+    ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
+    ${item.address?`<div class="detail-section">地址</div><div class="detail-val">${item.address}</div>`:''}
+    ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
+    <div class="detail-btns">
+      ${item.address?`<div class="detail-btn btn-nav" onclick="openMap('${item.address}')">🧭 導航</div>`:''}
+      ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditItem('${item.id}')">✏️ 編輯</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-done" onclick="markDone('${item.id}')">✓ 完成</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteItem('${item.id}')">🗑 刪除</div>`:''}
+    </div>
+  </div>`;
+  return h;
+}
+
+// ===== SHOP =====
+function renderShop() {
+  const allCnt = shopItems.filter(i=>!i.done).length;
+  let h = `<div class="list-item" style="background:var(--blue-bg)" onclick="goShopAllList()">
+    <div class="list-icon" style="background:rgba(77,166,255,0.15);font-size:22px">📋</div>
+    <div class="list-body"><div class="list-name" style="color:var(--blue)">全部網購清單</div>
+    <div class="list-sub" style="color:var(--muted)">${allCnt} 筆</div></div>
+    <div class="list-arrow" style="color:var(--blue)">›</div></div>`;
+  h += '<div class="section-hdr">— 依分類 —</div>';
+  shopCats.forEach(cat=>{
+    const cnt = shopItems.filter(i=>i.shopCat===cat.id&&!i.done).length;
+    h += `<div class="list-item" onclick="goShopCat('${cat.id}')">
+      <div class="list-icon" style="background:var(--blue-bg);font-size:22px">${cat.emoji}</div>
+      <div class="list-body"><div class="list-name">${cat.label}</div><div class="list-sub">${cnt} 筆</div></div>
+      <div class="list-arrow">›</div></div>`;
+  });
+  return h;
+}
+
+function shopListItem(item) {
+  const sc = shopCats.find(c=>c.id===item.shopCat);
+  const hasPhoto = item.photos&&item.photos.length;
+  const thumb = hasPhoto?'background:var(--card2);':'background:var(--blue-bg);';
+  const icon = hasPhoto?`<img src="${item.photos[0]}" style="width:100%;height:100%;object-fit:cover;"/>`:sc?sc.emoji:'🛒';
+  const starsStr = '★'.repeat(item.stars||0);
+  return `<div class="list-item" onclick="goShopDetail('${item.id}')">
+    <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
+    <div class="list-body"><div class="list-name">${item.name}</div>
+    <div class="list-sub"><span class="stars" style="font-size:11px">${starsStr}</span>
+    ${sc?`<span class="tag tag-shop" style="font-size:9px">${sc.emoji} ${sc.label}</span>`:''}
+    ${item.note?`<span style="color:var(--muted);font-size:11px">${item.note.slice(0,20)}</span>`:''}
+    </div></div><div class="list-arrow">›</div></div>`;
+}
+
+function renderShopCat() {
+  const f = shopItems.filter(i=>i.shopCat===nav.shopCat&&!i.done);
+  if(!f.length) return `<div class="empty">這個分類還沒有網購${isReadOnly()?'':('<br>按右上角 ＋ 新增！')}</div>`;
+  return `<div class="section-hdr">— 共 ${f.length} 筆 —</div>`+f.map(shopListItem).join('');
+}
+
+function renderShopAllList() {
+  const f = shopItems.filter(i=>!i.done);
+  if(!f.length) return '<div class="empty">網購清單是空的</div>';
+  return `<div class="section-hdr">— 全部 ${f.length} 筆 —</div>`+f.map(shopListItem).join('');
+}
+
+function renderShopDetail() {
+  const item = shopItems.find(i=>i.id===nav.itemId); if(!item) return '';
+  const sc = shopCats.find(c=>c.id===item.shopCat);
+  const photos = item.photos||[];
+  const slides = photos.length ? photos.map((p,i)=>makeSlide(p,i,item.id)).join('') :
+    `<div class="photo-swiper-slide"><div class="slide-emoji">🛒</div></div>`;
+  const dots = photos.length>1 ? photos.map((_,i)=>`<div class="photo-dot${i===0?' on':''}"></div>`).join('') : '';
+  let h = `<div class="photo-swiper" id="swiper_${item.id}" data-idx="0" data-count="${photos.length}" data-id="${item.id}" data-type="shop" data-photos='${JSON.stringify(photos)}'>
+    <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
+    <div class="photo-swiper-overlay"></div>
+    ${dots?'<div class="photo-dots">'+dots+'</div>':''}
+    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMedia('${item.id}','shop')">📷 ＋媒體</div>`:''}
+    ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
+  </div>`;
+  const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setShopStar('${item.id}',${v})`)}">★</span>`).join('');
+  h += `<div class="detail-body">
+    <div class="detail-tags"><span class="tag tag-shop">🛒 網購</span>${sc?`<span class="tag" style="background:var(--blue-bg);color:var(--blue)">${sc.emoji} ${sc.label}</span>`:''}</div>
+    <div class="detail-name">${item.name}</div>
+    <div class="detail-stars-row">${starsHtml}</div>
+    ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
+    ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
+    <div class="detail-btns">
+      ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditShop('${item.id}')">✏️ 編輯</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-done" onclick="markShopDone('${item.id}')">✓ 完成</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteShopItem('${item.id}')">🗑 刪除</div>`:''}
+    </div>
+  </div>`;
+  return h;
+}
+
+// ===== FRIENDS =====
+function renderFriends() {
+  let h = '';
+  if(friends.length===0) {
+    h = '<div class="empty">還沒有好友<br>按右上角 ＋ 新增好友！</div>';
   } else {
-    document.getElementById('otp-err').classList.add('show');
-    document.getElementById('otp-ok').classList.remove('show');
-    ['o1','o2','o3','o4','o5','o6'].forEach(id => {
-      const e = document.getElementById(id);
-      if (e) { e.value = ''; e.classList.remove('filled'); }
+    h = '<div class="section-hdr">— 好友列表 —</div>';
+    friends.forEach(f=>{
+      h += `<div class="friend-card" onclick="viewFriend('${f.uid}')">
+        <div class="friend-avatar">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>
+        <div class="friend-body">
+          <div class="friend-name">${f.name}</div>
+          <div class="friend-sub">${f.email||''}</div>
+        </div>
+        <div class="friend-action">查看收藏 ›</div>
+      </div>`;
     });
-    const f = document.getElementById('o1');
-    if (f) f.focus();
   }
+  // My friend code
+  h += `<div style="margin:20px;background:var(--card);border-radius:16px;padding:16px;text-align:center;">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">我的好友代碼（讓朋友輸入這個）</div>
+    <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:var(--amber)">${userProfile?.friendCode||'------'}</div>
+    <div style="font-size:11px;color:var(--muted2);margin-top:6px;">朋友輸入此代碼就能加你為好友</div>
+  </div>`;
+  return h;
 }
 
-// ════════════════════════════
-// FORGOT PASSWORD
-// ════════════════════════════
-function sendForgot() {
-  const v = document.getElementById('forgot-phone').value.trim();
-  const e = document.getElementById('forgot-err');
-  if (!v || v.length < 8) { e.classList.add('show'); return; }
-  e.classList.remove('show');
-  goTo('sc-forgot-otp');
+window.openAddFriend = function() {
+  openModal(`<div class="modal-title">新增好友</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;text-align:center;">輸入朋友的好友代碼</div>
+    <input class="modal-input" id="mFriendCode" placeholder="例：AB12CD" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px;"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddFriend()">新增</div>
+    </div>`);
+};
+
+window.doAddFriend = async function() {
+  const code = document.getElementById('mFriendCode').value.trim().toUpperCase();
+  if(!code || code.length<4) { alert('請輸入正確的好友代碼'); return; }
+  try {
+    const q = query(collection(db,'users'), where('friendCode','==',code));
+    const snap = await getDocs(q);
+    if(snap.empty) { alert('找不到這個好友代碼'); return; }
+    const friendData = snap.docs[0].data();
+    if(friendData.uid === currentUser.uid) { alert('不能加自己為好友 😅'); return; }
+    if(friends.find(f=>f.uid===friendData.uid)) { alert('這個人已經是你的好友了！'); return; }
+    const newFriend = {uid:friendData.uid, name:friendData.name, email:friendData.email, photo:friendData.photo||''};
+    friends.push(newFriend);
+    userProfile.friends = friends;
+    await setDoc(doc(db,'users',currentUser.uid), userProfile);
+    closeModal();
+    render();
+    alert('✅ 成功加入好友：'+friendData.name);
+  } catch(e) { alert('新增失敗：'+e.message); }
+};
+
+let friendListeners = []; // store unsubscribe functions
+
+function clearFriendListeners() {
+  friendListeners.forEach(unsub => unsub());
+  friendListeners = [];
 }
 
-function fotpIn(el, nextId) {
-  el.value ? el.classList.add('filled') : el.classList.remove('filled');
-  if (el.value && nextId) { const n = document.getElementById(nextId); if (n) n.focus(); }
-  else if (el.value && !nextId) goTo('sc-reset');
+window.viewFriend = async function(uid) {
+  viewingUid = uid;
+  clearFriendListeners();
+  document.getElementById('pageContent').innerHTML = '<div class="loading">載入中...</div>';
+  
+  // Load friend profile (realtime)
+  const profileUnsub = onSnapshot(doc(db,'users',uid), (snap) => {
+    if(snap.exists()) {
+      const data = snap.data();
+      // Update friend name in our list
+      const fi = friends.findIndex(f=>f.uid===uid);
+      if(fi>-1) { friends[fi].name=data.name; friends[fi].photo=data.photo||''; }
+    }
+  });
+  friendListeners.push(profileUnsub);
+
+  // Load friend userData (realtime)
+  const dataUnsub = onSnapshot(doc(db,'userData',uid), (snap) => {
+    if(snap.exists()) {
+      const data = snap.data();
+      countries = (data.countries || DEFAULT_COUNTRIES).map(fixCountryEmoji);
+      shopCats = data.shopCats || DEFAULT_SHOPCATS;
+      if(data.cats && data.cats.length) CATS = data.cats;
+    }
+    if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
+  });
+  friendListeners.push(dataUnsub);
+
+  // Load friend items (realtime)
+  const itemsUnsub = onSnapshot(collection(db,'userData',uid,'items'), (snap) => {
+    items = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
+  });
+  friendListeners.push(itemsUnsub);
+
+  // Load friend shopItems (realtime)
+  const shopUnsub = onSnapshot(collection(db,'userData',uid,'shopItems'), (snap) => {
+    shopItems = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
+  });
+  friendListeners.push(shopUnsub);
+
+  nav.page = 'countries';
+  render();
+};
+
+// ===== PROFILE =====
+function renderProfile() {
+  return `<div class="profile-section">
+    <div class="profile-avatar">${userProfile?.photo?`<img src="${userProfile.photo}"/>`:'👤'}</div>
+    <div class="profile-name">${userProfile?.name||'用戶'}</div>
+    <div class="profile-email">${currentUser?.email||''}</div>
+    <div class="profile-id">好友代碼：${userProfile?.friendCode||''}</div>
+  </div>
+  <div class="list-item" onclick="openEditName()">
+    <div class="list-body"><div class="list-name">修改名稱</div></div>
+    <div class="list-arrow">›</div>
+  </div>
+  <div class="list-item" onclick="doSignOut()" style="margin-top:20px;">
+    <div class="list-body"><div class="list-name" style="color:var(--red)">登出</div></div>
+  </div>`;
 }
 
-function doForgotOTP() {
-  const v = getOtpVal(['f1','f2','f3','f4','f5','f6']);
-  if (v === '123456') goTo('sc-reset');
-  else {
-    document.getElementById('fotp-err').classList.add('show');
-    ['f1','f2','f3','f4','f5','f6'].forEach(id => {
-      const e = document.getElementById(id);
-      if (e) { e.value = ''; e.classList.remove('filled'); }
-    });
-    const f = document.getElementById('f1'); if (f) f.focus();
-  }
-}
+window.openEditName = function() {
+  openModal(`<div class="modal-title">修改名稱</div>
+    <input class="modal-input" id="mName" value="${userProfile?.name||''}" placeholder="你的名稱"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEditName()">儲存</div>
+    </div>`);
+};
 
-function doReset() {
-  const p1 = document.getElementById('pw1').value;
-  const p2 = document.getElementById('pw2').value;
-  const e = document.getElementById('reset-err');
-  if (!p1 || p1.length < 8) { e.textContent = '密碼至少 8 個字元'; e.classList.add('show'); return; }
-  if (p1 !== p2) { e.textContent = '兩次密碼不一致'; e.classList.add('show'); return; }
-  e.classList.remove('show');
-  // Show success and go back to splash
-  alert('✅ 密碼重設成功！請用新密碼登入。');
-  goTo('sc-splash');
-}
+window.doEditName = async function() {
+  const name = document.getElementById('mName').value.trim();
+  if(!name) return;
+  userProfile.name = name;
+  await updateProfile(currentUser, {displayName: name});
+  await setDoc(doc(db,'users',currentUser.uid), userProfile);
+  closeModal(); render();
+};
 
-// ════════════════════════════
-// TOGGLE PW VISIBILITY
-// ════════════════════════════
-function tpw(id, btn) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const show = el.type === 'password';
-  el.type = show ? 'text' : 'password';
-  btn.textContent = show ? '隱藏' : '顯示';
-}
+window.doSignOut = async function() {
+  if(!confirm('確定要登出？')) return;
+  await signOut(auth);
+};
 
-// ════════════════════════════
-// ADMIN
-// ════════════════════════════
-function doAdmin() {
-  const u = document.getElementById('adm-u').value.trim();
-  const p = document.getElementById('adm-p').value;
-  const e = document.getElementById('adm-err');
-  if (u === 'admin' && p === '1234') {
-    e.classList.remove('show');
-    // TODO: Navigate to admin dashboard
-    alert('✅ 管理員驗證成功！後台頁面後續建置。');
+// ===== NAVIGATION =====
+window.goRegions = function(cid) { nav.country=cid; nav.page='regions'; render(); };
+window.goCats = function(r) { nav.region=r; nav.page='cats'; render(); };
+window.goList = function(cat) { nav.cat=cat; nav.page='list'; render(); };
+window.goAllList = function() { nav.page='alllist'; nav.filter='all'; render(); };
+window.goDetail = function(id,from) { nav.prevPage=from; nav.itemId=id; nav.page='detail'; render(); };
+window.goShopCat = function(id) { nav.shopCat=id; nav.page='shopcat'; render(); };
+window.goShopAllList = function() { nav.page='shopalllist'; render(); };
+window.goShopDetail = function(id) { nav.prevPage='shopcat'; nav.itemId=id; nav.page='shopdetail'; render(); };
+window.setFilter = function(f) { nav.filter=f; render(); };
+window.openLink = function(url) { if(url) window.open(url,'_blank'); };
+window.openMap = function(addr) { if(addr) window.open('https://maps.google.com/?q='+encodeURIComponent(addr),'_blank'); };
+
+// ===== STARS =====
+window.setItemStar = async function(id,v) {
+  const item = items.find(i=>i.id===id); if(!item) return;
+  item.stars = item.stars===v?0:v;
+  await saveItem(item); render();
+};
+window.setShopStar = async function(id,v) {
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  item.stars = item.stars===v?0:v;
+  await saveShopItem(item); render();
+};
+
+// ===== DONE / DELETE =====
+window.markDone = async function(id) {
+  if(!confirm('標記完成？')) return;
+  const item = items.find(i=>i.id===id); if(!item) return;
+  item.done = true;
+  await saveItem(item); nav.page=nav.prevPage||'list'; render();
+};
+window.markShopDone = async function(id) {
+  if(!confirm('標記完成？')) return;
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  item.done = true;
+  await saveShopItem(item); nav.page='shop'; render();
+};
+window.deleteItem = async function(id) {
+  if(!confirm('確定刪除？')) return;
+  items = items.filter(i=>i.id!==id);
+  await deleteItemDB(id); nav.page=nav.prevPage||'list'; render();
+};
+window.deleteShopItem = async function(id) {
+  if(!confirm('確定刪除？')) return;
+  shopItems = shopItems.filter(i=>i.id!==id);
+  await deleteShopItemDB(id); nav.page='shop'; render();
+};
+
+// ===== PHOTOS & VIDEOS =====
+let lightboxPhotos = [], lightboxIdx = 0;
+
+window.openLightbox = function(itemId, idx) {
+  const sw = document.getElementById('swiper_'+itemId);
+  if(!sw) return;
+  let photos = [];
+  try { photos = JSON.parse(sw.dataset.photos||'[]'); } catch(e){}
+  if(!photos.length) return;
+  lightboxPhotos = photos;
+  lightboxIdx = idx||0;
+  renderLightbox();
+  document.getElementById('lightbox').classList.remove('hidden');
+};
+
+function renderLightbox() {
+  const p = lightboxPhotos[lightboxIdx];
+  const med = document.getElementById('lightboxMedia');
+  const cnt = document.getElementById('lbCount');
+  const prev = document.getElementById('lbPrev');
+  const next = document.getElementById('lbNext');
+  if(isVideo(p)) {
+    med.innerHTML = `<video class="lightbox-media" src="${p}" controls autoplay playsinline></video>`;
   } else {
-    e.classList.add('show');
+    med.innerHTML = `<img class="lightbox-media" src="${p}"/>`;
   }
+  cnt.textContent = lightboxPhotos.length>1 ? `${lightboxIdx+1} / ${lightboxPhotos.length}` : '';
+  prev.style.display = lightboxPhotos.length>1 ? 'flex' : 'none';
+  next.style.display = lightboxPhotos.length>1 ? 'flex' : 'none';
 }
 
-// ════════════════════════════
-// MATCHMAKING TIMER
-// ════════════════════════════
-let wtTimer = null;
-function startWtTimer() {
-  let s = 0;
-  const el = document.getElementById('wt');
-  wtTimer = setInterval(() => { if (el) el.textContent = ++s; }, 1000);
+window.lightboxNav = function(dir) {
+  lightboxIdx = (lightboxIdx+dir+lightboxPhotos.length) % lightboxPhotos.length;
+  renderLightbox();
+};
+
+window.closeLightbox = function() {
+  document.getElementById('lightbox').classList.add('hidden');
+  document.getElementById('lightboxMedia').innerHTML = '';
+};
+
+// 點燈箱背景關閉
+document.getElementById('lightbox').addEventListener('click', e=>{
+  if(e.target===document.getElementById('lightbox')) closeLightbox();
+});
+
+window.addMedia = function(id, type) {
+  // 讓使用者選擇照片或影片
+  openModal(`<div class="modal-title">新增媒體</div>
+    <div style="display:flex;gap:10px;margin-bottom:8px;">
+      <div class="modal-btn modal-btn-ok" style="flex:1" onclick="closeModal();triggerMediaPick('${id}','${type}','image')">📷 照片</div>
+      <div class="modal-btn" style="flex:1;background:var(--blue-bg);color:var(--blue)" onclick="closeModal();triggerMediaPick('${id}','${type}','video')">🎬 影片</div>
+    </div>
+    <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>`);
+};
+
+window.triggerMediaPick = function(id, type, mediaType) {
+  const input = mediaType==='video' ? document.getElementById('videoInput') : document.getElementById('photoInput');
+  input.multiple = mediaType==='image';
+  input.onchange = async function(e) {
+    const files = Array.from(e.target.files); if(!files.length) return;
+    document.getElementById('pageContent').innerHTML = '<div class="loading">上傳中...</div>';
+    for(const f of files) {
+      const base64 = await new Promise(res=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result); r.readAsDataURL(f); });
+      if(type==='item') {
+        const item = items.find(i=>i.id===id);
+        if(item) { if(!item.photos) item.photos=[]; item.photos.push(base64); await saveItem(item); }
+      } else {
+        const item = shopItems.find(i=>i.id===id);
+        if(item) { if(!item.photos) item.photos=[]; item.photos.push(base64); await saveShopItem(item); }
+      }
+    }
+    e.target.value=''; render();
+  };
+  input.click();
+};
+
+window.addPhoto = window.addMedia; // 向後相容
+
+window.delPhoto = async function(id, type) {
+  const swiper = document.getElementById('swiper_'+id);
+  const idx = swiper?parseInt(swiper.dataset.idx)||0:0;
+  if(!confirm('刪除這張照片？')) return;
+  if(type==='item') {
+    const item = items.find(i=>i.id===id);
+    if(item&&item.photos) { item.photos.splice(idx,1); await saveItem(item); }
+  } else {
+    const item = shopItems.find(i=>i.id===id);
+    if(item&&item.photos) { item.photos.splice(idx,1); await saveShopItem(item); }
+  }
+  render();
+};
+
+// ===== MODAL =====
+window.openModal = function(html) {
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalWrap').classList.remove('hidden');
+};
+window.closeModal = function() { document.getElementById('modalWrap').classList.add('hidden'); };
+document.getElementById('modalWrap').addEventListener('click', e=>{ if(e.target===document.getElementById('modalWrap')) closeModal(); });
+
+window.pickE = function(e) {
+  pickEmoji=e;
+  document.querySelectorAll('.emoji-opt').forEach(el=>el.classList.toggle('sel',el.textContent===e));
+};
+window.setPickStar = function(v) {
+  pickStars=pickStars===v?0:v;
+  document.querySelectorAll('.star-pick').forEach((s,i)=>s.classList.toggle('on',i<pickStars));
+};
+
+// ===== ADD/EDIT ITEM =====
+window.openAddItem = function() {
+  pickStars=0; pickPhotos=[];
+  openModal(`<div class="modal-title">新增收藏</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" placeholder="例：青木原拉麵"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mCat">${CATS.map(c=>`<option value="${c.id}"${c.id===nav.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map(v=>`<span class="star-pick" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註（選填）</label>
+    <input class="modal-input" id="mNote" placeholder="例：必點乾麵"/>
+    <label class="modal-label">地址（選填）</label>
+    <input class="modal-input" id="mAddr" placeholder="例：台中市西區民權路"/>
+    <label class="modal-label">連結（選填）</label>
+    <input class="modal-input" id="mLink" placeholder="https://..."/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddItem()">新增</div>
+    </div>`);
+};
+
+window.doAddItem = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = {country:nav.country,region:nav.region,cat:document.getElementById('mCat').value,
+    name,stars:pickStars,note:document.getElementById('mNote').value.trim(),
+    address:document.getElementById('mAddr').value.trim(),link:document.getElementById('mLink').value.trim(),
+    photos:[],done:false,createdAt:Date.now()};
+  items.unshift(item);
+  await saveItem(item);
+  closeModal(); render();
+};
+
+window.openEditItem = function(id) {
+  const item = items.find(i=>i.id===id); if(!item) return;
+  pickStars = item.stars||0;
+  openModal(`<div class="modal-title">編輯收藏</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" value="${esc(item.name)}"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mCat">${CATS.map(c=>`<option value="${c.id}"${c.id===item.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>`<span class="star-pick${i<pickStars?' on':''}" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註</label>
+    <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
+    <label class="modal-label">地址</label>
+    <input class="modal-input" id="mAddr" value="${esc(item.address||'')}"/>
+    <label class="modal-label">連結</label>
+    <input class="modal-input" id="mLink" value="${esc(item.link||'')}"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEditItem('${id}')">儲存</div>
+    </div>`);
+};
+
+window.doEditItem = async function(id) {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = items.find(i=>i.id===id); if(!item) return;
+  Object.assign(item,{name,cat:document.getElementById('mCat').value,stars:pickStars,
+    note:document.getElementById('mNote').value.trim(),address:document.getElementById('mAddr').value.trim(),
+    link:document.getElementById('mLink').value.trim()});
+  await saveItem(item); closeModal(); render();
+};
+
+// ===== SHOP ADD/EDIT =====
+window.openAddShop = function() {
+  pickStars=0;
+  const defaultCat = nav.shopCat||shopCats[0]?.id||'';
+  openModal(`<div class="modal-title">新增網購</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" placeholder="例：Nike Air Max"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mShopCat">${shopCats.map(c=>`<option value="${c.id}"${c.id===defaultCat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map(v=>`<span class="star-pick" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註（選填）</label>
+    <input class="modal-input" id="mNote" placeholder="例：尺寸US10"/>
+    <label class="modal-label">連結（選填）</label>
+    <input class="modal-input" id="mLink" placeholder="https://..."/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddShop()">新增</div>
+    </div>`);
+};
+
+window.doAddShop = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = {name,shopCat:document.getElementById('mShopCat').value,stars:pickStars,
+    note:document.getElementById('mNote').value.trim(),link:document.getElementById('mLink').value.trim(),
+    photos:[],done:false,createdAt:Date.now()};
+  shopItems.unshift(item);
+  await saveShopItem(item);
+  closeModal(); render();
+};
+
+window.openEditShop = function(id) {
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  pickStars = item.stars||0;
+  openModal(`<div class="modal-title">編輯網購</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" value="${esc(item.name)}"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mShopCat">${shopCats.map(c=>`<option value="${c.id}"${c.id===item.shopCat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>`<span class="star-pick${i<pickStars?' on':''}" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註</label>
+    <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
+    <label class="modal-label">連結</label>
+    <input class="modal-input" id="mLink" value="${esc(item.link||'')}"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEditShop('${id}')">儲存</div>
+    </div>`);
+};
+
+window.doEditShop = async function(id) {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  Object.assign(item,{name,shopCat:document.getElementById('mShopCat').value,stars:pickStars,
+    note:document.getElementById('mNote').value.trim(),link:document.getElementById('mLink').value.trim()});
+  await saveShopItem(item); closeModal(); render();
+};
+
+// ===== CATEGORY MANAGEMENT =====
+window.openEditCountries = function() {
+  let h = '<div class="modal-title">管理國家</div>';
+  countries.forEach(c=>{
+    const canDel = !items.some(i=>i.country===c.id);
+    h += `<div class="edit-list-item"><span style="font-size:20px">${c.emoji}</span>
+      <span class="edit-list-name">${c.name}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteCountry('${c.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddCountry()">＋ 新增國家</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddCountry = function() {
+  pickEmoji='🌏';
+  openModal(`<div class="modal-title">新增國家</div>
+    <div class="emoji-grid">${EMOJIS.slice(0,20).map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <input class="modal-input" id="mName" placeholder="國家名稱（例：法國）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddCountry()">新增</div>
+    </div>`);
+};
+
+window.doAddCountry = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  countries.push({id:'c'+Date.now(),name,emoji:pickEmoji,regions:[]});
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteCountry = async function(id) {
+  if(!confirm('刪除國家？')) return;
+  countries = countries.filter(c=>c.id!==id);
+  await saveUserData(); closeModal(); render();
+};
+
+window.openEditRegions = function() {
+  const c = countries.find(x=>x.id===nav.country); if(!c) return;
+  let h = '<div class="modal-title">管理地區</div>';
+  (c.regions||[]).forEach(r=>{
+    const canDel = !items.some(i=>i.country===c.id&&i.region===r);
+    h += `<div class="edit-list-item"><span>📍</span><span class="edit-list-name">${r}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteRegion('${r}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddRegion()">＋ 新增地區</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddRegion = function() {
+  openModal(`<div class="modal-title">新增地區</div>
+    <input class="modal-input" id="mName" placeholder="地區名稱（例：花蓮）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddRegion()">新增</div>
+    </div>`);
+};
+
+window.doAddRegion = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const c = countries.find(x=>x.id===nav.country); if(!c) return;
+  if(!c.regions) c.regions=[];
+  c.regions.push(name);
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteRegion = async function(r) {
+  if(!confirm('刪除「'+r+'」地區？')) return;
+  const c = countries.find(x=>x.id===nav.country); if(!c) return;
+  c.regions = c.regions.filter(x=>x!==r);
+  await saveUserData(); closeModal(); render();
+};
+
+window.openEditCats = function() {
+  let h = '<div class="modal-title">管理分類</div>';
+  CATS.forEach(cat=>{
+    const canDel = !items.some(i=>i.cat===cat.id);
+    h += `<div class="edit-list-item"><span style="font-size:20px">${cat.emoji}</span>
+      <span class="edit-list-name">${cat.label}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteCat('${cat.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddCat()">＋ 新增分類</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddCat = function() {
+  pickEmoji='⭐';
+  const catEmojis=['🍜','🍕','🍣','🧋','☕','🏖','🏞','🎬','🎵','🎮','🎨','🛍','👗','👟','📍','⭐','🎁','🏛','🌸','📚'];
+  openModal(`<div class="modal-title">新增分類</div>
+    <div class="emoji-grid" id="epick">${catEmojis.map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <input class="modal-input" id="mName" placeholder="分類名稱（例：好住）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddCat()">新增</div>
+    </div>`);
+};
+
+window.doAddCat = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  CATS.push({id:'cat_'+Date.now(),label:name,emoji:pickEmoji,cls:'tag-eat'});
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteCat = async function(id) {
+  if(!confirm('確定刪除此分類？')) return;
+  CATS = CATS.filter(c=>c.id!==id);
+  await saveUserData(); closeModal(); render();
+};
+
+window.openEditShopCats = function() {
+  let h = '<div class="modal-title">管理網購分類</div>';
+  shopCats.forEach(cat=>{
+    const canDel = !shopItems.some(i=>i.shopCat===cat.id);
+    h += `<div class="edit-list-item"><span style="font-size:20px">${cat.emoji}</span>
+      <span class="edit-list-name">${cat.label}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteShopCat('${cat.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddShopCat()">＋ 新增分類</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddShopCat = function() {
+  pickEmoji='📦';
+  const catEmojis=['👗','👟','💄','💍','👜','🧢','⌚','📱','💻','🎮','🍜','🍕','🧴','🏠','📚','⭐','🎁','🛒','📦','🔧'];
+  openModal(`<div class="modal-title">新增網購分類</div>
+    <div class="emoji-grid" id="epick">${catEmojis.map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <input class="modal-input" id="mName" placeholder="分類名稱（例：保養品）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddShopCat()">新增</div>
+    </div>`);
+};
+
+window.doAddShopCat = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  shopCats.push({id:'sc_'+Date.now(),label:name,emoji:pickEmoji});
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteShopCat = async function(id) {
+  if(!confirm('確定刪除此分類？')) return;
+  shopCats = shopCats.filter(c=>c.id!==id);
+  await saveUserData(); closeModal(); render();
+};
+
+// ===== SWIPER =====
+function initSwipers() {
+  document.querySelectorAll('.photo-swiper').forEach(sw=>{
+    const track = sw.querySelector('.photo-swiper-track'); if(!track) return;
+    const count = parseInt(sw.dataset.count)||0;
+    let idx=0, startX=0;
+    function goTo(i) {
+      if(i<0)i=0; if(i>=count)i=count-1;
+      idx=i; sw.dataset.idx=i;
+      track.style.transform=`translateX(-${i}00%)`;
+      sw.querySelectorAll('.photo-dot').forEach((d,di)=>d.classList.toggle('on',di===i));
+      const badge=sw.querySelector('.photo-count'); if(badge) badge.textContent=`${i+1} / ${count}`;
+    }
+    sw.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
+    sw.addEventListener('touchend',e=>{
+      const diff=startX-e.changedTouches[0].clientX;
+      if(Math.abs(diff)>40){if(diff>0)goTo(idx+1);else goTo(idx-1);}
+    },{passive:true});
+  });
 }
+
+function esc(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Show loading initially
+document.getElementById('pageContent').innerHTML = '<div class="loading">載入中...</div>';
 </script>
 </body>
 </html>
