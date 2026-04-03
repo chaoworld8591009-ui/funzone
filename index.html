@@ -1520,28 +1520,28 @@ function parseHoursFromText(text) {
 }
 
 window.pasteHoursText = function() {
-  openModal(`<div class="modal-title">📋 貼上營業時間文字</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.6">
-      從 Google Maps 或任何地方複製營業時間文字，貼到下方，自動解析成時段。
-    </div>
-    <textarea class="modal-input" id="mHoursText" rows="8" placeholder="星期一 上午11:30 - 下午2:30&#10;5:30 - 下午9時&#10;星期二 上午11:30 - 下午2:30..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
-    <div class="modal-btns">
-      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
-      <div class="modal-btn modal-btn-ok" onclick="doParseHoursText()">解析</div>
-    </div>`);
-  setTimeout(()=>{ const t=document.getElementById('mHoursText'); if(t) t.focus(); },100);
+  const wrap = document.getElementById('hoursWrap');
+  if(!wrap) return;
+  wrap.innerHTML = `
+    <textarea id="mHoursText" rows="6" class="modal-input"
+      placeholder="從 Google Maps 複製營業時間文字貼在這裡...&#10;&#10;例：&#10;星期一 上午11:30 - 下午2:30&#10;5:30 - 下午9時"
+      style="resize:none;font-size:12px;line-height:1.6;margin-bottom:6px"></textarea>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <div class="modal-btn modal-btn-cancel" style="flex:1;padding:8px;font-size:13px" onclick="renderHoursWrap()">取消</div>
+      <div class="modal-btn modal-btn-ok" style="flex:1;padding:8px;font-size:13px" onclick="doParseHoursText()">解析</div>
+    </div>`;
+  setTimeout(()=>{ const t=document.getElementById('mHoursText'); if(t) t.focus(); }, 100);
 };
 
 window.doParseHoursText = function() {
-  const text = document.getElementById('mHoursText').value;
+  const text = document.getElementById('mHoursText')?.value||'';
   if(!text.trim()) return;
   const parsed = parseHoursFromText(text);
   if(parsed.length > 0) {
     pickHours = parsed;
-    closeModal();
     renderHoursWrap();
   } else {
-    alert('無法解析，請確認格式包含星期和時間。\n\n範例：\n星期一 上午11:30 - 下午2:30');
+    alert('無法解析，請確認文字包含星期和時間，或改用手動新增。');
   }
 };
 
