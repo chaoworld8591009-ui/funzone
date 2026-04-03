@@ -315,7 +315,33 @@ function setupOwnListeners() {
     if(viewingUid || !snap.exists()) return;
     userProfile = snap.data();
     friends = userProfile.friends || [];
+    // 重新監聽好友名字
+    setupFriendProfileListeners();
+    if(nav.page === 'friends') render();
   }));
+}
+
+// 即時監聽所有好友的名字/頭像
+let friendProfileListeners = [];
+function setupFriendProfileListeners() {
+  friendProfileListeners.forEach(u=>u()); friendProfileListeners=[];
+  friends.forEach(f=>{
+    const unsub = onSnapshot(doc(db,'users',f.uid), snap=>{
+      if(!snap.exists()) return;
+      const data = snap.data();
+      const fi = friends.findIndex(x=>x.uid===f.uid);
+      if(fi>-1) {
+        friends[fi].name = data.name || friends[fi].name;
+        friends[fi].photo = data.photo || friends[fi].photo;
+        // 同步更新 userProfile
+        if(userProfile.friends) {
+          userProfile.friends[fi] = friends[fi];
+        }
+      }
+      if(nav.page === 'friends') render();
+    });
+    friendProfileListeners.push(unsub);
+  });
 }
 
 async function saveUserData() {
@@ -414,6 +440,7 @@ function showMainApp() {
   document.getElementById('header').style.display='flex';
   document.getElementById('bottomNav').style.display='flex';
   setupOwnListeners();
+  setupFriendProfileListeners();
   render();
 }
 
