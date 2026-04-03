@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8"/>
@@ -86,40 +85,1960 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
 .detail-name{font-size:22px;font-weight:700;margin-bottom:6px;}
 .detail-stars-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
-.detail-star{font-size:26px;cursor:pointer;color:var(–muted2);}
-.detail-star.on{color:var(–amber);}
-.detail-section{font-size:11px;color:var(–muted2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;margin-top:12px;}
+.detail-star{font-size:26px;cursor:pointer;color:var(--muted2);}
+.detail-star.on{color:var(--amber);}
+.detail-section{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;margin-top:12px;}
 .detail-val{font-size:14px;color:#ccc;line-height:1.6;}
-.detail-link{font-size:14px;color:var(–blue);word-break:break-all;cursor:pointer;}
+.detail-link{font-size:14px;color:var(--blue);word-break:break-all;cursor:pointer;}
 .detail-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;}
 .detail-btn{padding:12px;border-radius:12px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;}
-.btn-nav{background:var(–blue-bg);color:var(–blue);}
-.btn-link{background:var(–blue-bg);color:var(–blue);}
-.btn-edit{background:var(–yellow-bg);color:var(–yellow);}
-.btn-done{background:var(–green-bg);color:var(–green);}
-.btn-del{background:var(–red-bg);color:var(–red);}
+.btn-nav{background:var(--blue-bg);color:var(--blue);}
+.btn-link{background:var(--blue-bg);color:var(--blue);}
+.btn-edit{background:var(--yellow-bg);color:var(--yellow);}
+.btn-done{background:var(--green-bg);color:var(--green);}
+.btn-del{background:var(--red-bg);color:var(--red);}
 .modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
 .modal-wrap.hidden{display:none;}
-.modal{background:var(–card);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:16px;text-align:center;}
-.modal-input{width:100%;background:var(–card2);border:0.5px solid var(–border2);border-radius:10px;padding:12px;font-size:15px;color:var(–text);margin-bottom:10px;font-family:inherit;}
-.modal-input::placeholder{color:var(–muted2);}
-.modal-label{font-size:12px;color:var(–muted);margin-bottom:4px;display:block;}
+.modal-input{width:100%;background:var(--card2);border:0.5px solid var(--border2);border-radius:10px;padding:12px;font-size:15px;color:var(--text);margin-bottom:10px;font-family:inherit;}
+.modal-input::placeholder{color:var(--muted2);}
+.modal-label{font-size:12px;color:var(--muted);margin-bottom:4px;display:block;}
 .modal-btns{display:flex;gap:8px;margin-top:4px;}
 .modal-btn{flex:1;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;border:none;font-family:inherit;}
-.modal-btn-cancel{background:var(–card2);color:var(–muted);}
-.modal-btn-ok{background:var(–amber);color:#000;}
-.modal-btn-danger{background:var(–red-bg);color:var(–red);}
+.modal-btn-cancel{background:var(--card2);color:var(--muted);}
+.modal-btn-ok{background:var(--amber);color:#000;}
+.modal-btn-danger{background:var(--red-bg);color:var(--red);}
 .emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
 .emoji-opt{font-size:24px;padding:6px;border-radius:8px;cursor:pointer;border:1px solid transparent;}
-.emoji-opt.sel{border-color:var(–amber);background:var(–amber-bg);}
+.emoji-opt.sel{border-color:var(--amber);background:var(--amber-bg);}
 .star-picker{display:flex;gap:4px;margin-bottom:12px;}
-.star-pick{font-size:28px;cursor:pointer;color:var(–muted2);}
-.star-pick.on{color:var(–amber);}
-.photo-upload{width:100%;background:var(–card2);border:0.5px dashed var(–border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(–muted);font-size:14px;margin-bottom:10px;}
+.star-pick{font-size:28px;cursor:pointer;color:var(--muted2);}
+.star-pick.on{color:var(--amber);}
+.photo-upload{width:100%;background:var(--card2);border:0.5px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--muted);font-size:14px;margin-bottom:10px;}
 .photo-preview{width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:10px;display:block;}
-.edit-list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–border);}
+.edit-list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);}
 .edit-list-name{flex:1;font-size:14px;}
 .edit-btn{font-size:13px;padding:5px 10px;border-radius:8px;cursor:pointer;border:none;font-family:inherit;}
-.edit-btn-del{background:var(–red-bg);color:var(–red);}
-.empty{text-align:center;padding:60px 20px;color:var(–muted);font-size:15px;line-height:2;}
+.edit-btn-del{background:var(--red-bg);color:var(--red);}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:15px;line-height:2;}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:14px;}
+
+/* Login page */
+.login-page{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 20px;gap:20px;}
+.login-logo{font-size:60px;margin-bottom:10px;}
+.login-title{font-size:28px;font-weight:700;}
+.login-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.6;}
+.login-btn{width:100%;max-width:320px;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;}
+.login-btn-google{background:#fff;color:#333;}
+.login-btn-email{background:var(--amber);color:#000;}
+.login-divider{color:var(--muted);font-size:13px;}
+
+/* Friends page */
+.friend-card{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.friend-avatar{width:44px;height:44px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+.friend-avatar img{width:100%;height:100%;object-fit:cover;}
+.friend-body{flex:1;}
+.friend-name{font-size:15px;font-weight:600;}
+.friend-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.friend-action{color:var(--amber);font-size:13px;}
+.profile-section{padding:20px;border-bottom:0.5px solid var(--border);}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;overflow:hidden;}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-name{text-align:center;font-size:20px;font-weight:700;margin-bottom:4px;}
+.profile-email{text-align:center;font-size:13px;color:var(--muted);}
+.profile-id{text-align:center;font-size:12px;color:var(--muted2);margin-top:4px;}
+.sync-badge{position:absolute;top:10px;right:60px;background:var(--green-bg);color:var(--green);font-size:11px;padding:3px 8px;border-radius:20px;}
+.sync-badge.syncing{background:var(--amber-bg);color:var(--amber);}
+
+/* 搜尋 */
+.search-bar{padding:8px 14px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.search-input{width:100%;background:var(--card2);border:0.5px solid var(--border2);border-radius:10px;padding:9px 14px;font-size:14px;color:var(--text);font-family:inherit;outline:none;}
+.search-input::placeholder{color:var(--muted2);}
+
+/* 排序 */
+.sort-bar{display:flex;gap:6px;padding:6px 14px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.sort-bar::-webkit-scrollbar{display:none;}
+.sort-pill{font-size:12px;padding:4px 12px;border-radius:20px;white-space:nowrap;cursor:pointer;border:0.5px solid var(--border2);color:var(--muted);background:transparent;flex-shrink:0;}
+.sort-pill.active{background:var(--green);color:#000;border-color:var(--green);font-weight:700;}
+
+/* 長按刪除 */
+.list-item.pressing{background:var(--red-bg) !important;transition:background 0.15s;}
+
+/* 營業時間 */
+.hours-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.hours-days{flex:1.2;background:var(--card2);border:0.5px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text);font-family:inherit;}
+.hours-time{width:72px;background:var(--card2);border:0.5px solid var(--border2);border-radius:8px;padding:8px 6px;font-size:13px;color:var(--text);font-family:inherit;text-align:center;}
+.hours-sep{color:var(--muted);font-size:12px;flex-shrink:0;}
+.hours-del{background:var(--red-bg);color:var(--red);border:none;border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer;flex-shrink:0;font-family:inherit;}
+.hours-add-btn{width:100%;background:var(--card2);border:0.5px dashed var(--border2);border-radius:8px;padding:9px;font-size:13px;color:var(--muted);cursor:pointer;text-align:center;margin-bottom:10px;}
+.hours-display{margin-bottom:12px;}
+.hours-group{display:flex;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--border);}
+.hours-group:last-child{border-bottom:none;}
+.hours-group-day{font-size:13px;color:var(--muted);width:52px;flex-shrink:0;padding-top:1px;}
+.hours-group-slots{flex:1;}
+.hours-group-slot{font-size:13px;color:var(--text);line-height:1.8;}
+.hours-slot-note{font-size:11px;color:var(--muted2);margin-left:6px;}
+
+
+.modal-photo-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.modal-photo-thumb{width:70px;height:70px;border-radius:8px;object-fit:cover;cursor:pointer;border:2px solid transparent;}
+.modal-photo-thumb:active{border-color:var(--red);opacity:0.7;}
+.modal-photo-add{width:70px;height:70px;border-radius:8px;background:var(--card2);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;color:var(--muted2);flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="header" id="header">
+    <div class="header-back" id="headerBack" style="display:none">‹</div>
+    <div class="header-title" id="headerTitle">我的收藏</div>
+    <div class="header-action" id="headerAction"></div>
+  </div>
+  <div class="page" id="pageContent"></div>
+  <div class="bottom-nav" id="bottomNav" style="display:none"></div>
+</div>
+<div class="modal-wrap hidden" id="modalWrap">
+  <div class="modal" id="modalBody"></div>
+</div>
+<input type="file" id="photoInput" accept="image/*" style="display:none"/>
+<input type="file" id="videoInput" accept="video/*" style="display:none"/>
+
+<!-- 全螢幕燈箱 -->
+<div class="lightbox hidden" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <div class="lightbox-prev" id="lbPrev" onclick="lightboxNav(-1)">‹</div>
+  <div id="lightboxMedia"></div>
+  <div class="lightbox-next" id="lbNext" onclick="lightboxNav(1)">›</div>
+  <div class="lightbox-count" id="lbCount"></div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAkHCehPV2vA6npTAXnENIfX07GqmZRDio",
+  authDomain: "my-collection-app-c51f4.firebaseapp.com",
+  projectId: "my-collection-app-c51f4",
+  storageBucket: "my-collection-app-c51f4.firebasestorage.app",
+  messagingSenderId: "27195030094",
+  appId: "1:27195030094:web:14a4ffec9b541fb5db611f"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+// ===== STATE =====
+let currentUser = null;
+let userProfile = null;
+let items = [];
+let shopItems = [];
+let countries = [];
+let shopCats = [];
+let CATS = [{id:'eat',label:'好吃',emoji:'🍜',cls:'tag-eat'},{id:'play',label:'好玩',emoji:'🏞',cls:'tag-play'},{id:'buy',label:'好買',emoji:'🏪',cls:'tag-buy'},{id:'go',label:'想去',emoji:'📍',cls:'tag-go'}];
+let friends = [];
+let friendRequests = [];
+let viewingUid = null; // null = own, uid = friend's
+let nav = {page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null,sort:'stars',search:''};
+let pickStars=0, pickEmoji='🌏', pickPhotos=[], editingId=null;
+const EMOJIS=['🇹🇼','🇯🇵','🇰🇷','🇺🇸','🇬🇧','🇫🇷','🇮🇹','🇩🇪','🇹🇭','🇸🇬','🇦🇺','🇨🇳','🍜','🍕','🍣','🍦','🧋','☕','🍺','🌮','🥗','🏖','🏞','🎬','🎵','🎮','🎨','🛍','👗','👟','💄','💍','📍','🌏','🏨','🚗','✈️','🏔','⭐','🎁'];
+const DEFAULT_COUNTRIES = [{id:'tw',name:'台灣',emoji:'🇹🇼',regions:['台中','台北','高雄']},{id:'jp',name:'日本',emoji:'🇯🇵',regions:['東京','大阪','京都']}];
+const DEFAULT_SHOPCATS = [{id:'clothes',label:'衣服',emoji:'👗'},{id:'shoes',label:'鞋子',emoji:'👟'},{id:'beauty',label:'美妝',emoji:'💄'},{id:'food',label:'食品',emoji:'🍜'},{id:'other',label:'其他',emoji:'📦'}];
+
+// ===== AUTH =====
+onAuthStateChanged(auth, async (user) => {
+  if(user) {
+    currentUser = user;
+    await loadUserProfile();
+    await loadUserData();
+    showMainApp();
+  } else {
+    currentUser = null;
+    showLoginPage();
+  }
+});
+
+async function loadUserProfile() {
+  const d = await getDoc(doc(db,'users',currentUser.uid));
+  if(d.exists()) {
+    userProfile = d.data();
+  } else {
+    userProfile = {
+      uid: currentUser.uid,
+      name: currentUser.displayName || '新用戶',
+      email: currentUser.email,
+      photo: currentUser.photoURL || '',
+      friendCode: Math.random().toString(36).slice(2,8).toUpperCase(),
+      friends: [],
+      createdAt: Date.now()
+    };
+    await setDoc(doc(db,'users',currentUser.uid), userProfile);
+  }
+}
+
+// 修正國家 emoji：若為文字縮寫（如 TW/JP）則轉換為旗子 emoji
+function fixCountryEmoji(c) {
+  const emojiMap = {
+    'TW':'🇹🇼','JP':'🇯🇵','KR':'🇰🇷','US':'🇺🇸','GB':'🇬🇧','FR':'🇫🇷',
+    'IT':'🇮🇹','DE':'🇩🇪','TH':'🇹🇭','SG':'🇸🇬','AU':'🇦🇺','CN':'🇨🇳',
+    'HK':'🇭🇰','MO':'🇲🇴','VN':'🇻🇳','MY':'🇲🇾','ID':'🇮🇩','PH':'🇵🇭',
+    'IN':'🇮🇳','ES':'🇪🇸','PT':'🇵🇹','NL':'🇳🇱','CH':'🇨🇭','CA':'🇨🇦',
+    'MX':'🇲🇽','BR':'🇧🇷','AR':'🇦🇷','NZ':'🇳🇿',
+  };
+  if(c.emoji && emojiMap[c.emoji.toUpperCase()]) {
+    c.emoji = emojiMap[c.emoji.toUpperCase()];
+  }
+  return c;
+}
+
+async function loadUserData() {
+  const uid = viewingUid || currentUser.uid;
+  const d = await getDoc(doc(db,'userData',uid));
+  if(d.exists()) {
+    const data = d.data();
+    countries = (data.countries || DEFAULT_COUNTRIES).map(fixCountryEmoji);
+    shopCats = data.shopCats || DEFAULT_SHOPCATS;
+    if(data.cats && data.cats.length) CATS = data.cats;
+  } else {
+    countries = DEFAULT_COUNTRIES;
+    shopCats = DEFAULT_SHOPCATS;
+    if(!viewingUid) await saveUserData();
+  }
+  // Load items with photos from subcollection
+  const itemsSnap = await getDocs(collection(db,'userData',uid,'items'));
+  items = await Promise.all(itemsSnap.docs.map(async d=>{
+    const item = {id:d.id,...d.data()};
+    if(item.photoCount>0) item.photos = await loadItemPhotos(uid,d.id,'items');
+    else item.photos = item.photos||[];
+    return item;
+  }));
+  const shopSnap = await getDocs(collection(db,'userData',uid,'shopItems'));
+  shopItems = await Promise.all(shopSnap.docs.map(async d=>{
+    const item = {id:d.id,...d.data()};
+    if(item.photoCount>0) item.photos = await loadItemPhotos(uid,d.id,'shopItems');
+    else item.photos = item.photos||[];
+    return item;
+  }));
+  // Load friends
+  if(!viewingUid) {
+    friends = userProfile.friends || [];
+  }
+}
+
+// Setup realtime listeners for own data
+let ownListeners = [];
+function setupOwnListeners() {
+  ownListeners.forEach(u=>u()); ownListeners=[];
+  const uid = currentUser.uid;
+  
+  // Listen to own items - 保留記憶體中的照片，不被 snapshot 蓋掉
+  ownListeners.push(onSnapshot(collection(db,'userData',uid,'items'), snap=>{
+    if(viewingUid) return;
+    const existingPhotos = {};
+    items.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
+    items = snap.docs.map(d=>{
+      const item = {id:d.id,...d.data()};
+      item.photos = existingPhotos[d.id] || item.photos || [];
+      return item;
+    });
+    if(nav.page !== 'detail') render();
+  }));
+  
+  // Listen to own shopItems
+  ownListeners.push(onSnapshot(collection(db,'userData',uid,'shopItems'), snap=>{
+    if(viewingUid) return;
+    const existingPhotos = {};
+    shopItems.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
+    shopItems = snap.docs.map(d=>{
+      const item = {id:d.id,...d.data()};
+      item.photos = existingPhotos[d.id] || item.photos || [];
+      return item;
+    });
+    if(nav.page !== 'shopdetail') render();
+  }));
+  
+  // Listen to own userData (countries, cats etc)
+  ownListeners.push(onSnapshot(doc(db,'userData',uid), snap=>{
+    if(viewingUid || !snap.exists()) return;
+    const data = snap.data();
+    countries = (data.countries || DEFAULT_COUNTRIES).map(fixCountryEmoji);
+    shopCats = data.shopCats || DEFAULT_SHOPCATS;
+    if(data.cats && data.cats.length) CATS = data.cats;
+  }));
+  
+  // Listen to own profile (for friend code etc)
+  ownListeners.push(onSnapshot(doc(db,'users',uid), snap=>{
+    if(viewingUid || !snap.exists()) return;
+    userProfile = snap.data();
+    friends = userProfile.friends || [];
+    // 重新監聽好友名字
+    setupFriendProfileListeners();
+    if(nav.page === 'friends') render();
+  }));
+}
+
+// 即時監聽所有好友的名字/頭像
+let friendProfileListeners = [];
+function setupFriendProfileListeners() {
+  friendProfileListeners.forEach(u=>u()); friendProfileListeners=[];
+  friends.forEach(f=>{
+    const unsub = onSnapshot(doc(db,'users',f.uid), snap=>{
+      if(!snap.exists()) return;
+      const data = snap.data();
+      const fi = friends.findIndex(x=>x.uid===f.uid);
+      if(fi>-1) {
+        friends[fi].name = data.name || friends[fi].name;
+        friends[fi].photo = data.photo || friends[fi].photo;
+        // 同步更新 userProfile
+        if(userProfile.friends) {
+          userProfile.friends[fi] = friends[fi];
+        }
+      }
+      if(nav.page === 'friends') render();
+    });
+    friendProfileListeners.push(unsub);
+  });
+}
+
+async function saveUserData() {
+  if(viewingUid) return;
+  await setDoc(doc(db,'userData',currentUser.uid), {countries, shopCats, cats:CATS, updatedAt:Date.now()});
+}
+
+async function saveItem(item) {
+  if(viewingUid) return;
+  const {id, photos, ...data} = item; // 照片另存，不放在主文件
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,'items',id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,'items'), data);
+    item.id = ref.id;
+  }
+}
+async function deleteItemDB(id) {
+  if(viewingUid) return;
+  await deleteDoc(doc(db,'userData',currentUser.uid,'items',id));
+}
+async function saveShopItem(item) {
+  if(viewingUid) return;
+  const {id, photos, ...data} = item;
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,'shopItems',id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,'shopItems'), data);
+    item.id = ref.id;
+  }
+}
+async function deleteShopItemDB(id) {
+  if(viewingUid) return;
+  await deleteDoc(doc(db,'userData',currentUser.uid,'shopItems',id));
+}
+
+// ===== 照片另存子集合（不受 1MB 限制）=====
+
+// 只更新主文件的 photoCount，不動照片
+async function saveItemMainDoc(item, colName) {
+  if(viewingUid) return;
+  const {id, photos, ...data} = item;
+  data.photoCount = (photos||[]).length;
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,colName,id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,colName), data);
+    item.id = ref.id;
+  }
+}
+
+// 新增照片（只追加，不刪舊的）
+async function appendPhotosToCol(uid, colName, itemId, newPhotos) {
+  const col = collection(db,'userData',uid,colName,itemId,'photos');
+  const existing = await getDocs(col);
+  const startIdx = existing.size;
+  await Promise.all(newPhotos.map((data, i) =>
+    setDoc(doc(col, String(startIdx + i).padStart(6,'0')), {data, idx: startIdx + i, t: Date.now()})
+  ));
+}
+
+// 刪除特定位置的照片
+async function deletePhotoFromCol(uid, colName, itemId, displayIdx) {
+  const col = collection(db,'userData',uid,colName,itemId,'photos');
+  const snap = await getDocs(col);
+  const sorted = snap.docs.sort((a,b)=>a.data().idx-b.data().idx);
+  if(sorted[displayIdx]) await deleteDoc(sorted[displayIdx].ref);
+}
+
+// 相容舊版（供 delPhoto 呼叫）
+async function saveItemWithPhotos(item) { await saveItemMainDoc(item,'items'); }
+async function saveShopItemWithPhotos(item) { await saveItemMainDoc(item,'shopItems'); }
+
+async function loadItemPhotos(uid, itemId, colName) {
+  const col = collection(db,'userData',uid,colName,itemId,'photos');
+  const snap = await getDocs(col);
+  if(snap.empty) return [];
+  return snap.docs.sort((a,b)=>a.data().idx-b.data().idx).map(d=>d.data().data);
+}
+
+// 圖片壓縮
+async function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1080;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ===== LOGIN PAGE =====
+function showLoginPage() {
+  document.getElementById('bottomNav').style.display='none';
+  document.getElementById('header').style.display='none';
+  document.getElementById('pageContent').innerHTML = `
+    <div class="login-page">
+      <div class="login-logo">🗂</div>
+      <div class="login-title">我的收藏</div>
+      <div class="login-sub">記錄你的好吃、好玩、好買<br>還可以看朋友的收藏！</div>
+      <button class="login-btn login-btn-google" onclick="loginGoogle()">
+        <span>G</span> 用 Google 帳號登入
+      </button>
+      <div class="login-divider">— 或 —</div>
+      <button class="login-btn login-btn-email" onclick="showEmailLogin()">
+        📧 用 Email 登入 / 註冊
+      </button>
+    </div>`;
+}
+
+window.loginGoogle = async function() {
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch(e) { alert('登入失敗：'+e.message); }
+};
+
+window.showEmailLogin = function() {
+  openModal(`<div class="modal-title">Email 登入 / 註冊</div>
+    <label class="modal-label">Email</label>
+    <input class="modal-input" id="mEmail" type="email" placeholder="your@email.com"/>
+    <label class="modal-label">密碼（至少6位）</label>
+    <input class="modal-input" id="mPwd" type="password" placeholder="••••••"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="doEmailLogin()">登入</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEmailRegister()">註冊</div>
+    </div>`);
+};
+
+window.doEmailLogin = async function() {
+  const email = document.getElementById('mEmail').value.trim();
+  const pwd = document.getElementById('mPwd').value;
+  try { await signInWithEmailAndPassword(auth, email, pwd); closeModal(); }
+  catch(e) { alert('登入失敗：'+e.message); }
+};
+
+window.doEmailRegister = async function() {
+  const email = document.getElementById('mEmail').value.trim();
+  const pwd = document.getElementById('mPwd').value;
+  try { await createUserWithEmailAndPassword(auth, email, pwd); closeModal(); }
+  catch(e) { alert('註冊失敗：'+e.message); }
+};
+
+// ===== MAIN APP =====
+function showMainApp() {
+  document.getElementById('header').style.display='flex';
+  document.getElementById('bottomNav').style.display='flex';
+  setupOwnListeners();
+  setupFriendProfileListeners();
+  render();
+}
+
+function isReadOnly() { return !!viewingUid; }
+
+function render() {
+  renderHeader();
+  renderPage();
+  renderBottomNav();
+}
+
+function renderHeader() {
+  const back = document.getElementById('headerBack');
+  const title = document.getElementById('headerTitle');
+  const action = document.getElementById('headerAction');
+  back.style.display='none'; action.textContent=''; action.onclick=null;
+
+  const pages = {
+    'countries': ['我的收藏', null, isReadOnly()?null:'編輯', ()=>openEditCountries()],
+    'regions': ['', ()=>{ if(viewingUid){clearFriendListeners();viewingUid=null;loadUserData().then(()=>render());} else {nav.page='countries';render();} }, isReadOnly()?null:'編輯', ()=>openEditRegions()],
+    'cats': ['', ()=>{nav.page='regions';render();}, isReadOnly()?null:'編輯', ()=>openEditCats()],
+    'list': ['', ()=>{nav.page='cats';render();}, isReadOnly()?null:'＋', ()=>openAddItem()],
+    'alllist': ['全部收藏', ()=>{nav.page='regions';render();}, isReadOnly()?null:'＋', ()=>openAddItem()],
+    'detail': ['詳細', ()=>{nav.page=nav.prevPage||'list';render();}, isReadOnly()?null:'編輯', ()=>openEditItem(nav.itemId)],
+    'shop': ['🛒 網購', null, isReadOnly()?null:'編輯', ()=>openEditShopCats()],
+    'shopcat': ['', ()=>{nav.page='shop';render();}, isReadOnly()?null:'＋', ()=>openAddShop()],
+    'shopalllist': ['全部網購', ()=>{nav.page='shop';render();}, isReadOnly()?null:'＋', ()=>openAddShop()],
+    'shopdetail': ['詳細', ()=>{nav.page=nav.prevPage||'shopcat';render();}, isReadOnly()?null:'編輯', ()=>openEditShop(nav.itemId)],
+    'friends': ['好友收藏', null, '＋ 新增', ()=>openAddFriend()],
+    'profile': ['我的帳號', null, null, null],
+  };
+
+  const cfg = pages[nav.page];
+  if(!cfg) return;
+
+  let t = cfg[0];
+  if(nav.page==='regions') { const c=countries.find(x=>x.id===nav.country); t=(c?c.emoji+' '+c.name:''); }
+  if(nav.page==='cats') t='📍 '+nav.region;
+  if(nav.page==='list') { const cat=CATS.find(c=>c.id===nav.cat); t=cat?cat.emoji+' '+cat.label:''; }
+  if(nav.page==='shopcat') { const sc=shopCats.find(c=>c.id===nav.shopCat); t=sc?sc.emoji+' '+sc.label:''; }
+
+  if(isReadOnly() && ['countries','regions','cats','list','alllist','shop','shopcat','shopalllist'].includes(nav.page)) {
+    const fp = friends.find(f=>f.uid===viewingUid);
+    title.textContent = (fp?fp.name+'的':'朋友的')+' '+t;
+  } else {
+    title.textContent = t;
+  }
+
+  if(cfg[1]) { back.style.display='block'; back.onclick=cfg[1]; }
+  if(cfg[2]) { action.textContent=cfg[2]; action.onclick=cfg[3]; }
+}
+
+function renderPage() {
+  const p = document.getElementById('pageContent');
+  const pages = {
+    'countries': renderCountries,
+    'regions': renderRegions,
+    'cats': renderCats,
+    'list': renderList,
+    'alllist': renderAllList,
+    'detail': renderDetail,
+    'shop': renderShop,
+    'shopcat': renderShopCat,
+    'shopalllist': renderShopAllList,
+    'shopdetail': renderShopDetail,
+    'friends': renderFriends,
+    'profile': renderProfile,
+  };
+  p.innerHTML = (pages[nav.page]||renderCountries)();
+  setTimeout(initSwipers, 50);
+}
+
+function renderBottomNav() {
+  const btns = [
+    {ico:'🌏',lbl:'收藏',pages:['countries','regions','cats','list','alllist','detail']},
+    {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
+    {ico:'👥',lbl:'好友',pages:['friends']},
+    {ico:'👤',lbl:'我的',pages:['profile']},
+  ];
+  document.getElementById('bottomNav').innerHTML = btns.map(b=>{
+    const active = b.pages.includes(nav.page);
+    return `<div class="nav-btn${active?' active':''}" onclick="goNav('${b.pages[0]}')">
+      <div class="nav-ico">${b.ico}</div>
+      <div class="nav-lbl">${b.lbl}</div>
+    </div>`;
+  }).join('');
+}
+
+window.goNav = function(page) {
+  if(['countries','regions','cats','list','alllist','detail'].includes(page)) {
+    if(viewingUid) {
+      // Going back to own data - clear friend listeners and reload own data
+      clearFriendListeners();
+      viewingUid = null;
+      // 立即重置為自己的資料，避免短暫顯示朋友的資料
+      countries = DEFAULT_COUNTRIES;
+      items = [];
+      shopItems = [];
+      CATS = [{id:'eat',label:'好吃',emoji:'🍜',cls:'tag-eat'},{id:'play',label:'好玩',emoji:'🏞',cls:'tag-play'},{id:'buy',label:'好買',emoji:'🏪',cls:'tag-buy'},{id:'go',label:'想去',emoji:'📍',cls:'tag-go'}];
+      nav={page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null};
+      document.getElementById('pageContent').innerHTML = '<div class="loading">載入中...</div>';
+      loadUserData().then(()=>render());
+      return;
+    }
+  }
+  nav.page=page;
+  render();
+};
+
+// ===== COUNTRIES =====
+function renderCountries() {
+  let h = '<div class="section-hdr">— 選擇國家 —</div>';
+  if(!countries.length) return '<div class="empty">還沒有國家<br>'+(isReadOnly()?'':'按右上角開始新增！')+'</div>';
+  countries.forEach(c=>{
+    const cnt = items.filter(i=>i.country===c.id&&!i.done).length;
+    h += `<div class="list-item" onclick="goRegions('${c.id}')">
+      <div class="list-icon" style="background:#1a1a1a;font-size:28px">${c.emoji}</div>
+      <div class="list-body"><div class="list-name">${c.name}</div><div class="list-sub">${cnt} 筆收藏</div></div>
+      <div class="list-arrow">›</div></div>`;
+  });
+  return h;
+}
+
+function renderRegions() {
+  const c = countries.find(x=>x.id===nav.country); if(!c) return '';
+  const allCnt = items.filter(i=>i.country===c.id&&!i.done).length;
+  let h = `<div class="list-item" style="background:var(--yellow-bg)" onclick="goAllList()">
+    <div class="list-icon" style="background:var(--yellow-bg);font-size:22px">📋</div>
+    <div class="list-body"><div class="list-name" style="color:var(--yellow)">${c.name}全部收藏</div>
+    <div class="list-sub" style="color:var(--muted)">不分地區 · ${allCnt} 筆</div></div>
+    <div class="list-arrow" style="color:var(--yellow)">›</div></div>`;
+  h += '<div class="section-hdr">— 依地區 —</div>';
+  (c.regions||[]).forEach(r=>{
+    const cnt = items.filter(i=>i.country===c.id&&i.region===r&&!i.done).length;
+    h += `<div class="list-item" onclick="goCats('${r}')">
+      <div class="list-icon" style="background:var(--blue-bg);font-size:20px">📍</div>
+      <div class="list-body"><div class="list-name">${r}</div><div class="list-sub">${cnt} 筆</div></div>
+      <div class="list-arrow">›</div></div>`;
+  });
+  return h;
+}
+
+function renderCats() {
+  return CATS.map(cat=>{
+    const cnt = items.filter(i=>i.country===nav.country&&i.region===nav.region&&i.cat===cat.id&&!i.done).length;
+    return `<div class="list-item" onclick="goList('${cat.id}')">
+      <div class="list-icon" style="background:${getCatBg(cat.id)};font-size:22px">${cat.emoji}</div>
+      <div class="list-body"><div class="list-name">${cat.label}</div><div class="list-sub">${cnt} 筆</div></div>
+      <div class="list-arrow">›</div></div>`;
+  }).join('');
+}
+
+function getCatBg(id){return{eat:'var(--amber-bg)',play:'var(--green-bg)',buy:'var(--purple-bg)',go:'var(--red-bg)'}[id]||'var(--card2)';}
+
+function getFilteredItems() {
+  let base = items.filter(i=>!i.done);
+  if(nav.page==='list') base = items.filter(i=>i.country===nav.country&&i.region===nav.region&&i.cat===nav.cat&&!i.done);
+  else if(nav.page==='alllist') {
+    base = items.filter(i=>i.country===nav.country&&!i.done);
+    if(nav.filter&&nav.filter!=='all') base = base.filter(i=>i.cat===nav.filter);
+  }
+  if(nav.search) {
+    const q = nav.search.toLowerCase();
+    base = base.filter(i=>i.name.toLowerCase().includes(q)||(i.note||'').toLowerCase().includes(q)||(i.address||'').toLowerCase().includes(q));
+  }
+  const sort = nav.sort||'stars';
+  if(sort==='newest') return base.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(sort==='name') return base.sort((a,b)=>a.name.localeCompare(b.name,'zh-TW'));
+  return base.sort((a,b)=>(b.stars||0)-(a.stars||0));
+}
+
+function renderListItem(item, from) {
+  const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
+  const starsStr = '★'.repeat(item.stars||0);
+  let sub = `<span class="stars" style="font-size:11px">${starsStr}</span>`;
+  if(from==='alllist') sub += ` <span class="tag tag-loc">📍${item.region}</span><span class="tag ${cat.cls}">${cat.label}</span>`;
+  if(item.note) sub += ` <span style="color:var(--muted);font-size:11px">${item.note.slice(0,15)}${item.note.length>15?'…':''}</span>`;
+  const hasPhoto = item.photos&&item.photos.length;
+  const thumb = hasPhoto?`background:var(--card2);`:`background:${getCatBg(item.cat)};`;
+  const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
+  const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
+  return `<div class="list-item" 
+    onclick="goDetail('${item.id}','${from}')"
+    ${!isReadOnly()?`ontouchstart="startLongPress('${item.id}',this,event)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()"`:''}>
+    <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
+    <div class="list-body"><div class="list-name">${item.name}</div><div class="list-sub">${sub}</div></div>
+    <div class="list-arrow">›</div></div>`;
+}
+
+function renderList() {
+  const f = getFilteredItems();
+  const sortBar = `<div class="sort-bar">
+    <span class="sort-pill${(nav.sort||'stars')==='stars'?' active':''}" onclick="setSort('stars')">⭐ 星星</span>
+    <span class="sort-pill${nav.sort==='newest'?' active':''}" onclick="setSort('newest')">🕐 最新</span>
+    <span class="sort-pill${nav.sort==='name'?' active':''}" onclick="setSort('name')">🔤 名稱</span>
+  </div>`;
+  const searchBar = `<div class="search-bar"><input class="search-input" placeholder="🔍 搜尋名稱、備註..." value="${esc(nav.search||'')}" oninput="setSearch(this.value)"/></div>`;
+  if(!f.length) return searchBar+sortBar+`<div class="empty">${nav.search?'找不到符合的收藏':'還沒有收藏'+(isReadOnly()?'':'<br>按右上角 ＋ 新增！')}</div>`;
+  return searchBar+sortBar+`<div class="section-hdr">— 共 ${f.length} 筆 —</div>`+f.map(i=>renderListItem(i,'list')).join('');
+}
+
+function renderAllList() {
+  nav.filter = nav.filter||'all';
+  const f = getFilteredItems();
+  const searchBar = `<div class="search-bar"><input class="search-input" placeholder="🔍 搜尋名稱、備註..." value="${esc(nav.search||'')}" oninput="setSearch(this.value)"/></div>`;
+  let h = searchBar+'<div class="filter-bar">';
+  h += `<div class="filter-pill${nav.filter==='all'?' active':''}" onclick="setFilter('all')">全部</div>`;
+  CATS.forEach(cat=>{ h+=`<div class="filter-pill${nav.filter===cat.id?' active':''}" onclick="setFilter('${cat.id}')">${cat.emoji} ${cat.label}</div>`; });
+  h += '</div>';
+  h += `<div class="sort-bar">
+    <span class="sort-pill${(nav.sort||'stars')==='stars'?' active':''}" onclick="setSort('stars')">⭐ 星星</span>
+    <span class="sort-pill${nav.sort==='newest'?' active':''}" onclick="setSort('newest')">🕐 最新</span>
+    <span class="sort-pill${nav.sort==='name'?' active':''}" onclick="setSort('name')">🔤 名稱</span>
+  </div>`;
+  if(!f.length) return h+(nav.search?'<div class="empty">找不到符合的收藏</div>':'<div class="empty">這個分類還沒有收藏</div>');
+  h += `<div class="section-hdr">— 共 ${f.length} 筆 —</div>`;
+  return h + f.map(i=>renderListItem(i,'alllist')).join('');
+}
+
+function isVideo(url) { return url && (url.startsWith('data:video') || /\.(mp4|mov|webm|avi)$/i.test(url)); }
+
+function makeSlide(p, idx, itemId) {
+  if(isVideo(p)) {
+    return `<div class="photo-swiper-slide" data-open-idx="${idx}" data-open-id="${itemId}">
+      <video src="${p}" playsinline muted loop autoplay style="width:100%;height:100%;object-fit:cover;pointer-events:none;"></video>
+      <div class="media-type-badge">▶ 影片</div>
+    </div>`;
+  }
+  return `<div class="photo-swiper-slide" data-open-idx="${idx}" data-open-id="${itemId}"><img src="${p}" style="pointer-events:none;"/></div>`;
+}
+
+function renderDetail() {
+  const item = items.find(i=>i.id===nav.itemId); if(!item) return '<div class="empty">找不到</div>';
+  const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
+  const c = countries.find(x=>x.id===item.country);
+  const photos = item.photos||[];
+  const slides = photos.length ? photos.map((p,i)=>makeSlide(p,i,item.id)).join('') :
+    `<div class="photo-swiper-slide"><div class="slide-emoji">${cat.emoji}</div></div>`;
+  const dots = photos.length>1 ? photos.map((_,i)=>`<div class="photo-dot${i===0?' on':''}" id="dot_${item.id}_${i}"></div>`).join('') : '';
+  const count = photos.length>1 ? `<div class="photo-count">1 / ${photos.length}</div>` : '';
+  let h = `<div class="photo-swiper" id="swiper_${item.id}" data-idx="0" data-count="${photos.length}" data-id="${item.id}" data-type="item">
+    <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
+    <div class="photo-swiper-overlay"></div>
+    ${dots?'<div class="photo-dots">'+dots+'</div>':''}${count}
+    ${!isReadOnly()?`<div class="photo-btn-row">
+      <div class="photo-add-btn" onclick="addMediaType('${item.id}','item','image')">📷 ＋照片</div>
+      <div class="photo-add-video-btn" onclick="addMediaType('${item.id}','item','video')">🎥 ＋影片</div>
+    </div>`:''}
+    ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" id="coverBtn_${item.id}" onclick="setCover('${item.id}','item')">⭐ 設封面</div>`:''}
+    ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
+  </div>`;
+  const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setItemStar('${item.id}',${v})`)}">★</span>`).join('');
+  h += `<div class="detail-body">
+    <div class="detail-tags">
+      ${c?`<span class="tag" style="background:#1a1a1a;color:var(--muted)">${c.emoji} ${c.name}</span>`:''}
+      <span class="tag tag-loc">📍 ${item.region}</span>
+      <span class="tag ${cat.cls}">${cat.label}</span>
+    </div>
+    <div class="detail-name">${item.name}</div>
+    <div class="detail-stars-row">${starsHtml}</div>
+    ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
+    ${item.hours&&item.hours.length?`<div class="detail-section">🕐 營業時間</div><div class="hours-display">${(()=>{
+      const groups=[];
+      item.hours.forEach(h=>{
+        const last=groups[groups.length-1];
+        if(last&&last.day===h.days) last.slots.push(h);
+        else groups.push({day:h.days,slots:[h]});
+      });
+      return groups.map(g=>`<div class="hours-group">
+        <div class="hours-group-day">${esc(g.day)}</div>
+        <div class="hours-group-slots">${g.slots.map(s=>`<div class="hours-group-slot">${s.open&&s.close?s.open+' – '+s.close:(s.note||'公休')}${s.note&&s.open?`<span class="hours-slot-note">${esc(s.note)}</span>`:''}</div>`).join('')}</div>
+      </div>`).join('');
+    })()}</div>`:''}
+    ${item.address?`<div class="detail-section">地址</div><div class="detail-val">${item.address}</div>`:''}
+    ${item.phone?`<div class="detail-section">電話</div><div class="detail-val"><a href="tel:${esc(item.phone)}" style="color:var(--green);text-decoration:none">📞 ${esc(item.phone)}</a></div>`:''}
+    ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
+    <div class="detail-btns">
+      ${item.address?`<div class="detail-btn btn-nav" onclick="openMap('${item.address}')">🧭 導航</div>`:''}
+      ${item.phone?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="window.location='tel:${esc(item.phone)}'">📞 致電</div>`:''}
+      ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
+      <div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareItem('${item.id}')">📤 分享</div>
+      ${isReadOnly()?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="copyFromFriend('${item.id}')">➕ 複製到我的</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditItem('${item.id}')">✏️ 編輯</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteItem('${item.id}')">🗑 刪除</div>`:''}
+    </div>
+  </div>`;
+  return h;
+}
+
+// ===== SHOP =====
+function renderShop() {
+  const allCnt = shopItems.filter(i=>!i.done).length;
+  let h = `<div class="list-item" style="background:var(--blue-bg)" onclick="goShopAllList()">
+    <div class="list-icon" style="background:rgba(77,166,255,0.15);font-size:22px">📋</div>
+    <div class="list-body"><div class="list-name" style="color:var(--blue)">全部網購清單</div>
+    <div class="list-sub" style="color:var(--muted)">${allCnt} 筆</div></div>
+    <div class="list-arrow" style="color:var(--blue)">›</div></div>`;
+  h += '<div class="section-hdr">— 依分類 —</div>';
+  shopCats.forEach(cat=>{
+    const cnt = shopItems.filter(i=>i.shopCat===cat.id&&!i.done).length;
+    h += `<div class="list-item" onclick="goShopCat('${cat.id}')">
+      <div class="list-icon" style="background:var(--blue-bg);font-size:22px">${cat.emoji}</div>
+      <div class="list-body"><div class="list-name">${cat.label}</div><div class="list-sub">${cnt} 筆</div></div>
+      <div class="list-arrow">›</div></div>`;
+  });
+  return h;
+}
+
+function shopListItem(item) {
+  const sc = shopCats.find(c=>c.id===item.shopCat);
+  const hasPhoto = item.photos&&item.photos.length;
+  const thumb = hasPhoto?'background:var(--card2);':'background:var(--blue-bg);';
+  const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
+  const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:sc?sc.emoji:'🛒';
+  const starsStr = '★'.repeat(item.stars||0);
+  return `<div class="list-item" onclick="goShopDetail('${item.id}')">
+    <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
+    <div class="list-body"><div class="list-name">${item.name}</div>
+    <div class="list-sub"><span class="stars" style="font-size:11px">${starsStr}</span>
+    ${sc?`<span class="tag tag-shop" style="font-size:9px">${sc.emoji} ${sc.label}</span>`:''}
+    ${item.note?`<span style="color:var(--muted);font-size:11px">${item.note.slice(0,20)}</span>`:''}
+    </div></div><div class="list-arrow">›</div></div>`;
+}
+
+function renderShopCat() {
+  const f = shopItems.filter(i=>i.shopCat===nav.shopCat&&!i.done);
+  if(!f.length) return `<div class="empty">這個分類還沒有網購${isReadOnly()?'':('<br>按右上角 ＋ 新增！')}</div>`;
+  return `<div class="section-hdr">— 共 ${f.length} 筆 —</div>`+f.map(shopListItem).join('');
+}
+
+function renderShopAllList() {
+  const f = shopItems.filter(i=>!i.done);
+  if(!f.length) return '<div class="empty">網購清單是空的</div>';
+  return `<div class="section-hdr">— 全部 ${f.length} 筆 —</div>`+f.map(shopListItem).join('');
+}
+
+function renderShopDetail() {
+  const item = shopItems.find(i=>i.id===nav.itemId); if(!item) return '';
+  const sc = shopCats.find(c=>c.id===item.shopCat);
+  const photos = item.photos||[];
+  const slides = photos.length ? photos.map((p,i)=>makeSlide(p,i,item.id)).join('') :
+    `<div class="photo-swiper-slide"><div class="slide-emoji">🛒</div></div>`;
+  const dots = photos.length>1 ? photos.map((_,i)=>`<div class="photo-dot${i===0?' on':''}"></div>`).join('') : '';
+  let h = `<div class="photo-swiper" id="swiper_${item.id}" data-idx="0" data-count="${photos.length}" data-id="${item.id}" data-type="shop">
+    <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
+    <div class="photo-swiper-overlay"></div>
+    ${dots?'<div class="photo-dots">'+dots+'</div>':''}
+    ${!isReadOnly()?`<div class="photo-btn-row">
+      <div class="photo-add-btn" onclick="addMediaType('${item.id}','shop','image')">📷 ＋照片</div>
+      <div class="photo-add-video-btn" onclick="addMediaType('${item.id}','shop','video')">🎥 ＋影片</div>
+    </div>`:''}
+    ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" onclick="setCover('${item.id}','shop')">⭐ 設封面</div>`:''}
+    ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
+  </div>`;
+  const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setShopStar('${item.id}',${v})`)}">★</span>`).join('');
+  h += `<div class="detail-body">
+    <div class="detail-tags"><span class="tag tag-shop">🛒 網購</span>${sc?`<span class="tag" style="background:var(--blue-bg);color:var(--blue)">${sc.emoji} ${sc.label}</span>`:''}</div>
+    <div class="detail-name">${item.name}</div>
+    <div class="detail-stars-row">${starsHtml}</div>
+    ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
+    ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
+    <div class="detail-btns">
+      ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditShop('${item.id}')">✏️ 編輯</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-done" onclick="markShopDone('${item.id}')">✓ 完成</div>`:''}
+      ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteShopItem('${item.id}')">🗑 刪除</div>`:''}
+    </div>
+  </div>`;
+  return h;
+}
+
+// ===== FRIENDS =====
+function renderFriends() {
+  let h = '';
+  if(friends.length===0) {
+    h = '<div class="empty">還沒有好友<br>按右上角 ＋ 新增好友！</div>';
+  } else {
+    h = '<div class="section-hdr">— 好友列表 —</div>';
+    friends.forEach(f=>{
+      h += `<div class="friend-card" onclick="viewFriend('${f.uid}')">
+        <div class="friend-avatar">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>
+        <div class="friend-body">
+          <div class="friend-name">${f.name}</div>
+          <div class="friend-sub">${f.email||''}</div>
+        </div>
+        <div class="friend-action">查看收藏 ›</div>
+      </div>`;
+    });
+  }
+  // My friend code
+  h += `<div style="margin:20px;background:var(--card);border-radius:16px;padding:16px;text-align:center;">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">我的好友代碼（讓朋友輸入這個）</div>
+    <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:var(--amber)">${userProfile?.friendCode||'------'}</div>
+    <div style="font-size:11px;color:var(--muted2);margin-top:6px;">朋友輸入此代碼就能加你為好友</div>
+  </div>`;
+  return h;
+}
+
+window.openAddFriend = function() {
+  openModal(`<div class="modal-title">新增好友</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;text-align:center;">輸入朋友的好友代碼</div>
+    <input class="modal-input" id="mFriendCode" placeholder="例：AB12CD" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px;"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddFriend()">新增</div>
+    </div>`);
+};
+
+window.doAddFriend = async function() {
+  const code = document.getElementById('mFriendCode').value.trim().toUpperCase();
+  if(!code || code.length<4) { alert('請輸入正確的好友代碼'); return; }
+  try {
+    const q = query(collection(db,'users'), where('friendCode','==',code));
+    const snap = await getDocs(q);
+    if(snap.empty) { alert('找不到這個好友代碼'); return; }
+    const friendData = snap.docs[0].data();
+    if(friendData.uid === currentUser.uid) { alert('不能加自己為好友 😅'); return; }
+    if(friends.find(f=>f.uid===friendData.uid)) { alert('這個人已經是你的好友了！'); return; }
+    const newFriend = {uid:friendData.uid, name:friendData.name, email:friendData.email, photo:friendData.photo||''};
+    friends.push(newFriend);
+    userProfile.friends = friends;
+    await setDoc(doc(db,'users',currentUser.uid), userProfile);
+    closeModal();
+    render();
+    alert('✅ 成功加入好友：'+friendData.name);
+  } catch(e) { alert('新增失敗：'+e.message); }
+};
+
+let friendListeners = []; // store unsubscribe functions
+
+function clearFriendListeners() {
+  friendListeners.forEach(unsub => unsub());
+  friendListeners = [];
+}
+
+window.viewFriend = async function(uid) {
+  viewingUid = uid;
+  clearFriendListeners();
+  document.getElementById('pageContent').innerHTML = '<div class="loading">載入中...</div>';
+  
+  // Load friend profile (realtime)
+  const profileUnsub = onSnapshot(doc(db,'users',uid), (snap) => {
+    if(snap.exists()) {
+      const data = snap.data();
+      // Update friend name in our list
+      const fi = friends.findIndex(f=>f.uid===uid);
+      if(fi>-1) { friends[fi].name=data.name; friends[fi].photo=data.photo||''; }
+    }
+  });
+  friendListeners.push(profileUnsub);
+
+  // Load friend userData (realtime)
+  const dataUnsub = onSnapshot(doc(db,'userData',uid), (snap) => {
+    if(snap.exists()) {
+      const data = snap.data();
+      countries = (data.countries || DEFAULT_COUNTRIES).map(fixCountryEmoji);
+      shopCats = data.shopCats || DEFAULT_SHOPCATS;
+      if(data.cats && data.cats.length) CATS = data.cats;
+    }
+    if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
+  });
+  friendListeners.push(dataUnsub);
+
+  // Load friend items (realtime)
+  const itemsUnsub = onSnapshot(collection(db,'userData',uid,'items'), (snap) => {
+    const existingPhotos = {};
+    items.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
+    items = snap.docs.map(d=>{
+      const item = {id:d.id,...d.data()};
+      item.photos = existingPhotos[d.id] || item.photos || [];
+      return item;
+    });
+    if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
+  });
+  friendListeners.push(itemsUnsub);
+
+  // Load friend shopItems (realtime)
+  const shopUnsub = onSnapshot(collection(db,'userData',uid,'shopItems'), (snap) => {
+    shopItems = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
+  });
+  friendListeners.push(shopUnsub);
+
+  nav.page = 'countries';
+  render();
+};
+
+// ===== PROFILE =====
+function renderProfile() {
+  return `<div class="profile-section">
+    <div class="profile-avatar">${userProfile?.photo?`<img src="${userProfile.photo}"/>`:'👤'}</div>
+    <div class="profile-name">${userProfile?.name||'用戶'}</div>
+    <div class="profile-email">${currentUser?.email||''}</div>
+    <div class="profile-id">好友代碼：${userProfile?.friendCode||''}</div>
+  </div>
+  <div class="list-item" onclick="openEditName()">
+    <div class="list-body"><div class="list-name">修改名稱</div></div>
+    <div class="list-arrow">›</div>
+  </div>
+  <div class="list-item" onclick="doSignOut()" style="margin-top:20px;">
+    <div class="list-body"><div class="list-name" style="color:var(--red)">登出</div></div>
+  </div>`;
+}
+
+// ===== 全局搜尋 =====
+// ===== 從好友收藏複製到自己 =====
+window.copyFromFriend = function(itemId) {
+  const item = items.find(i=>i.id===itemId); if(!item) return;
+  // 選擇要存到哪個國家/地區/分類
+  const countryOpts = countries.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+  openModal(`<div class="modal-title">複製到我的收藏</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;text-align:center">「${esc(item.name)}」將複製到你的收藏</div>
+    <label class="modal-label">存到哪個國家</label>
+    <select class="modal-input" id="cpCountry" onchange="updateCopyRegions()">${countryOpts}</select>
+    <label class="modal-label">地區</label>
+    <input class="modal-input" id="cpRegion" placeholder="例：台中" value="${esc(item.region||'')}"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="cpCat">${CATS.map(c=>`<option value="${c.id}"${c.id===item.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doCopyFromFriend('${itemId}')">複製過來</div>
+    </div>`);
+};
+
+window.doCopyFromFriend = async function(srcId) {
+  const src = items.find(i=>i.id===srcId); if(!src) return;
+  const countryId = document.getElementById('cpCountry').value;
+  const region = document.getElementById('cpRegion').value.trim()||src.region||'';
+  const cat = document.getElementById('cpCat').value;
+
+  // 先暫存 viewingUid，切回自己的資料
+  const friendUid = viewingUid;
+  const friendItems = [...items];
+
+  closeModal();
+  document.getElementById('pageContent').innerHTML='<div class="loading">複製中...</div>';
+
+  // 切回自己
+  clearFriendListeners();
+  viewingUid = null;
+  await loadUserData();
+
+  // 建立新 item
+  const newItem = {
+    country: countryId,
+    region,
+    cat,
+    name: src.name,
+    stars: src.stars||0,
+    note: src.note||'',
+    address: src.address||'',
+    link: src.link||'',
+    photos: [],
+    done: false,
+    createdAt: Date.now(),
+    copiedFrom: friendUid||''
+  };
+  items.unshift(newItem);
+  await saveItem(newItem);
+
+  // 複製照片（如果有）
+  if(src.photos&&src.photos.length) {
+    await appendPhotosToCol(currentUser.uid,'items',newItem.id,src.photos);
+    newItem.photos = [...src.photos];
+    await saveItemMainDoc(newItem,'items');
+  }
+
+  nav = {page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null,sort:'stars',search:''};
+  setupFriendProfileListeners();
+  render();
+  alert('✅ 已複製到你的收藏！');
+};
+
+window.openEditName = function() {
+  openModal(`<div class="modal-title">修改名稱</div>
+    <input class="modal-input" id="mName" value="${userProfile?.name||''}" placeholder="你的名稱"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEditName()">儲存</div>
+    </div>`);
+};
+
+window.doEditName = async function() {
+  const name = document.getElementById('mName').value.trim();
+  if(!name) return;
+  userProfile.name = name;
+  await updateProfile(currentUser, {displayName: name});
+  await setDoc(doc(db,'users',currentUser.uid), userProfile);
+  closeModal(); render();
+};
+
+window.doSignOut = async function() {
+  if(!confirm('確定要登出？')) return;
+  await signOut(auth);
+};
+
+// ===== NAVIGATION =====
+window.goRegions = function(cid) { nav.country=cid; nav.page='regions'; render(); };
+window.goCats = function(r) { nav.region=r; nav.page='cats'; render(); };
+window.goList = function(cat) { nav.cat=cat; nav.page='list'; render(); };
+window.goAllList = function() { nav.page='alllist'; nav.filter='all'; render(); };
+window.goDetail = function(id,from) { nav.prevPage=from; nav.itemId=id; nav.page='detail'; render(); };
+window.goShopCat = function(id) { nav.shopCat=id; nav.page='shopcat'; render(); };
+window.goShopAllList = function() { nav.page='shopalllist'; render(); };
+window.goShopDetail = function(id) { nav.prevPage='shopcat'; nav.itemId=id; nav.page='shopdetail'; render(); };
+window.setFilter = function(f) { nav.filter=f; render(); };
+window.setSort = function(s) { nav.sort=s; render(); };
+window.setSearch = function(q) { nav.search=q; renderPage(); };
+
+// 長按快速刪除
+let _lpTimer = null;
+window.startLongPress = function(id, el, e) {
+  if(isReadOnly()) return; // 看好友的不能刪
+  _lpTimer = setTimeout(()=>{
+    el.classList.add('pressing');
+    if(navigator.vibrate) navigator.vibrate(40);
+    setTimeout(()=>{
+      el.classList.remove('pressing');
+      const _n=(items.find(i=>i.id===id)||{name:""}).name; if(confirm("長按快速刪除\n確定刪除\u300c"+_n+"\u300d？")) {
+        deleteItem(id);
+      }
+    },50);
+  }, 550);
+};
+window.cancelLongPress = function() {
+  if(_lpTimer){ clearTimeout(_lpTimer); _lpTimer=null; }
+};
+
+// 分享收藏
+window.shareItem = function(id) {
+  const item = items.find(i=>i.id===id)||shopItems.find(i=>i.id===id);
+  if(!item) return;
+  const lines = [`📌 ${item.name}`];
+  if(item.address) lines.push(`📍 ${item.address}`);
+  if(item.phone) lines.push(`📞 ${item.phone}`);
+  if(item.note) lines.push(`📝 ${item.note}`);
+  if(item.link) lines.push(`🔗 ${item.link}`);
+  lines.push(`\n來自「我的收藏」App`);
+  const text = lines.join('\n');
+  if(navigator.share) {
+    navigator.share({title:item.name, text}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(()=>alert('✅ 已複製到剪貼簿！')).catch(()=>alert(text));
+  }
+};
+window.openLink = function(url) { if(url) window.open(url,'_blank'); };
+window.openMap = function(addr) { if(addr) window.open('https://maps.google.com/?q='+encodeURIComponent(addr),'_blank'); };
+
+// ===== STARS =====
+window.setItemStar = async function(id,v) {
+  const item = items.find(i=>i.id===id); if(!item) return;
+  item.stars = item.stars===v?0:v;
+  await saveItem(item); render();
+};
+window.setShopStar = async function(id,v) {
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  item.stars = item.stars===v?0:v;
+  await saveShopItem(item); render();
+};
+
+// ===== DONE / DELETE =====
+window.markDone = async function(id) {
+  if(!confirm('標記完成？')) return;
+  const item = items.find(i=>i.id===id); if(!item) return;
+  item.done = true;
+  await saveItem(item); nav.page=nav.prevPage||'list'; render();
+};
+window.markShopDone = async function(id) {
+  if(!confirm('標記完成？')) return;
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  item.done = true;
+  await saveShopItem(item); nav.page='shop'; render();
+};
+window.deleteItem = async function(id) {
+  if(isReadOnly()) return; // 絕對不能刪好友的東西
+  if(!confirm('確定刪除？')) return;
+  items = items.filter(i=>i.id!==id);
+  await deleteItemDB(id); nav.page=nav.prevPage||'list'; render();
+};
+window.deleteShopItem = async function(id) {
+  if(isReadOnly()) return;
+  if(!confirm('確定刪除？')) return;
+  shopItems = shopItems.filter(i=>i.id!==id);
+  await deleteShopItemDB(id); nav.page='shop'; render();
+};
+
+// ===== PHOTOS & VIDEOS =====
+let lightboxPhotos = [], lightboxIdx = 0;
+
+window.openLightbox = function(itemId, idx) {
+  const item = items.find(i=>i.id===itemId) || shopItems.find(i=>i.id===itemId);
+  if(!item || !item.photos || !item.photos.length) return;
+  lightboxPhotos = item.photos;
+  lightboxIdx = idx||0;
+  const lb = document.getElementById('lightbox');
+  lb.classList.remove('hidden');
+  renderLightbox();
+};
+
+function renderLightbox() {
+  const p = lightboxPhotos[lightboxIdx];
+  const med = document.getElementById('lightboxMedia');
+  if(isVideo(p)) {
+    med.innerHTML = `<video class="lightbox-media" src="${p}" controls autoplay playsinline></video>`;
+  } else {
+    med.innerHTML = `<img class="lightbox-media" src="${p}" style="max-width:100vw;max-height:85vh;object-fit:contain;"/>`;
+  }
+  const total = lightboxPhotos.length;
+  document.getElementById('lbCount').textContent = total>1 ? `${lightboxIdx+1} / ${total}` : '';
+  document.getElementById('lbPrev').style.display = total>1 ? 'flex' : 'none';
+  document.getElementById('lbNext').style.display = total>1 ? 'flex' : 'none';
+}
+
+window.lightboxNav = function(dir) {
+  lightboxIdx = (lightboxIdx + dir + lightboxPhotos.length) % lightboxPhotos.length;
+  renderLightbox();
+};
+
+window.closeLightbox = function() {
+  document.getElementById('lightbox').classList.add('hidden');
+  document.getElementById('lightboxMedia').innerHTML = '';
+  lightboxPhotos = [];
+};
+
+// 燈箱手指左右滑動
+(function(){
+  let lbStartX=0, lbStartY=0;
+  const lb = document.getElementById('lightbox');
+  lb.addEventListener('touchstart', e=>{ lbStartX=e.touches[0].clientX; lbStartY=e.touches[0].clientY; },{passive:true});
+  lb.addEventListener('touchend', e=>{
+    const dx = lbStartX - e.changedTouches[0].clientX;
+    const dy = Math.abs(e.changedTouches[0].clientY - lbStartY);
+    if(Math.abs(dx)>50 && dy<80 && lightboxPhotos.length>1) lightboxNav(dx>0?1:-1);
+  },{passive:true});
+})();
+
+window.addMediaType = function(id, type, mediaKind) {
+  const inp = document.getElementById('photoInput');
+  inp.accept = mediaKind === 'video' ? 'video/*' : 'image/*';
+  inp.multiple = true;
+  inp.onchange = async function(e) {
+    const files = Array.from(e.target.files);
+    if(!files.length) return;
+    let done = 0;
+    const showP = () => {
+      document.getElementById('pageContent').innerHTML =
+        `<div class="loading">壓縮中 ${done} / ${files.length}...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
+    };
+    showP();
+    // 平行壓縮
+    const newData = await Promise.all(files.map(async f => {
+      let d;
+      if(f.type.startsWith('video/')) {
+        d = await new Promise(res=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result); r.readAsDataURL(f); });
+      } else { d = await compressImage(f); }
+      done++; showP(); return d;
+    }));
+
+    document.getElementById('pageContent').innerHTML =
+      `<div class="loading">儲存中...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
+
+    const colName = type==='item' ? 'items' : 'shopItems';
+    const arr = type==='item' ? items : shopItems;
+    const item = arr.find(i=>i.id===id);
+    if(item) {
+      // 先確保 item.id 存在
+      if(!item.id || item.id.length <= 5) await saveItemMainDoc(item, colName);
+      // 追加照片到子集合（不刪舊的）
+      await appendPhotosToCol(currentUser.uid, colName, item.id, newData);
+      // 更新記憶體
+      if(!item.photos) item.photos = [];
+      item.photos.push(...newData);
+      // 更新 photoCount
+      await saveItemMainDoc(item, colName);
+    }
+    e.target.value = '';
+    render();
+  };
+  inp.click();
+};
+
+window.addMedia = window.addMediaType;
+window.addPhoto = window.addMediaType;
+
+window.delPhoto = async function(id, type) {
+  const swiper = document.getElementById('swiper_'+id);
+  const idx = swiper ? parseInt(swiper.dataset.idx)||0 : 0;
+  if(!confirm('刪除這張照片？')) return;
+  const colName = type==='item' ? 'items' : 'shopItems';
+  const arr = type==='item' ? items : shopItems;
+  const item = arr.find(i=>i.id===id);
+  if(item && item.photos) {
+    await deletePhotoFromCol(currentUser.uid, colName, id, idx);
+    item.photos.splice(idx, 1);
+    // 如果刪的是封面，重設為第一張
+    if((item.coverIdx||0) >= item.photos.length) item.coverIdx = 0;
+    await saveItemMainDoc(item, colName);
+  }
+  render();
+};
+
+window.setCover = async function(id, type) {
+  const swiper = document.getElementById('swiper_'+id);
+  const idx = swiper ? parseInt(swiper.dataset.idx)||0 : 0;
+  const colName = type==='item' ? 'items' : 'shopItems';
+  const arr = type==='item' ? items : shopItems;
+  const item = arr.find(i=>i.id===id);
+  if(!item || !item.photos || !item.photos.length) return;
+  if(idx === (item.coverIdx||0)) {
+    alert('這張已經是封面了！');
+    return;
+  }
+  item.coverIdx = idx;
+  await saveItemMainDoc(item, colName);
+  // 更新按鈕樣式，不需要完整 render
+  const btn = document.getElementById('coverBtn_'+id);
+  if(btn) {
+    btn.textContent = '✅ 已設為封面';
+    btn.classList.add('is-cover');
+    setTimeout(()=>{ btn.textContent='⭐ 設封面'; btn.classList.remove('is-cover'); }, 1500);
+  }
+};
+
+// ===== MODAL =====
+window.openModal = function(html) {
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalWrap').classList.remove('hidden');
+};
+window.closeModal = function() { document.getElementById('modalWrap').classList.add('hidden'); };
+document.getElementById('modalWrap').addEventListener('click', e=>{ if(e.target===document.getElementById('modalWrap')) closeModal(); });
+
+window.pickE = function(e) {
+  pickEmoji=e;
+  document.querySelectorAll('.emoji-opt').forEach(el=>el.classList.toggle('sel',el.textContent===e));
+};
+window.setPickStar = function(v) {
+  pickStars=pickStars===v?0:v;
+  document.querySelectorAll('.star-pick').forEach((s,i)=>s.classList.toggle('on',i<pickStars));
+};
+
+// ===== ADD/EDIT ITEM =====
+window.openAddItem = function() {
+  pickStars=0; pickPhotos=[]; pickHours=[];
+  openModal(`<div class="modal-title">新增收藏</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" placeholder="例：青木原拉麵"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mCat">${CATS.map(c=>`<option value="${c.id}"${c.id===nav.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map(v=>`<span class="star-pick" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註（選填）</label>
+    <input class="modal-input" id="mNote" placeholder="例：必點乾麵"/>
+    <label class="modal-label">🕐 營業時間（選填）</label>
+    <div id="hoursWrap"></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0" onclick="addHourRow()">＋ 新增時段</div>
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="pasteHoursText()">📋 貼上文字解析</div>
+    </div>
+    <label class="modal-label">地址（選填）</label>
+    <input class="modal-input" id="mAddr" placeholder="例：台中市西區民權路"/>
+    <label class="modal-label">電話（選填）</label>
+    <input class="modal-input" id="mPhone" type="tel" placeholder="例：04-12345678"/>
+    <label class="modal-label">連結（選填）</label>
+    <input class="modal-input" id="mLink" placeholder="https://..."/>
+    <label class="modal-label">照片（選填）</label>
+    <div id="modalPhotoRow" class="modal-photo-row">
+      <div class="modal-photo-add" onclick="pickModalPhoto()">📷</div>
+    </div>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddItem()">新增</div>
+    </div>`);
+};
+
+function updateModalPhotoRow() {
+  const row = document.getElementById('modalPhotoRow');
+  if(!row) return;
+  row.innerHTML = pickPhotos.map((p,i)=>`<img class="modal-photo-thumb" src="${p}" onclick="removePickPhoto(${i})" title="點擊移除"/>`).join('')
+    + '<div class="modal-photo-add" onclick="pickModalPhoto()">📷</div>';
+}
+
+window.pickModalPhoto = function() {
+  const inp = document.getElementById('photoInput');
+  inp.accept = 'image/*'; inp.multiple = true;
+  inp.onchange = async function(e) {
+    const files = Array.from(e.target.files);
+    for(const f of files) { pickPhotos.push(await compressImage(f)); }
+    updateModalPhotoRow();
+    e.target.value = '';
+  };
+  inp.click();
+};
+
+window.removePickPhoto = function(idx) {
+  pickPhotos.splice(idx,1);
+  updateModalPhotoRow();
+};
+
+let pickHours = [];
+
+function renderHoursWrap() {
+  const wrap = document.getElementById('hoursWrap');
+  if(!wrap) return;
+  wrap.innerHTML = pickHours.map((h,i)=>`
+    <div class="hours-row">
+      <input class="hours-days" placeholder="例：週一至週五" value="${esc(h.days)}" oninput="pickHours[${i}].days=this.value"/>
+      <input class="hours-time" type="time" value="${h.open}" oninput="pickHours[${i}].open=this.value"/>
+      <span class="hours-sep">–</span>
+      <input class="hours-time" type="time" value="${h.close}" oninput="pickHours[${i}].close=this.value"/>
+      <button class="hours-del" onclick="removeHourRow(${i})">✕</button>
+    </div>${h.note?`<div style="font-size:11px;color:var(--muted);margin:-4px 0 6px 4px">📝 ${esc(h.note)}</div>`:''}`).join('');
+}
+
+window.addHourRow = function() {
+  pickHours.push({days:'',open:'',close:''});
+  renderHoursWrap();
+};
+
+window.removeHourRow = function(i) {
+  pickHours.splice(i,1);
+  renderHoursWrap();
+};
+
+// ===== 貼上文字解析營業時間 =====
+
+function parseChineseTime(str) {
+  if(!str) return '';
+  str = str.trim();
+  if(/午夜/.test(str)) return '00:00';
+  if(/^中午$/.test(str)) return '12:00';
+  if(/凌晨/.test(str)) {
+    const m = str.match(/(\d{1,2})(?::(\d{2}))?/);
+    if(!m) return '';
+    return `${String(parseInt(m[1])).padStart(2,'0')}:${m[2]||'00'}`;
+  }
+  const isPM = /下午|晚/.test(str);
+  const isAM = /上午/.test(str);
+  const m = str.match(/(\d{1,2})(?::(\d{2}))?(?:\s*[時时])?/);
+  if(!m) return '';
+  let h = parseInt(m[1]), min = m[2] ? parseInt(m[2]) : 0;
+  if(isPM && h < 12) h += 12;
+  if(isAM && h === 12) h = 0;
+  return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
+
+function fixAmbiguousTime(open, close, raw) {
+  if(open && close && !/[上下]午|晚|午夜|凌晨|中午/.test(raw||'')) {
+    const oh = parseInt(open.split(':')[0]);
+    const ch = parseInt(close.split(':')[0]);
+    if((ch > 12 || ch === 0) && oh < 12) return `${oh+12}:${open.split(':')[1]}`;
+  }
+  return open;
+}
+
+// 文字前處理：統一各種破折號、全形符號
+function normalizeText(text) {
+  return text
+    .replace(/[－ー−‐‑‒–—―]/g, '-') // 統一所有破折號
+    .replace(/　/g, ' ')              // 全形空格
+    .replace(/（/g, '(').replace(/）/g, ')'); // 全形括號
+}
+
+function parseHoursFromText(rawText) {
+  const text = normalizeText(rawText);
+  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>0);
+  const SKIP = /新增或編輯|評論|最新動態|關於|菜單|相片|總覽|展開/;
+  const dayRegex = /星期[一二三四五六日天]|週[一二三四五六日天]|周[一二三四五六日天]/;
+  const TP = '(中午|[上下]午\\s*\\d{1,2}(?::\\d{2})?(?:\\s*[時时])?|午夜|凌晨\\s*\\d{1,2}(?::\\d{2})?(?:\\s*[時时])?|\\d{1,2}:\\d{2})';
+  const timeReg = new RegExp(TP + '\\s*-\\s*' + TP);
+
+  // 偵測格式：交錯 vs 星期全在前
+  let firstDay = false, format = 'interleaved';
+  for(const line of lines) {
+    if(SKIP.test(line)) continue;
+    if(dayRegex.test(line)) {
+      if(firstDay) { format = 'days-first'; break; }
+      firstDay = true;
+    } else if(firstDay && (timeReg.test(line) || /休息中|公休/.test(line))) {
+      format = 'interleaved'; break;
+    }
+  }
+
+  return format === 'interleaved'
+    ? parseInterleaved(lines, dayRegex, timeReg, SKIP)
+    : parseDaysFirst(lines, dayRegex, timeReg, SKIP);
+}
+
+// 格式二：星期和時間交錯排列（支援成對對應）
+function parseInterleaved(lines, dayRegex, timeReg, SKIP) {
+  const results = [], dayOrder = [], daysData = {};
+
+  // 第一步：把所有行解析成結構化列表
+  const tokens = [];
+  for(const line of lines) {
+    if(SKIP.test(line)) continue;
+    const dayM = line.match(dayRegex);
+    if(dayM) {
+      tokens.push({type:'day', day:dayM[0]});
+    } else if(timeReg.test(line)) {
+      const m = line.match(timeReg);
+      let open = parseChineseTime(m[1]);
+      const close = parseChineseTime(m[2]);
+      open = fixAmbiguousTime(open, close, m[1]);
+      if(open && close) tokens.push({type:'time', open, close});
+    } else if(/公休|休息中|不營業|已關閉/.test(line)) {
+      tokens.push({type:'closed'});
+    } else if(/營業時間可能不同/.test(line)) {
+      tokens.push({type:'note', note:'營業時間可能不同'});
+    }
+  }
+
+  // 第二步：處理 tokens
+  let i = 0;
+  while(i < tokens.length) {
+    if(tokens[i].type !== 'day') { i++; continue; }
+
+    // 收集連續的星期
+    const days = [];
+    while(i < tokens.length && tokens[i].type === 'day') {
+      const d = tokens[i].day;
+      if(!daysData[d]) { daysData[d]={slots:[],closed:false,note:''}; dayOrder.push(d); }
+      days.push(d);
+      i++;
+    }
+
+    if(days.length === 1) {
+      // 單一星期：收集後面所有非星期的 token
+      const day = days[0];
+      while(i < tokens.length && tokens[i].type !== 'day') {
+        const t = tokens[i];
+        if(t.type==='time' && !daysData[day].closed) daysData[day].slots.push({open:t.open,close:t.close});
+        else if(t.type==='closed') { daysData[day].closed=true; daysData[day].note='公休'; }
+        else if(t.type==='note' && !daysData[day].closed) daysData[day].note=t.note;
+        i++;
+      }
+    } else {
+      // 多個連續星期：後面的 token 一對一對應
+      // time/closed 對應到各星期（各占一個），note 貼到前一個
+      let dayIdx = 0;
+      while(i < tokens.length && tokens[i].type !== 'day') {
+        if(dayIdx >= days.length) { i++; continue; }
+        const t = tokens[i];
+        const day = days[dayIdx];
+        if(t.type==='time') {
+          if(!daysData[day].closed) daysData[day].slots.push({open:t.open,close:t.close});
+          dayIdx++; i++;
+        } else if(t.type==='closed') {
+          daysData[day].closed=true; daysData[day].note='公休';
+          dayIdx++; i++;
+        } else if(t.type==='note') {
+          // note 貼到前一個星期（剛剛處理完的那個）
+          const prevDay = dayIdx > 0 ? days[dayIdx-1] : day;
+          if(!daysData[prevDay].closed) daysData[prevDay].note=t.note;
+          i++;
+          // 不推進 dayIdx
+        } else {
+          i++;
+        }
+      }
+    }
+  }
+
+  dayOrder.forEach(day => {
+    const d = daysData[day];
+    if(d.closed || !d.slots.length) results.push({days:day,open:'',close:'',note:d.note||'公休'});
+    else d.slots.forEach(s=>results.push({days:day,open:s.open,close:s.close,note:d.note}));
+  });
+  return results;
+}
+
+// 格式一：星期全在前，時間全在後
+function parseDaysFirst(lines, dayRegex, timeReg, SKIP) {
+  const results = [], dayNames = [], groups = [];
+  let curTimes = [], foundFirstTime = false;
+  for(const line of lines) {
+    if(SKIP.test(line)) continue;
+    if(!foundFirstTime) {
+      if(timeReg.test(line) || /公休|休息中/.test(line)) foundFirstTime = true;
+      else if(dayRegex.test(line)) { dayNames.push(line.match(dayRegex)[0]); continue; }
+      else continue;
+    }
+    if(/營業時間可能不同/.test(line)) {
+      if(curTimes.length) { groups.push({times:[...curTimes],note:'營業時間可能不同'}); curTimes=[]; }
+      else if(groups.length) groups[groups.length-1].note='營業時間可能不同';
+    } else if(/公休|休息中|不營業|已關閉/.test(line)) {
+      if(curTimes.length) { groups.push({times:[...curTimes],note:''}); curTimes=[]; }
+      groups.push({times:[],note:'公休'});
+    } else if(timeReg.test(line)) {
+      const m = line.match(timeReg);
+      let open = parseChineseTime(m[1]);
+      const close = parseChineseTime(m[2]);
+      open = fixAmbiguousTime(open, close, m[1]);
+      if(open && close) curTimes.push({open, close});
+    }
+  }
+  if(curTimes.length) {
+    const rem = dayNames.length - groups.length;
+    if(rem > 0 && curTimes.length % rem === 0) {
+      const s = curTimes.length/rem;
+      for(let i=0;i<curTimes.length;i+=s) groups.push({times:curTimes.slice(i,i+s),note:''});
+    } else groups.push({times:curTimes,note:''});
+  }
+  dayNames.forEach((day,i) => {
+    const g = groups[i]; if(!g) return;
+    if(!g.times.length) results.push({days:day,open:'',close:'',note:g.note||'公休'});
+    else g.times.forEach(t=>results.push({days:day,open:t.open,close:t.close,note:g.note}));
+  });
+  return results;
+}
+
+
+window.pasteHoursText = function() {
+  const wrap = document.getElementById('hoursWrap');
+  if(!wrap) return;
+  wrap.innerHTML = `
+    <textarea id="mHoursText" rows="6" class="modal-input"
+      placeholder="從 Google Maps 複製營業時間文字貼在這裡...&#10;&#10;例：&#10;星期一 上午11:30 - 下午2:30&#10;5:30 - 下午9時"
+      style="resize:none;font-size:12px;line-height:1.6;margin-bottom:6px"></textarea>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <div class="modal-btn modal-btn-cancel" style="flex:1;padding:8px;font-size:13px" onclick="renderHoursWrap()">取消</div>
+      <div class="modal-btn modal-btn-ok" style="flex:1;padding:8px;font-size:13px" onclick="doParseHoursText()">解析</div>
+    </div>`;
+  setTimeout(()=>{ const t=document.getElementById('mHoursText'); if(t) t.focus(); }, 100);
+};
+
+window.doParseHoursText = function() {
+  const text = document.getElementById('mHoursText')?.value||'';
+  if(!text.trim()) return;
+  const parsed = parseHoursFromText(text);
+  if(parsed.length > 0) {
+    pickHours = parsed;
+    renderHoursWrap();
+  } else {
+    alert('無法解析，請確認文字包含星期和時間，或改用手動新增。');
+  }
+};
+
+function getHoursFromPick() {
+  return pickHours.filter(h=>h.days||h.open||h.close);
+}
+
+window.doAddItem = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = {country:nav.country,region:nav.region,cat:document.getElementById('mCat').value,
+    name,stars:pickStars,note:document.getElementById('mNote').value.trim(),
+    hours:getHoursFromPick(),
+    address:document.getElementById('mAddr').value.trim(),
+    phone:document.getElementById('mPhone').value.trim(),
+    link:document.getElementById('mLink').value.trim(),
+    photos:[],done:false,createdAt:Date.now()};
+  items.unshift(item);
+  closeModal();
+  await saveItem(item);
+  if(pickPhotos.length > 0) {
+    await appendPhotosToCol(currentUser.uid,'items',item.id,[...pickPhotos]);
+    item.photos = [...pickPhotos];
+    await saveItemMainDoc(item,'items');
+    pickPhotos = [];
+  }
+  render();
+};
+
+window.openEditItem = function(id) {
+  const item = items.find(i=>i.id===id); if(!item) return;
+  pickStars = item.stars||0;
+  pickHours = (item.hours||[]).map(h=>({...h}));
+  openModal(`<div class="modal-title">編輯收藏</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" value="${esc(item.name)}"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mCat">${CATS.map(c=>`<option value="${c.id}"${c.id===item.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>`<span class="star-pick${i<pickStars?' on':''}" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註</label>
+    <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
+    <label class="modal-label">🕐 營業時間</label>
+    <div id="hoursWrap"></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0" onclick="addHourRow()">＋ 新增時段</div>
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="pasteHoursText()">📋 貼上文字解析</div>
+    </div>
+    <label class="modal-label">地址</label>
+    <input class="modal-input" id="mAddr" value="${esc(item.address||'')}"/>
+    <label class="modal-label">電話</label>
+    <input class="modal-input" id="mPhone" type="tel" value="${esc(item.phone||'')}"/>
+    <label class="modal-label">連結</label>
+    <input class="modal-input" id="mLink" value="${esc(item.link||'')}"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEditItem('${id}')">儲存</div>
+    </div>`);
+  renderHoursWrap();
+};
+
+window.doEditItem = async function(id) {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = items.find(i=>i.id===id); if(!item) return;
+  Object.assign(item,{name,cat:document.getElementById('mCat').value,stars:pickStars,
+    hours:getHoursFromPick(),
+    note:document.getElementById('mNote').value.trim(),
+    address:document.getElementById('mAddr').value.trim(),
+    phone:document.getElementById('mPhone').value.trim(),
+    link:document.getElementById('mLink').value.trim()});
+  await saveItem(item); closeModal(); render();
+};
+
+// ===== SHOP ADD/EDIT =====
+window.openAddShop = function() {
+  pickStars=0;
+  const defaultCat = nav.shopCat||shopCats[0]?.id||'';
+  openModal(`<div class="modal-title">新增網購</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" placeholder="例：Nike Air Max"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mShopCat">${shopCats.map(c=>`<option value="${c.id}"${c.id===defaultCat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map(v=>`<span class="star-pick" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註（選填）</label>
+    <input class="modal-input" id="mNote" placeholder="例：尺寸US10"/>
+    <label class="modal-label">連結（選填）</label>
+    <input class="modal-input" id="mLink" placeholder="https://..."/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddShop()">新增</div>
+    </div>`);
+};
+
+window.doAddShop = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = {name,shopCat:document.getElementById('mShopCat').value,stars:pickStars,
+    note:document.getElementById('mNote').value.trim(),link:document.getElementById('mLink').value.trim(),
+    photos:[],done:false,createdAt:Date.now()};
+  shopItems.unshift(item);
+  await saveShopItem(item);
+  closeModal(); render();
+};
+
+window.openEditShop = function(id) {
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  pickStars = item.stars||0;
+  openModal(`<div class="modal-title">編輯網購</div>
+    <label class="modal-label">名稱</label>
+    <input class="modal-input" id="mName" value="${esc(item.name)}"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="mShopCat">${shopCats.map(c=>`<option value="${c.id}"${c.id===item.shopCat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <label class="modal-label">星星評分</label>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>`<span class="star-pick${i<pickStars?' on':''}" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <label class="modal-label">備註</label>
+    <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
+    <label class="modal-label">連結</label>
+    <input class="modal-input" id="mLink" value="${esc(item.link||'')}"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doEditShop('${id}')">儲存</div>
+    </div>`);
+};
+
+window.doEditShop = async function(id) {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const item = shopItems.find(i=>i.id===id); if(!item) return;
+  Object.assign(item,{name,shopCat:document.getElementById('mShopCat').value,stars:pickStars,
+    note:document.getElementById('mNote').value.trim(),link:document.getElementById('mLink').value.trim()});
+  await saveShopItem(item); closeModal(); render();
+};
+
+// ===== CATEGORY MANAGEMENT =====
+window.openEditCountries = function() {
+  let h = '<div class="modal-title">管理國家</div>';
+  countries.forEach(c=>{
+    const canDel = !items.some(i=>i.country===c.id);
+    h += `<div class="edit-list-item"><span style="font-size:20px">${c.emoji}</span>
+      <span class="edit-list-name">${c.name}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteCountry('${c.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddCountry()">＋ 新增國家</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddCountry = function() {
+  pickEmoji='🌏';
+  openModal(`<div class="modal-title">新增國家</div>
+    <div class="emoji-grid">${EMOJIS.slice(0,20).map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <input class="modal-input" id="mName" placeholder="國家名稱（例：法國）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddCountry()">新增</div>
+    </div>`);
+};
+
+window.doAddCountry = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  countries.push({id:'c'+Date.now(),name,emoji:pickEmoji,regions:[]});
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteCountry = async function(id) {
+  if(!confirm('刪除國家？')) return;
+  countries = countries.filter(c=>c.id!==id);
+  await saveUserData(); closeModal(); render();
+};
+
+window.openEditRegions = function() {
+  const c = countries.find(x=>x.id===nav.country); if(!c) return;
+  let h = '<div class="modal-title">管理地區</div>';
+  (c.regions||[]).forEach(r=>{
+    const canDel = !items.some(i=>i.country===c.id&&i.region===r);
+    h += `<div class="edit-list-item"><span>📍</span><span class="edit-list-name">${r}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteRegion('${r}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddRegion()">＋ 新增地區</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddRegion = function() {
+  openModal(`<div class="modal-title">新增地區</div>
+    <input class="modal-input" id="mName" placeholder="地區名稱（例：花蓮）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddRegion()">新增</div>
+    </div>`);
+};
+
+window.doAddRegion = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  const c = countries.find(x=>x.id===nav.country); if(!c) return;
+  if(!c.regions) c.regions=[];
+  c.regions.push(name);
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteRegion = async function(r) {
+  if(!confirm('刪除「'+r+'」地區？')) return;
+  const c = countries.find(x=>x.id===nav.country); if(!c) return;
+  c.regions = c.regions.filter(x=>x!==r);
+  await saveUserData(); closeModal(); render();
+};
+
+window.openEditCats = function() {
+  let h = '<div class="modal-title">管理分類</div>';
+  CATS.forEach(cat=>{
+    const canDel = !items.some(i=>i.cat===cat.id);
+    h += `<div class="edit-list-item"><span style="font-size:20px">${cat.emoji}</span>
+      <span class="edit-list-name">${cat.label}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteCat('${cat.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddCat()">＋ 新增分類</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddCat = function() {
+  pickEmoji='⭐';
+  const catEmojis=['🍜','🍕','🍣','🧋','☕','🏖','🏞','🎬','🎵','🎮','🎨','🛍','👗','👟','📍','⭐','🎁','🏛','🌸','📚'];
+  openModal(`<div class="modal-title">新增分類</div>
+    <div class="emoji-grid" id="epick">${catEmojis.map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <input class="modal-input" id="mName" placeholder="分類名稱（例：好住）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddCat()">新增</div>
+    </div>`);
+};
+
+window.doAddCat = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  CATS.push({id:'cat_'+Date.now(),label:name,emoji:pickEmoji,cls:'tag-eat'});
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteCat = async function(id) {
+  if(!confirm('確定刪除此分類？')) return;
+  CATS = CATS.filter(c=>c.id!==id);
+  await saveUserData(); closeModal(); render();
+};
+
+window.openEditShopCats = function() {
+  let h = '<div class="modal-title">管理網購分類</div>';
+  shopCats.forEach(cat=>{
+    const canDel = !shopItems.some(i=>i.shopCat===cat.id);
+    h += `<div class="edit-list-item"><span style="font-size:20px">${cat.emoji}</span>
+      <span class="edit-list-name">${cat.label}</span>
+      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteShopCat('${cat.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      </div>`;
+  });
+  h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddShopCat()">＋ 新增分類</div></div>
+    <div style="margin-top:8px"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">完成</div></div>`;
+  openModal(h);
+};
+
+window.openAddShopCat = function() {
+  pickEmoji='📦';
+  const catEmojis=['👗','👟','💄','💍','👜','🧢','⌚','📱','💻','🎮','🍜','🍕','🧴','🏠','📚','⭐','🎁','🛒','📦','🔧'];
+  openModal(`<div class="modal-title">新增網購分類</div>
+    <div class="emoji-grid" id="epick">${catEmojis.map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <input class="modal-input" id="mName" placeholder="分類名稱（例：保養品）"/>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddShopCat()">新增</div>
+    </div>`);
+};
+
+window.doAddShopCat = async function() {
+  const name = document.getElementById('mName').value.trim(); if(!name) return;
+  shopCats.push({id:'sc_'+Date.now(),label:name,emoji:pickEmoji});
+  await saveUserData(); closeModal(); render();
+};
+
+window.deleteShopCat = async function(id) {
+  if(!confirm('確定刪除此分類？')) return;
+  shopCats = shopCats.filter(c=>c.id!==id);
+  await saveUserData(); closeModal(); render();
+};
+
+// ===== SWIPER =====
+function initSwipers() {
+  document.querySelectorAll('.photo-swiper').forEach(sw=>{
+    const track = sw.querySelector('.photo-swiper-track'); if(!track) return;
+    const count = parseInt(sw.dataset.count)||0;
+    const itemId = sw.dataset.id;
+    let idx=0, startX=0, startY=0, startTime=0, wasSwiped=false;
+
+    function goTo(i) {
+      if(i<0)i=0; if(i>=count)i=count-1;
+      idx=i; sw.dataset.idx=i;
+      track.style.transform=`translateX(-${i}00%)`;
+      sw.querySelectorAll('.photo-dot').forEach((d,di)=>d.classList.toggle('on',di===i));
+      const badge=sw.querySelector('.photo-count'); if(badge) badge.textContent=`${i+1} / ${count}`;
+    }
+
+    function tryOpenLightbox(target) {
+      const isBtn = target.closest('.photo-add-btn')||target.closest('.photo-del-btn')||target.closest('.photo-btn-row');
+      if(!isBtn && count>0) {
+        setTimeout(()=>openLightbox(itemId, idx), 10);
+      }
+    }
+
+    // 手機 touch
+    let touchHandled = false;
+    sw.addEventListener('touchstart',e=>{
+      startX=e.touches[0].clientX;
+      startY=e.touches[0].clientY;
+      startTime=Date.now();
+      wasSwiped=false;
+      touchHandled=false;
+    },{passive:true});
+
+    sw.addEventListener('touchend',e=>{
+      const dx=startX-e.changedTouches[0].clientX;
+      const dy=Math.abs(e.changedTouches[0].clientY-startY);
+      const dt=Date.now()-startTime;
+      if(Math.abs(dx)>40 && dy<60){
+        wasSwiped=true;
+        if(dx>0)goTo(idx+1);else goTo(idx-1);
+      } else if(Math.abs(dx)<15 && dy<15 && dt<400){
+        touchHandled=true;
+        tryOpenLightbox(e.target);
+      }
+    },{passive:true});
+
+    // 電腦 click (方便測試)
+    sw.addEventListener('click',e=>{
+      if(wasSwiped){wasSwiped=false;return;}
+      if(touchHandled){touchHandled=false;return;}
+      tryOpenLightbox(e.target);
+    });
+  });
+}
+
+function esc(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Show loading initially
+document.getElementById('pageContent').innerHTML = '<div class="loading">載入中...</div>';
+</script>
+</body>
+</html>
