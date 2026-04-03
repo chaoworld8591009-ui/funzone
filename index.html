@@ -270,11 +270,21 @@ async function loadUserData() {
     shopCats = DEFAULT_SHOPCATS;
     if(!viewingUid) await saveUserData();
   }
-  // Load items
+  // Load items with photos from subcollection
   const itemsSnap = await getDocs(collection(db,'userData',uid,'items'));
-  items = itemsSnap.docs.map(d=>({id:d.id,...d.data()}));
+  items = await Promise.all(itemsSnap.docs.map(async d=>{
+    const item = {id:d.id,...d.data()};
+    if(item.photoCount>0) item.photos = await loadItemPhotos(uid,d.id,'items');
+    else item.photos = item.photos||[];
+    return item;
+  }));
   const shopSnap = await getDocs(collection(db,'userData',uid,'shopItems'));
-  shopItems = shopSnap.docs.map(d=>({id:d.id,...d.data()}));
+  shopItems = await Promise.all(shopSnap.docs.map(async d=>{
+    const item = {id:d.id,...d.data()};
+    if(item.photoCount>0) item.photos = await loadItemPhotos(uid,d.id,'shopItems');
+    else item.photos = item.photos||[];
+    return item;
+  }));
   // Load friends
   if(!viewingUid) {
     friends = userProfile.friends || [];
@@ -351,7 +361,7 @@ async function saveUserData() {
 
 async function saveItem(item) {
   if(viewingUid) return;
-  const {id, ...data} = item;
+  const {id, photos, ...data} = item; // 照片另存，不放在主文件
   if(id && typeof id === 'string' && id.length > 5) {
     await setDoc(doc(db,'userData',currentUser.uid,'items',id), data);
   } else {
@@ -365,7 +375,7 @@ async function deleteItemDB(id) {
 }
 async function saveShopItem(item) {
   if(viewingUid) return;
-  const {id, ...data} = item;
+  const {id, photos, ...data} = item;
   if(id && typeof id === 'string' && id.length > 5) {
     await setDoc(doc(db,'userData',currentUser.uid,'shopItems',id), data);
   } else {
@@ -378,9 +388,73 @@ async function deleteShopItemDB(id) {
   await deleteDoc(doc(db,'userData',currentUser.uid,'shopItems',id));
 }
 
-// Store photo as base64 directly (no Storage needed)
-async function uploadPhoto(base64, path) {
-  return base64; // Return base64 directly
+// ===== 照片另存子集合（不受 1MB 限制）=====
+async function saveItemWithPhotos(item) {
+  if(viewingUid) return;
+  const {id, photos, ...data} = item;
+  data.photoCount = (photos||[]).length;
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,'items',id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,'items'), data);
+    item.id = ref.id;
+  }
+  // 把每張照片存成獨立文件
+  const col = collection(db,'userData',currentUser.uid,'items',item.id,'photos');
+  const existing = await getDocs(col);
+  existing.docs.forEach(d=>deleteDoc(d.ref));
+  for(let i=0;i<(photos||[]).length;i++){
+    await setDoc(doc(col,String(i).padStart(4,'0')),{data:photos[i],idx:i});
+  }
+}
+
+async function saveShopItemWithPhotos(item) {
+  if(viewingUid) return;
+  const {id, photos, ...data} = item;
+  data.photoCount = (photos||[]).length;
+  if(id && typeof id === 'string' && id.length > 5) {
+    await setDoc(doc(db,'userData',currentUser.uid,'shopItems',id), data);
+  } else {
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,'shopItems'), data);
+    item.id = ref.id;
+  }
+  const col = collection(db,'userData',currentUser.uid,'shopItems',item.id,'photos');
+  const existing = await getDocs(col);
+  existing.docs.forEach(d=>deleteDoc(d.ref));
+  for(let i=0;i<(photos||[]).length;i++){
+    await setDoc(doc(col,String(i).padStart(4,'0')),{data:photos[i],idx:i});
+  }
+}
+
+async function loadItemPhotos(uid, itemId, colName) {
+  const col = collection(db,'userData',uid,colName,itemId,'photos');
+  const snap = await getDocs(col);
+  if(snap.empty) return [];
+  return snap.docs.sort((a,b)=>a.data().idx-b.data().idx).map(d=>d.data().data);
+}
+
+// 圖片壓縮
+async function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1080;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 // ===== LOGIN PAGE =====
@@ -1013,47 +1087,13 @@ window.closeLightbox = function() {
 (function(){
   let lbStartX=0, lbStartY=0;
   const lb = document.getElementById('lightbox');
-  lb.addEventListener('touchstart', e=>{
-    lbStartX = e.touches[0].clientX;
-    lbStartY = e.touches[0].clientY;
-  },{passive:true});
+  lb.addEventListener('touchstart', e=>{ lbStartX=e.touches[0].clientX; lbStartY=e.touches[0].clientY; },{passive:true});
   lb.addEventListener('touchend', e=>{
     const dx = lbStartX - e.changedTouches[0].clientX;
     const dy = Math.abs(e.changedTouches[0].clientY - lbStartY);
-    if(Math.abs(dx) > 50 && dy < 80 && lightboxPhotos.length > 1) {
-      lightboxNav(dx > 0 ? 1 : -1);
-    }
+    if(Math.abs(dx)>50 && dy<80 && lightboxPhotos.length>1) lightboxNav(dx>0?1:-1);
   },{passive:true});
 })();
-
-// ===== 圖片壓縮（上傳前自動縮小）=====
-async function compressImage(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 1080; // 最大邊長
-        let w = img.width, h = img.height;
-        if (w > MAX || h > MAX) {
-          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else { w = Math.round(w * MAX / h); h = MAX; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.72));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function showUploadProgress(current, total) {
-  document.getElementById('pageContent').innerHTML =
-    `<div class="loading">壓縮上傳中 ${current} / ${total}...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-}
 
 window.addMediaType = function(id, type, mediaKind) {
   const inp = document.getElementById('photoInput');
@@ -1062,33 +1102,28 @@ window.addMediaType = function(id, type, mediaKind) {
   inp.onchange = async function(e) {
     const files = Array.from(e.target.files);
     if(!files.length) return;
-    document.getElementById('pageContent').innerHTML =
-      `<div class="loading">壓縮中 0 / ${files.length}...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-
-    // 所有照片平行壓縮
     let done = 0;
-    const dataList = await Promise.all(files.map(async f => {
-      let data;
-      if(f.type.startsWith('video/')) {
-        data = await new Promise(res=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result); r.readAsDataURL(f); });
-      } else {
-        data = await compressImage(f);
-      }
-      done++;
+    const showP = () => {
       document.getElementById('pageContent').innerHTML =
         `<div class="loading">壓縮中 ${done} / ${files.length}...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-      return data;
+    };
+    showP();
+    // 平行壓縮
+    const newData = await Promise.all(files.map(async f => {
+      let d;
+      if(f.type.startsWith('video/')) {
+        d = await new Promise(res=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result); r.readAsDataURL(f); });
+      } else { d = await compressImage(f); }
+      done++; showP(); return d;
     }));
-
-    // 全部壓縮好，只存一次 Firestore
     document.getElementById('pageContent').innerHTML =
       `<div class="loading">儲存中...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
     if(type==='item') {
       const item = items.find(i=>i.id===id);
-      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...dataList); await saveItem(item); }
+      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...newData); await saveItemWithPhotos(item); }
     } else {
       const item = shopItems.find(i=>i.id===id);
-      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...dataList); await saveShopItem(item); }
+      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...newData); await saveShopItemWithPhotos(item); }
     }
     e.target.value = '';
     render();
@@ -1096,44 +1131,8 @@ window.addMediaType = function(id, type, mediaKind) {
   inp.click();
 };
 
-window.addMedia = function(id, type) {
-  const inp = document.getElementById('photoInput');
-  inp.accept = 'image/*,video/*';
-  inp.multiple = true;
-  inp.onchange = async function(e) {
-    const files = Array.from(e.target.files);
-    if(!files.length) return;
-    document.getElementById('pageContent').innerHTML =
-      `<div class="loading">壓縮中 0 / ${files.length}...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-    let done = 0;
-    const dataList = await Promise.all(files.map(async f => {
-      let data;
-      if(f.type.startsWith('video/')) {
-        data = await new Promise(res=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result); r.readAsDataURL(f); });
-      } else {
-        data = await compressImage(f);
-      }
-      done++;
-      document.getElementById('pageContent').innerHTML =
-        `<div class="loading">壓縮中 ${done} / ${files.length}...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-      return data;
-    }));
-    document.getElementById('pageContent').innerHTML =
-      `<div class="loading">儲存中...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-    if(type==='item') {
-      const item = items.find(i=>i.id===id);
-      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...dataList); await saveItem(item); }
-    } else {
-      const item = shopItems.find(i=>i.id===id);
-      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...dataList); await saveShopItem(item); }
-    }
-    e.target.value = '';
-    render();
-  };
-  inp.click();
-};
-
-window.addPhoto = window.addMedia;
+window.addMedia = window.addMediaType;
+window.addPhoto = window.addMediaType;
 
 window.delPhoto = async function(id, type) {
   const swiper = document.getElementById('swiper_'+id);
@@ -1141,10 +1140,10 @@ window.delPhoto = async function(id, type) {
   if(!confirm('刪除這張照片？')) return;
   if(type==='item') {
     const item = items.find(i=>i.id===id);
-    if(item&&item.photos) { item.photos.splice(idx,1); await saveItem(item); }
+    if(item&&item.photos) { item.photos.splice(idx,1); await saveItemWithPhotos(item); }
   } else {
     const item = shopItems.find(i=>i.id===id);
-    if(item&&item.photos) { item.photos.splice(idx,1); await saveShopItem(item); }
+    if(item&&item.photos) { item.photos.splice(idx,1); await saveShopItemWithPhotos(item); }
   }
   render();
 };
