@@ -819,7 +819,7 @@ function renderDetail() {
     <div class="detail-name">${item.name}</div>
     <div class="detail-stars-row">${starsHtml}</div>
     ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
-    ${item.hours&&item.hours.length?`<div class="detail-section">🕐 營業時間</div><div style="margin-bottom:8px">${item.hours.map(h=>`<div class="detail-hours-row"><span class="detail-hours-days">${esc(h.days||'')}</span><span class="detail-hours-time">${h.open||''}${h.open&&h.close?' – ':''}${h.close||''}</span></div>`).join('')}</div>`:''}
+    ${item.hours&&item.hours.length?`<div class="detail-section">🕐 營業時間</div><div style="margin-bottom:8px">${item.hours.map(h=>`<div class="detail-hours-row"><span class="detail-hours-days">${esc(h.days||'')}</span><span class="detail-hours-time">${h.open||''}${h.open&&h.close?' – ':''}${h.close||''}${h.note?` <span style="color:var(--muted);font-size:11px">${esc(h.note)}</span>`:''}</span></div>`).join('')}</div>`:''}
     ${item.address?`<div class="detail-section">地址</div><div class="detail-val">${item.address}</div>`:''}
     ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
     <div class="detail-btns">
@@ -1398,7 +1398,10 @@ window.openAddItem = function() {
     <input class="modal-input" id="mNote" placeholder="例：必點乾麵"/>
     <label class="modal-label">🕐 營業時間（選填）</label>
     <div id="hoursWrap"></div>
-    <div class="hours-add-btn" onclick="addHourRow()">＋ 新增時段</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0" onclick="addHourRow()">＋ 新增時段</div>
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="detectHoursFromPhoto()">📷 拍照自動偵測</div>
+    </div>
     <label class="modal-label">地址（選填）</label>
     <input class="modal-input" id="mAddr" placeholder="例：台中市西區民權路"/>
     <label class="modal-label">連結（選填）</label>
@@ -1449,7 +1452,7 @@ function renderHoursWrap() {
       <span class="hours-sep">–</span>
       <input class="hours-time" type="time" value="${h.close}" oninput="pickHours[${i}].close=this.value"/>
       <button class="hours-del" onclick="removeHourRow(${i})">✕</button>
-    </div>`).join('');
+    </div>${h.note?`<div style="font-size:11px;color:var(--muted);margin:-4px 0 6px 4px">📝 ${esc(h.note)}</div>`:''}`).join('');
 }
 
 window.addHourRow = function() {
@@ -1460,6 +1463,84 @@ window.addHourRow = function() {
 window.removeHourRow = function(i) {
   pickHours.splice(i,1);
   renderHoursWrap();
+};
+
+// AI 拍照偵測營業時間
+window.detectHoursFromPhoto = function() {
+  const inp = document.getElementById('photoInput');
+  inp.accept = 'image/*';
+  inp.multiple = false;
+  inp.onchange = async function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+
+    // 顯示偵測中狀態
+    const wrap = document.getElementById('hoursWrap');
+    if(wrap) wrap.innerHTML = '<div style="text-align:center;padding:12px;color:var(--blue);font-size:13px">🤖 AI 分析中，請稍候...</div>';
+
+    // 讀圖轉 base64
+    const base64 = await new Promise(res=>{
+      const r = new FileReader();
+      r.onload = ev => res(ev.target.result.split(',')[1]);
+      r.readAsDataURL(file);
+    });
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {type:'base64', media_type: file.type||'image/jpeg', data: base64}
+              },
+              {
+                type: 'text',
+                text: `請分析這張圖片中的營業時間資訊，回傳 JSON 陣列格式。
+每個元素包含：
+- days: 星期說明（例如「週一至週五」「星期六」「例假日」）
+- open: 開始時間，24小時制 HH:MM 格式（例如「11:30」）
+- close: 結束時間，24小時制 HH:MM 格式（例如「21:00」）
+- note: 備註（選填，例如「公休」「營業時間可能不同」）
+
+如果同一天有多個時段（例如午休），請分成多筆。
+只回傳 JSON 陣列，不要任何其他文字或 markdown。
+範例格式：[{"days":"週一至週五","open":"11:30","close":"14:30"},{"days":"週一至週五","open":"17:30","close":"21:00"}]`
+              }
+            ]
+          }]
+        })
+      });
+      const data = await resp.json();
+      const text = data.content.map(c=>c.text||'').join('').trim();
+      const cleaned = text.replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(cleaned);
+
+      if(Array.isArray(parsed) && parsed.length > 0) {
+        pickHours = parsed.map(h=>({
+          days: h.days||'',
+          open: h.open||'',
+          close: h.close||'',
+          note: h.note||''
+        }));
+        renderHoursWrap();
+      } else {
+        if(wrap) wrap.innerHTML = '';
+        alert('⚠️ 無法辨識，請手動輸入或換一張更清楚的照片');
+      }
+    } catch(err) {
+      console.error(err);
+      if(wrap) wrap.innerHTML = '';
+      alert('⚠️ 偵測失敗，請重試或手動輸入');
+    }
+    e.target.value = '';
+  };
+  inp.click();
 };
 
 function getHoursFromPick() {
@@ -1500,7 +1581,10 @@ window.openEditItem = function(id) {
     <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
     <label class="modal-label">🕐 營業時間</label>
     <div id="hoursWrap"></div>
-    <div class="hours-add-btn" onclick="addHourRow()">＋ 新增時段</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0" onclick="addHourRow()">＋ 新增時段</div>
+      <div class="hours-add-btn" style="flex:1;margin-bottom:0;color:var(--blue);border-color:var(--blue)" onclick="detectHoursFromPhoto()">📷 拍照自動偵測</div>
+    </div>
     <label class="modal-label">地址</label>
     <input class="modal-input" id="mAddr" value="${esc(item.address||'')}"/>
     <label class="modal-label">連結</label>
