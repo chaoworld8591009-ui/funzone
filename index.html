@@ -65,6 +65,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .photo-add-video-btn{background:rgba(0,0,0,0.65);color:var(--purple);font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;}
 .photo-btn-row{position:absolute;bottom:8px;right:10px;display:flex;gap:6px;z-index:3;}
 .photo-del-btn{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.6);color:var(--red);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
+.photo-cover-btn{position:absolute;bottom:8px;left:90px;background:rgba(0,0,0,0.65);color:var(--yellow);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
+.photo-cover-btn.is-cover{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow);}
 
 /* 全螢幕燈箱 */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;}
@@ -576,6 +578,7 @@ function renderHeader() {
     'shopdetail': ['詳細', ()=>{nav.page=nav.prevPage||'shopcat';render();}, isReadOnly()?null:'編輯', ()=>openEditShop(nav.itemId)],
     'friends': ['好友收藏', null, '＋ 新增', ()=>openAddFriend()],
     'profile': ['我的帳號', null, null, null],
+    'globalsearch': ['🔍 搜尋收藏', null, null, null],
   };
 
   const cfg = pages[nav.page];
@@ -607,6 +610,7 @@ function renderPage() {
     'list': renderList,
     'alllist': renderAllList,
     'detail': renderDetail,
+    'globalsearch': renderGlobalSearch,
     'shop': renderShop,
     'shopcat': renderShopCat,
     'shopalllist': renderShopAllList,
@@ -616,11 +620,16 @@ function renderPage() {
   };
   p.innerHTML = (pages[nav.page]||renderCountries)();
   setTimeout(initSwipers, 50);
+  if(nav.page==='globalsearch') {
+    const inp = document.getElementById('gSearchInput');
+    if(inp) setTimeout(()=>inp.focus(),150);
+  }
 }
 
 function renderBottomNav() {
   const btns = [
     {ico:'🌏',lbl:'收藏',pages:['countries','regions','cats','list','alllist','detail']},
+    {ico:'🔍',lbl:'搜尋',pages:['globalsearch']},
     {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
     {ico:'👥',lbl:'好友',pages:['friends']},
     {ico:'👤',lbl:'我的',pages:['profile']},
@@ -725,7 +734,8 @@ function renderListItem(item, from) {
   if(item.note) sub += ` <span style="color:var(--muted);font-size:11px">${item.note.slice(0,15)}${item.note.length>15?'…':''}</span>`;
   const hasPhoto = item.photos&&item.photos.length;
   const thumb = hasPhoto?`background:var(--card2);`:`background:${getCatBg(item.cat)};`;
-  const icon = hasPhoto?`<img src="${item.photos[0]}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
+  const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
+  const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
   return `<div class="list-item" 
     onclick="goDetail('${item.id}','${from}')"
     ontouchstart="startLongPress('${item.id}',this,event)"
@@ -795,6 +805,7 @@ function renderDetail() {
       <div class="photo-add-btn" onclick="addMediaType('${item.id}','item','image')">📷 ＋照片</div>
       <div class="photo-add-video-btn" onclick="addMediaType('${item.id}','item','video')">🎥 ＋影片</div>
     </div>`:''}
+    ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" id="coverBtn_${item.id}" onclick="setCover('${item.id}','item')">⭐ 設封面</div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
   </div>`;
   const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setItemStar('${item.id}',${v})`)}">★</span>`).join('');
@@ -813,6 +824,7 @@ function renderDetail() {
       ${item.address?`<div class="detail-btn btn-nav" onclick="openMap('${item.address}')">🧭 導航</div>`:''}
       ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
       <div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareItem('${item.id}')">📤 分享</div>
+      ${isReadOnly()?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="copyFromFriend('${item.id}')">➕ 複製到我的</div>`:''}
       ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditItem('${item.id}')">✏️ 編輯</div>`:''}
       ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteItem('${item.id}')">🗑 刪除</div>`:''}
     </div>
@@ -843,7 +855,8 @@ function shopListItem(item) {
   const sc = shopCats.find(c=>c.id===item.shopCat);
   const hasPhoto = item.photos&&item.photos.length;
   const thumb = hasPhoto?'background:var(--card2);':'background:var(--blue-bg);';
-  const icon = hasPhoto?`<img src="${item.photos[0]}" style="width:100%;height:100%;object-fit:cover;"/>`:sc?sc.emoji:'🛒';
+  const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
+  const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:sc?sc.emoji:'🛒';
   const starsStr = '★'.repeat(item.stars||0);
   return `<div class="list-item" onclick="goShopDetail('${item.id}')">
     <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
@@ -881,6 +894,7 @@ function renderShopDetail() {
       <div class="photo-add-btn" onclick="addMediaType('${item.id}','shop','image')">📷 ＋照片</div>
       <div class="photo-add-video-btn" onclick="addMediaType('${item.id}','shop','video')">🎥 ＋影片</div>
     </div>`:''}
+    ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" onclick="setCover('${item.id}','shop')">⭐ 設封面</div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
   </div>`;
   const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setShopStar('${item.id}',${v})`)}">★</span>`).join('');
@@ -1032,6 +1046,143 @@ function renderProfile() {
     <div class="list-body"><div class="list-name" style="color:var(--red)">登出</div></div>
   </div>`;
 }
+
+// ===== 全局搜尋 =====
+let gSearchQ = '';
+function renderGlobalSearch() {
+  const q = gSearchQ.trim().toLowerCase();
+  let resultsHtml = '';
+  if(q.length >= 1) {
+    const matched = items.filter(i=>!i.done&&(
+      i.name.toLowerCase().includes(q)||
+      (i.note||'').toLowerCase().includes(q)||
+      (i.address||'').toLowerCase().includes(q)||
+      (i.region||'').toLowerCase().includes(q)
+    ));
+    if(matched.length === 0) {
+      resultsHtml = '<div class="empty">找不到符合的收藏</div>';
+    } else {
+      resultsHtml = `<div class="section-hdr">— 找到 ${matched.length} 筆 —</div>`;
+      resultsHtml += matched.map(item=>{
+        const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
+        const c = countries.find(x=>x.id===item.country);
+        const hasPhoto = item.photos&&item.photos.length;
+        const thumb = hasPhoto?'background:var(--card2);':`background:${getCatBg(item.cat)};`;
+        const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
+        const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
+        const starsStr = '★'.repeat(item.stars||0);
+        return `<div class="list-item" onclick="goDetailFromSearch('${item.id}')">
+          <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
+          <div class="list-body">
+            <div class="list-name">${item.name}</div>
+            <div class="list-sub">
+              ${c?`<span style="font-size:11px">${c.emoji} ${c.name}</span>`:''}
+              <span class="tag tag-loc" style="font-size:10px">📍${item.region}</span>
+              <span class="tag ${cat.cls}" style="font-size:10px">${cat.label}</span>
+              ${item.stars?`<span class="stars" style="font-size:11px">${starsStr}</span>`:''}
+            </div>
+          </div>
+          <div class="list-arrow">›</div>
+        </div>`;
+      }).join('');
+    }
+  } else {
+    resultsHtml = '<div class="empty" style="padding-top:40px">輸入關鍵字搜尋所有收藏<br><span style="font-size:13px;color:var(--muted2)">名稱、備註、地址、地區</span></div>';
+  }
+  return `<div class="search-bar" style="padding:12px 14px;">
+    <input id="gSearchInput" class="search-input" placeholder="🔍 搜尋所有收藏..." value="${esc(gSearchQ)}" oninput="doGlobalSearch(this.value)" style="font-size:16px;"/>
+  </div>${resultsHtml}`;
+}
+
+window.doGlobalSearch = function(q) {
+  gSearchQ = q;
+  const p = document.getElementById('pageContent');
+  const inp = document.getElementById('gSearchInput');
+  const cursorPos = inp ? inp.selectionStart : 0;
+  p.innerHTML = renderGlobalSearch();
+  const newInp = document.getElementById('gSearchInput');
+  if(newInp) { newInp.focus(); try{newInp.setSelectionRange(cursorPos,cursorPos);}catch(e){} }
+};
+
+window.goDetailFromSearch = function(id) {
+  const item = items.find(i=>i.id===id); if(!item) return;
+  // Find which country/region/cat to set nav
+  nav.country = item.country;
+  nav.region = item.region;
+  nav.cat = item.cat;
+  nav.prevPage = 'globalsearch';
+  nav.itemId = id;
+  nav.page = 'detail';
+  render();
+};
+
+// ===== 從好友收藏複製到自己 =====
+window.copyFromFriend = function(itemId) {
+  const item = items.find(i=>i.id===itemId); if(!item) return;
+  // 選擇要存到哪個國家/地區/分類
+  const countryOpts = countries.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+  openModal(`<div class="modal-title">複製到我的收藏</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;text-align:center">「${esc(item.name)}」將複製到你的收藏</div>
+    <label class="modal-label">存到哪個國家</label>
+    <select class="modal-input" id="cpCountry" onchange="updateCopyRegions()">${countryOpts}</select>
+    <label class="modal-label">地區</label>
+    <input class="modal-input" id="cpRegion" placeholder="例：台中" value="${esc(item.region||'')}"/>
+    <label class="modal-label">分類</label>
+    <select class="modal-input" id="cpCat">${CATS.map(c=>`<option value="${c.id}"${c.id===item.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <div class="modal-btns">
+      <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
+      <div class="modal-btn modal-btn-ok" onclick="doCopyFromFriend('${itemId}')">複製過來</div>
+    </div>`);
+};
+
+window.doCopyFromFriend = async function(srcId) {
+  const src = items.find(i=>i.id===srcId); if(!src) return;
+  const countryId = document.getElementById('cpCountry').value;
+  const region = document.getElementById('cpRegion').value.trim()||src.region||'';
+  const cat = document.getElementById('cpCat').value;
+
+  // 先暫存 viewingUid，切回自己的資料
+  const friendUid = viewingUid;
+  const friendItems = [...items];
+
+  closeModal();
+  document.getElementById('pageContent').innerHTML='<div class="loading">複製中...</div>';
+
+  // 切回自己
+  clearFriendListeners();
+  viewingUid = null;
+  await loadUserData();
+
+  // 建立新 item
+  const newItem = {
+    country: countryId,
+    region,
+    cat,
+    name: src.name,
+    stars: src.stars||0,
+    note: src.note||'',
+    address: src.address||'',
+    link: src.link||'',
+    photos: [],
+    done: false,
+    createdAt: Date.now(),
+    copiedFrom: friendUid||''
+  };
+  items.unshift(newItem);
+  await saveItem(newItem);
+
+  // 複製照片（如果有）
+  if(src.photos&&src.photos.length) {
+    await appendPhotosToCol(currentUser.uid,'items',newItem.id,src.photos);
+    newItem.photos = [...src.photos];
+    await saveItemMainDoc(newItem,'items');
+  }
+
+  nav = {page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null,sort:'stars',search:''};
+  setupFriendProfileListeners();
+  render();
+  alert('✅ 已複製到你的收藏！');
+};
 
 window.openEditName = function() {
   openModal(`<div class="modal-title">修改名稱</div>
@@ -1250,9 +1401,33 @@ window.delPhoto = async function(id, type) {
   if(item && item.photos) {
     await deletePhotoFromCol(currentUser.uid, colName, id, idx);
     item.photos.splice(idx, 1);
+    // 如果刪的是封面，重設為第一張
+    if((item.coverIdx||0) >= item.photos.length) item.coverIdx = 0;
     await saveItemMainDoc(item, colName);
   }
   render();
+};
+
+window.setCover = async function(id, type) {
+  const swiper = document.getElementById('swiper_'+id);
+  const idx = swiper ? parseInt(swiper.dataset.idx)||0 : 0;
+  const colName = type==='item' ? 'items' : 'shopItems';
+  const arr = type==='item' ? items : shopItems;
+  const item = arr.find(i=>i.id===id);
+  if(!item || !item.photos || !item.photos.length) return;
+  if(idx === (item.coverIdx||0)) {
+    alert('這張已經是封面了！');
+    return;
+  }
+  item.coverIdx = idx;
+  await saveItemMainDoc(item, colName);
+  // 更新按鈕樣式，不需要完整 render
+  const btn = document.getElementById('coverBtn_'+id);
+  if(btn) {
+    btn.textContent = '✅ 已設為封面';
+    btn.classList.add('is-cover');
+    setTimeout(()=>{ btn.textContent='⭐ 設封面'; btn.classList.remove('is-cover'); }, 1500);
+  }
 };
 
 // ===== MODAL =====
