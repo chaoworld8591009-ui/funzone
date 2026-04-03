@@ -51,18 +51,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .filter-bar::-webkit-scrollbar{display:none;}
 .filter-pill{font-size:12px;padding:5px 14px;border-radius:20px;white-space:nowrap;cursor:pointer;border:0.5px solid var(--border2);color:var(--muted);background:transparent;flex-shrink:0;}
 .filter-pill.active{background:var(--amber);color:#000;border-color:var(--amber);font-weight:700;}
-.photo-swiper{width:100%;height:280px;position:relative;overflow:hidden;flex-shrink:0;background:#000;}
+.photo-swiper{width:100%;height:300px;position:relative;overflow:hidden;flex-shrink:0;background:#000;}
 .photo-swiper-track{display:flex;height:100%;transition:transform 0.3s ease;}
-.photo-swiper-slide{min-width:100%;height:100%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#000;}
-.photo-swiper-slide img{width:100%;height:100%;object-fit:contain;display:block;}
+.photo-swiper-slide{min-width:100%;height:100%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#000;cursor:pointer;}
+.photo-swiper-slide img{max-width:100%;max-height:100%;width:auto;height:auto;display:block;object-fit:contain;}
 .slide-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;}
 .photo-swiper-overlay{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,var(--bg));pointer-events:none;z-index:1;}
 .photo-dots{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;}
 .photo-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);}
 .photo-dot.on{background:#fff;}
 .photo-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;z-index:2;}
-.photo-add-btn{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,0.6);color:var(--amber);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
-.photo-add-video-btn{position:absolute;bottom:8px;right:90px;background:rgba(0,0,0,0.6);color:var(--purple);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
+.photo-add-btn{background:rgba(0,0,0,0.65);color:var(--amber);font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;}
+.photo-add-video-btn{background:rgba(0,0,0,0.65);color:var(--purple);font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;}
+.photo-btn-row{position:absolute;bottom:8px;right:10px;display:flex;gap:6px;z-index:3;}
 .photo-del-btn{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.6);color:var(--red);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
 
 /* 全螢幕燈箱 */
@@ -76,7 +77,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .lightbox-count{position:absolute;bottom:20px;color:rgba(255,255,255,0.6);font-size:13px;}
 
 /* 影片樣式 */
-.photo-swiper-slide video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
+.photo-swiper-slide video{max-width:100%;max-height:100%;width:auto;height:auto;display:block;object-fit:contain;background:#000;}
 .media-type-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;z-index:2;}
 .detail-body{padding:16px 20px;flex:1;overflow-y:auto;}
 .detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
@@ -635,8 +636,10 @@ function renderDetail() {
     <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
     <div class="photo-swiper-overlay"></div>
     ${dots?'<div class="photo-dots">'+dots+'</div>':''}${count}
-    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMediaType('${item.id}','item','image')">📷 ＋照片</div>`:''}
-    ${!isReadOnly()?`<div class="photo-add-video-btn" onclick="addMediaType('${item.id}','item','video')">🎥 ＋影片</div>`:''}
+    ${!isReadOnly()?`<div class="photo-btn-row">
+      <div class="photo-add-btn" onclick="addMediaType('${item.id}','item','image')">📷 ＋照片</div>
+      <div class="photo-add-video-btn" onclick="addMediaType('${item.id}','item','video')">🎥 ＋影片</div>
+    </div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
   </div>`;
   const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setItemStar('${item.id}',${v})`)}">★</span>`).join('');
@@ -719,8 +722,10 @@ function renderShopDetail() {
     <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
     <div class="photo-swiper-overlay"></div>
     ${dots?'<div class="photo-dots">'+dots+'</div>':''}
-    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMediaType('${item.id}','shop','image')">📷 ＋照片</div>`:''}
-    ${!isReadOnly()?`<div class="photo-add-video-btn" onclick="addMediaType('${item.id}','shop','video')">🎥 ＋影片</div>`:''}
+    ${!isReadOnly()?`<div class="photo-btn-row">
+      <div class="photo-add-btn" onclick="addMediaType('${item.id}','shop','image')">📷 ＋照片</div>
+      <div class="photo-add-video-btn" onclick="addMediaType('${item.id}','shop','video')">🎥 ＋影片</div>
+    </div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
   </div>`;
   const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setShopStar('${item.id}',${v})`)}">★</span>`).join('');
@@ -1358,16 +1363,20 @@ function initSwipers() {
     }
 
     function tryOpenLightbox(target) {
-      const isBtn = target.closest('.photo-add-btn')||target.closest('.photo-del-btn');
-      if(!isBtn && count>0) openLightbox(itemId, idx);
+      const isBtn = target.closest('.photo-add-btn')||target.closest('.photo-del-btn')||target.closest('.photo-btn-row');
+      if(!isBtn && count>0) {
+        setTimeout(()=>openLightbox(itemId, idx), 10);
+      }
     }
 
     // 手機 touch
+    let touchHandled = false;
     sw.addEventListener('touchstart',e=>{
       startX=e.touches[0].clientX;
       startY=e.touches[0].clientY;
       startTime=Date.now();
       wasSwiped=false;
+      touchHandled=false;
     },{passive:true});
 
     sw.addEventListener('touchend',e=>{
@@ -1377,7 +1386,8 @@ function initSwipers() {
       if(Math.abs(dx)>40 && dy<60){
         wasSwiped=true;
         if(dx>0)goTo(idx+1);else goTo(idx-1);
-      } else if(!wasSwiped && Math.abs(dx)<15 && dy<15 && dt<400){
+      } else if(Math.abs(dx)<15 && dy<15 && dt<400){
+        touchHandled=true;
         tryOpenLightbox(e.target);
       }
     },{passive:true});
@@ -1385,6 +1395,7 @@ function initSwipers() {
     // 電腦 click (方便測試)
     sw.addEventListener('click',e=>{
       if(wasSwiped){wasSwiped=false;return;}
+      if(touchHandled){touchHandled=false;return;}
       tryOpenLightbox(e.target);
     });
   });
