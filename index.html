@@ -837,9 +837,11 @@ function renderDetail() {
       </div>`).join('');
     })()}</div>`:''}
     ${item.address?`<div class="detail-section">地址</div><div class="detail-val">${item.address}</div>`:''}
+    ${item.phone?`<div class="detail-section">電話</div><div class="detail-val"><a href="tel:${esc(item.phone)}" style="color:var(--green);text-decoration:none">📞 ${esc(item.phone)}</a></div>`:''}
     ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
     <div class="detail-btns">
       ${item.address?`<div class="detail-btn btn-nav" onclick="openMap('${item.address}')">🧭 導航</div>`:''}
+      ${item.phone?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="window.location='tel:${esc(item.phone)}'">📞 致電</div>`:''}
       ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
       <div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareItem('${item.id}')">📤 分享</div>
       ${isReadOnly()?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="copyFromFriend('${item.id}')">➕ 複製到我的</div>`:''}
@@ -1195,6 +1197,7 @@ window.shareItem = function(id) {
   if(!item) return;
   const lines = [`📌 ${item.name}`];
   if(item.address) lines.push(`📍 ${item.address}`);
+  if(item.phone) lines.push(`📞 ${item.phone}`);
   if(item.note) lines.push(`📝 ${item.note}`);
   if(item.link) lines.push(`🔗 ${item.link}`);
   lines.push(`\n來自「我的收藏」App`);
@@ -1420,6 +1423,8 @@ window.openAddItem = function() {
     </div>
     <label class="modal-label">地址（選填）</label>
     <input class="modal-input" id="mAddr" placeholder="例：台中市西區民權路"/>
+    <label class="modal-label">電話（選填）</label>
+    <input class="modal-input" id="mPhone" type="tel" placeholder="例：04-12345678"/>
     <label class="modal-label">連結（選填）</label>
     <input class="modal-input" id="mLink" placeholder="https://..."/>
     <label class="modal-label">照片（選填）</label>
@@ -1501,93 +1506,111 @@ function parseChineseTime(str) {
   return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
 }
 
-function parseHoursFromText(text) {
-  const results = [];
-  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>0);
+function fixAmbiguousTime(open, close, raw) {
+  if(open && close && !/[上下]午|晚|午夜|凌晨/.test(raw||'')) {
+    const oh = parseInt(open.split(':')[0]);
+    const ch = parseInt(close.split(':')[0]);
+    if((ch > 12 || ch === 0) && oh < 12) return `${oh+12}:${open.split(':')[1]}`;
+  }
+  return open;
+}
 
+function parseHoursFromText(text) {
+  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>0);
+  const SKIP = /新增或編輯|評論|最新動態|關於|菜單|相片|總覽|展開/;
   const dayRegex = /星期[一二三四五六日天]|週[一二三四五六日天]|周[一二三四五六日天]/;
   const TP = '([上下]午\\s*\\d{1,2}(?::\\d{2})?(?:\\s*[時时])?|午夜|凌晨\\s*\\d{1,2}(?::\\d{2})?(?:\\s*[時时])?|\\d{1,2}:\\d{2})';
-  const timeRangeRegex = new RegExp(TP + '\\s*[-–~至]\\s*' + TP);
+  const timeReg = new RegExp(TP + '\\s*[-\u2013~至]\\s*' + TP);
 
-  const dayNames = [];
-  const groups = [];
-  let curTimes = [];
-  let foundFirstTime = false;
-
+  // 偵測格式：交錯 vs 星期全在前
+  let firstDay = false, format = 'interleaved';
   for(const line of lines) {
-    if(/新增或編輯|評論|最新動態|關於|菜單|相片|總覽|展開/.test(line)) continue;
+    if(SKIP.test(line)) continue;
+    if(dayRegex.test(line)) {
+      if(firstDay) { format = 'days-first'; break; }
+      firstDay = true;
+    } else if(firstDay && (timeReg.test(line) || /休息中|公休/.test(line))) {
+      format = 'interleaved'; break;
+    }
+  }
 
-    if(!foundFirstTime) {
-      if(timeRangeRegex.test(line) || /公休|休息中|不營業|已關閉/.test(line)) {
-        foundFirstTime = true;
-        // fall through to time section
-      } else if(dayRegex.test(line)) {
-        dayNames.push(line.match(dayRegex)[0]);
-        continue;
-      } else {
-        continue;
+  return format === 'interleaved'
+    ? parseInterleaved(lines, dayRegex, timeReg, SKIP)
+    : parseDaysFirst(lines, dayRegex, timeReg, SKIP);
+}
+
+// 格式二：星期和時間交錯排列
+function parseInterleaved(lines, dayRegex, timeReg, SKIP) {
+  const results = [], dayOrder = [], daysData = {};
+  let cur = null;
+  for(const line of lines) {
+    if(SKIP.test(line)) continue;
+    const dayM = line.match(dayRegex);
+    if(dayM) {
+      cur = dayM[0];
+      if(!daysData[cur]) { daysData[cur]={slots:[],note:''}; dayOrder.push(cur); }
+    } else if(cur) {
+      if(/公休|休息中|不營業|已關閉/.test(line)) {
+        daysData[cur].note = '公休';
+      } else if(/營業時間可能不同/.test(line)) {
+        if(daysData[cur].note !== '公休') daysData[cur].note = '營業時間可能不同';
+      } else if(timeReg.test(line)) {
+        const m = line.match(timeReg);
+        let open = parseChineseTime(m[1]);
+        const close = parseChineseTime(m[2]);
+        open = fixAmbiguousTime(open, close, m[1]);
+        if(open && close) daysData[cur].slots.push({open, close});
       }
     }
+  }
+  dayOrder.forEach(day => {
+    const d = daysData[day];
+    if(!d.slots.length) results.push({days:day,open:'',close:'',note:d.note||'公休'});
+    else d.slots.forEach(s=>results.push({days:day,open:s.open,close:s.close,note:d.note}));
+  });
+  return results;
+}
 
-    // 時間區段處理
+// 格式一：星期全在前，時間全在後
+function parseDaysFirst(lines, dayRegex, timeReg, SKIP) {
+  const results = [], dayNames = [], groups = [];
+  let curTimes = [], foundFirstTime = false;
+  for(const line of lines) {
+    if(SKIP.test(line)) continue;
+    if(!foundFirstTime) {
+      if(timeReg.test(line) || /公休|休息中/.test(line)) foundFirstTime = true;
+      else if(dayRegex.test(line)) { dayNames.push(line.match(dayRegex)[0]); continue; }
+      else continue;
+    }
     if(/營業時間可能不同/.test(line)) {
-      if(curTimes.length > 0) {
-        groups.push({times:[...curTimes], note:'營業時間可能不同'});
-        curTimes = [];
-      } else if(groups.length > 0) {
-        groups[groups.length-1].note = '營業時間可能不同';
-      }
+      if(curTimes.length) { groups.push({times:[...curTimes],note:'營業時間可能不同'}); curTimes=[]; }
+      else if(groups.length) groups[groups.length-1].note='營業時間可能不同';
     } else if(/公休|休息中|不營業|已關閉/.test(line)) {
-      if(curTimes.length > 0) { groups.push({times:[...curTimes], note:''}); curTimes=[]; }
-      groups.push({times:[], note:'公休'});
-    } else if(timeRangeRegex.test(line)) {
-      const m = line.match(timeRangeRegex);
+      if(curTimes.length) { groups.push({times:[...curTimes],note:''}); curTimes=[]; }
+      groups.push({times:[],note:'公休'});
+    } else if(timeReg.test(line)) {
+      const m = line.match(timeReg);
       let open = parseChineseTime(m[1]);
-      let close = parseChineseTime(m[2]);
-      // 修正沒有上下午標記的時間（例如 5:30 實際是下午）
-      if(open && close && !/[上下]午|晚|午夜|凌晨/.test(m[1])) {
-        const oh = parseInt(open.split(':')[0]);
-        const ch = parseInt(close.split(':')[0]);
-        if((ch > 12 || ch === 0) && oh < 12) open = `${oh+12}:${open.split(':')[1]}`;
-      }
+      const close = parseChineseTime(m[2]);
+      open = fixAmbiguousTime(open, close, m[1]);
       if(open && close) curTimes.push({open, close});
     }
   }
-
-  // 處理最後剩下的時間段
-  if(curTimes.length > 0) {
-    const confirmedGroups = groups.length;
-    const remainingDays = dayNames.length - confirmedGroups;
-    if(remainingDays > 0 && curTimes.length % remainingDays === 0) {
-      const slots = curTimes.length / remainingDays;
-      for(let i = 0; i < curTimes.length; i += slots) {
-        groups.push({times: curTimes.slice(i, i+slots), note:''});
-      }
-    } else {
-      groups.push({times: curTimes, note:''});
-    }
+  if(curTimes.length) {
+    const rem = dayNames.length - groups.length;
+    if(rem > 0 && curTimes.length % rem === 0) {
+      const s = curTimes.length/rem;
+      for(let i=0;i<curTimes.length;i+=s) groups.push({times:curTimes.slice(i,i+s),note:''});
+    } else groups.push({times:curTimes,note:''});
   }
-
-  // 對應星期和時段
-  dayNames.forEach((day, i) => {
-    const g = groups[i];
-    if(!g) return;
-    if(g.times.length === 0) {
-      results.push({days:day, open:'', close:'', note:g.note||'公休'});
-    } else {
-      g.times.forEach(t => {
-        results.push({days:day, open:t.open, close:t.close, note:g.note||''});
-      });
-    }
+  dayNames.forEach((day,i) => {
+    const g = groups[i]; if(!g) return;
+    if(!g.times.length) results.push({days:day,open:'',close:'',note:g.note||'公休'});
+    else g.times.forEach(t=>results.push({days:day,open:t.open,close:t.close,note:g.note}));
   });
-
-  const seen = new Set();
-  return results.filter(r=>{
-    const k = `${r.days}|${r.open}|${r.close}`;
-    if(seen.has(k)) return false;
-    seen.add(k); return true;
-  });
+  return results;
 }
+
 
 window.pasteHoursText = function() {
   const wrap = document.getElementById('hoursWrap');
@@ -1624,7 +1647,9 @@ window.doAddItem = async function() {
   const item = {country:nav.country,region:nav.region,cat:document.getElementById('mCat').value,
     name,stars:pickStars,note:document.getElementById('mNote').value.trim(),
     hours:getHoursFromPick(),
-    address:document.getElementById('mAddr').value.trim(),link:document.getElementById('mLink').value.trim(),
+    address:document.getElementById('mAddr').value.trim(),
+    phone:document.getElementById('mPhone').value.trim(),
+    link:document.getElementById('mLink').value.trim(),
     photos:[],done:false,createdAt:Date.now()};
   items.unshift(item);
   closeModal();
@@ -1659,6 +1684,8 @@ window.openEditItem = function(id) {
     </div>
     <label class="modal-label">地址</label>
     <input class="modal-input" id="mAddr" value="${esc(item.address||'')}"/>
+    <label class="modal-label">電話</label>
+    <input class="modal-input" id="mPhone" type="tel" value="${esc(item.phone||'')}"/>
     <label class="modal-label">連結</label>
     <input class="modal-input" id="mLink" value="${esc(item.link||'')}"/>
     <div class="modal-btns">
@@ -1673,7 +1700,9 @@ window.doEditItem = async function(id) {
   const item = items.find(i=>i.id===id); if(!item) return;
   Object.assign(item,{name,cat:document.getElementById('mCat').value,stars:pickStars,
     hours:getHoursFromPick(),
-    note:document.getElementById('mNote').value.trim(),address:document.getElementById('mAddr').value.trim(),
+    note:document.getElementById('mNote').value.trim(),
+    address:document.getElementById('mAddr').value.trim(),
+    phone:document.getElementById('mPhone').value.trim(),
     link:document.getElementById('mLink').value.trim()});
   await saveItem(item); closeModal(); render();
 };
