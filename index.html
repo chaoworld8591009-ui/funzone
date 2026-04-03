@@ -51,10 +51,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .filter-bar::-webkit-scrollbar{display:none;}
 .filter-pill{font-size:12px;padding:5px 14px;border-radius:20px;white-space:nowrap;cursor:pointer;border:0.5px solid var(--border2);color:var(--muted);background:transparent;flex-shrink:0;}
 .filter-pill.active{background:var(--amber);color:#000;border-color:var(--amber);font-weight:700;}
-.photo-swiper{width:100%;height:220px;position:relative;overflow:hidden;flex-shrink:0;background:var(--card2);}
+.photo-swiper{width:100%;height:280px;position:relative;overflow:hidden;flex-shrink:0;background:#000;}
 .photo-swiper-track{display:flex;height:100%;transition:transform 0.3s ease;}
-.photo-swiper-slide{min-width:100%;height:100%;flex-shrink:0;}
-.photo-swiper-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-swiper-slide{min-width:100%;height:100%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#000;}
+.photo-swiper-slide img{width:100%;height:100%;object-fit:contain;display:block;}
 .slide-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;}
 .photo-swiper-overlay{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,var(--bg));pointer-events:none;z-index:1;}
 .photo-dots{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;}
@@ -62,6 +62,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .photo-dot.on{background:#fff;}
 .photo-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.55);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;z-index:2;}
 .photo-add-btn{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,0.6);color:var(--amber);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
+.photo-add-video-btn{position:absolute;bottom:8px;right:90px;background:rgba(0,0,0,0.6);color:var(--purple);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
 .photo-del-btn{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.6);color:var(--red);font-size:12px;padding:5px 10px;border-radius:20px;cursor:pointer;z-index:2;}
 
 /* 全螢幕燈箱 */
@@ -75,7 +76,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .lightbox-count{position:absolute;bottom:20px;color:rgba(255,255,255,0.6);font-size:13px;}
 
 /* 影片樣式 */
-.photo-swiper-slide video{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-swiper-slide video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
 .media-type-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;padding:3px 8px;border-radius:20px;z-index:2;}
 .detail-body{padding:16px 20px;flex:1;overflow-y:auto;}
 .detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
@@ -634,7 +635,8 @@ function renderDetail() {
     <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
     <div class="photo-swiper-overlay"></div>
     ${dots?'<div class="photo-dots">'+dots+'</div>':''}${count}
-    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMedia('${item.id}','item')">📷 ＋媒體</div>`:''}
+    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMediaType('${item.id}','item','image')">📷 ＋照片</div>`:''}
+    ${!isReadOnly()?`<div class="photo-add-video-btn" onclick="addMediaType('${item.id}','item','video')">🎥 ＋影片</div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
   </div>`;
   const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setItemStar('${item.id}',${v})`)}">★</span>`).join('');
@@ -717,7 +719,8 @@ function renderShopDetail() {
     <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
     <div class="photo-swiper-overlay"></div>
     ${dots?'<div class="photo-dots">'+dots+'</div>':''}
-    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMedia('${item.id}','shop')">📷 ＋媒體</div>`:''}
+    ${!isReadOnly()?`<div class="photo-add-btn" onclick="addMediaType('${item.id}','shop','image')">📷 ＋照片</div>`:''}
+    ${!isReadOnly()?`<div class="photo-add-video-btn" onclick="addMediaType('${item.id}','shop','video')">🎥 ＋影片</div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
   </div>`;
   const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setShopStar('${item.id}',${v})`)}">★</span>`).join('');
@@ -972,6 +975,34 @@ window.closeLightbox = function() {
   document.getElementById('lightbox').classList.add('hidden');
   document.getElementById('lightboxMedia').innerHTML = '';
   lightboxPhotos = [];
+};
+
+window.addMediaType = function(id, type, mediaKind) {
+  const inp = document.getElementById('photoInput');
+  inp.accept = mediaKind === 'video' ? 'video/*' : 'image/*';
+  inp.multiple = true;
+  inp.onchange = async function(e) {
+    const files = Array.from(e.target.files);
+    if(!files.length) return;
+    document.getElementById('pageContent').innerHTML = '<div class="loading">上傳中...</div>';
+    for(const f of files) {
+      const base64 = await new Promise(res=>{
+        const r = new FileReader();
+        r.onload = ev => res(ev.target.result);
+        r.readAsDataURL(f);
+      });
+      if(type==='item') {
+        const item = items.find(i=>i.id===id);
+        if(item) { if(!item.photos) item.photos=[]; item.photos.push(base64); await saveItem(item); }
+      } else {
+        const item = shopItems.find(i=>i.id===id);
+        if(item) { if(!item.photos) item.photos=[]; item.photos.push(base64); await saveShopItem(item); }
+      }
+    }
+    e.target.value = '';
+    render();
+  };
+  inp.click();
 };
 
 window.addMedia = function(id, type) {
