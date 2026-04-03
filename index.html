@@ -578,7 +578,6 @@ function renderHeader() {
     'shopdetail': ['詳細', ()=>{nav.page=nav.prevPage||'shopcat';render();}, isReadOnly()?null:'編輯', ()=>openEditShop(nav.itemId)],
     'friends': ['好友收藏', null, '＋ 新增', ()=>openAddFriend()],
     'profile': ['我的帳號', null, null, null],
-    'globalsearch': ['🔍 搜尋收藏', null, null, null],
   };
 
   const cfg = pages[nav.page];
@@ -610,7 +609,6 @@ function renderPage() {
     'list': renderList,
     'alllist': renderAllList,
     'detail': renderDetail,
-    'globalsearch': renderGlobalSearch,
     'shop': renderShop,
     'shopcat': renderShopCat,
     'shopalllist': renderShopAllList,
@@ -620,16 +618,11 @@ function renderPage() {
   };
   p.innerHTML = (pages[nav.page]||renderCountries)();
   setTimeout(initSwipers, 50);
-  if(nav.page==='globalsearch') {
-    const inp = document.getElementById('gSearchInput');
-    if(inp) setTimeout(()=>inp.focus(),150);
-  }
 }
 
 function renderBottomNav() {
   const btns = [
     {ico:'🌏',lbl:'收藏',pages:['countries','regions','cats','list','alllist','detail']},
-    {ico:'🔍',lbl:'搜尋',pages:['globalsearch']},
     {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
     {ico:'👥',lbl:'好友',pages:['friends']},
     {ico:'👤',lbl:'我的',pages:['profile']},
@@ -738,9 +731,7 @@ function renderListItem(item, from) {
   const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
   return `<div class="list-item" 
     onclick="goDetail('${item.id}','${from}')"
-    ontouchstart="startLongPress('${item.id}',this,event)"
-    ontouchend="cancelLongPress()"
-    ontouchmove="cancelLongPress()">
+    ${!isReadOnly()?`ontouchstart="startLongPress('${item.id}',this,event)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()"`:''}>
     <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
     <div class="list-body"><div class="list-name">${item.name}</div><div class="list-sub">${sub}</div></div>
     <div class="list-arrow">›</div></div>`;
@@ -1048,74 +1039,6 @@ function renderProfile() {
 }
 
 // ===== 全局搜尋 =====
-let gSearchQ = '';
-function renderGlobalSearch() {
-  const q = gSearchQ.trim().toLowerCase();
-  let resultsHtml = '';
-  if(q.length >= 1) {
-    const matched = items.filter(i=>!i.done&&(
-      i.name.toLowerCase().includes(q)||
-      (i.note||'').toLowerCase().includes(q)||
-      (i.address||'').toLowerCase().includes(q)||
-      (i.region||'').toLowerCase().includes(q)
-    ));
-    if(matched.length === 0) {
-      resultsHtml = '<div class="empty">找不到符合的收藏</div>';
-    } else {
-      resultsHtml = `<div class="section-hdr">— 找到 ${matched.length} 筆 —</div>`;
-      resultsHtml += matched.map(item=>{
-        const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
-        const c = countries.find(x=>x.id===item.country);
-        const hasPhoto = item.photos&&item.photos.length;
-        const thumb = hasPhoto?'background:var(--card2);':`background:${getCatBg(item.cat)};`;
-        const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
-        const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
-        const starsStr = '★'.repeat(item.stars||0);
-        return `<div class="list-item" onclick="goDetailFromSearch('${item.id}')">
-          <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
-          <div class="list-body">
-            <div class="list-name">${item.name}</div>
-            <div class="list-sub">
-              ${c?`<span style="font-size:11px">${c.emoji} ${c.name}</span>`:''}
-              <span class="tag tag-loc" style="font-size:10px">📍${item.region}</span>
-              <span class="tag ${cat.cls}" style="font-size:10px">${cat.label}</span>
-              ${item.stars?`<span class="stars" style="font-size:11px">${starsStr}</span>`:''}
-            </div>
-          </div>
-          <div class="list-arrow">›</div>
-        </div>`;
-      }).join('');
-    }
-  } else {
-    resultsHtml = '<div class="empty" style="padding-top:40px">輸入關鍵字搜尋所有收藏<br><span style="font-size:13px;color:var(--muted2)">名稱、備註、地址、地區</span></div>';
-  }
-  return `<div class="search-bar" style="padding:12px 14px;">
-    <input id="gSearchInput" class="search-input" placeholder="🔍 搜尋所有收藏..." value="${esc(gSearchQ)}" oninput="doGlobalSearch(this.value)" style="font-size:16px;"/>
-  </div>${resultsHtml}`;
-}
-
-window.doGlobalSearch = function(q) {
-  gSearchQ = q;
-  const p = document.getElementById('pageContent');
-  const inp = document.getElementById('gSearchInput');
-  const cursorPos = inp ? inp.selectionStart : 0;
-  p.innerHTML = renderGlobalSearch();
-  const newInp = document.getElementById('gSearchInput');
-  if(newInp) { newInp.focus(); try{newInp.setSelectionRange(cursorPos,cursorPos);}catch(e){} }
-};
-
-window.goDetailFromSearch = function(id) {
-  const item = items.find(i=>i.id===id); if(!item) return;
-  // Find which country/region/cat to set nav
-  nav.country = item.country;
-  nav.region = item.region;
-  nav.cat = item.cat;
-  nav.prevPage = 'globalsearch';
-  nav.itemId = id;
-  nav.page = 'detail';
-  render();
-};
-
 // ===== 從好友收藏複製到自己 =====
 window.copyFromFriend = function(itemId) {
   const item = items.find(i=>i.id===itemId); if(!item) return;
@@ -1223,6 +1146,7 @@ window.setSearch = function(q) { nav.search=q; renderPage(); };
 // 長按快速刪除
 let _lpTimer = null;
 window.startLongPress = function(id, el, e) {
+  if(isReadOnly()) return; // 看好友的不能刪
   _lpTimer = setTimeout(()=>{
     el.classList.add('pressing');
     if(navigator.vibrate) navigator.vibrate(40);
@@ -1283,11 +1207,13 @@ window.markShopDone = async function(id) {
   await saveShopItem(item); nav.page='shop'; render();
 };
 window.deleteItem = async function(id) {
+  if(isReadOnly()) return; // 絕對不能刪好友的東西
   if(!confirm('確定刪除？')) return;
   items = items.filter(i=>i.id!==id);
   await deleteItemDB(id); nav.page=nav.prevPage||'list'; render();
 };
 window.deleteShopItem = async function(id) {
+  if(isReadOnly()) return;
   if(!confirm('確定刪除？')) return;
   shopItems = shopItems.filter(i=>i.id!==id);
   await deleteShopItemDB(id); nav.page='shop'; render();
