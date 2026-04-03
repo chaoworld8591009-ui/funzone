@@ -814,7 +814,6 @@ function renderDetail() {
       ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
       <div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareItem('${item.id}')">📤 分享</div>
       ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditItem('${item.id}')">✏️ 編輯</div>`:''}
-      ${!isReadOnly()?`<div class="detail-btn btn-done" onclick="markDone('${item.id}')">✓ 完成</div>`:''}
       ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteItem('${item.id}')">🗑 刪除</div>`:''}
     </div>
   </div>`;
