@@ -297,17 +297,29 @@ function setupOwnListeners() {
   ownListeners.forEach(u=>u()); ownListeners=[];
   const uid = currentUser.uid;
   
-  // Listen to own items
+  // Listen to own items - 保留記憶體中的照片，不被 snapshot 蓋掉
   ownListeners.push(onSnapshot(collection(db,'userData',uid,'items'), snap=>{
     if(viewingUid) return;
-    items = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const existingPhotos = {};
+    items.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
+    items = snap.docs.map(d=>{
+      const item = {id:d.id,...d.data()};
+      item.photos = existingPhotos[d.id] || item.photos || [];
+      return item;
+    });
     if(nav.page !== 'detail') render();
   }));
   
   // Listen to own shopItems
   ownListeners.push(onSnapshot(collection(db,'userData',uid,'shopItems'), snap=>{
     if(viewingUid) return;
-    shopItems = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const existingPhotos = {};
+    shopItems.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
+    shopItems = snap.docs.map(d=>{
+      const item = {id:d.id,...d.data()};
+      item.photos = existingPhotos[d.id] || item.photos || [];
+      return item;
+    });
     if(nav.page !== 'shopdetail') render();
   }));
   
@@ -389,42 +401,41 @@ async function deleteShopItemDB(id) {
 }
 
 // ===== 照片另存子集合（不受 1MB 限制）=====
-async function saveItemWithPhotos(item) {
+
+// 只更新主文件的 photoCount，不動照片
+async function saveItemMainDoc(item, colName) {
   if(viewingUid) return;
   const {id, photos, ...data} = item;
   data.photoCount = (photos||[]).length;
   if(id && typeof id === 'string' && id.length > 5) {
-    await setDoc(doc(db,'userData',currentUser.uid,'items',id), data);
+    await setDoc(doc(db,'userData',currentUser.uid,colName,id), data);
   } else {
-    const ref = await addDoc(collection(db,'userData',currentUser.uid,'items'), data);
+    const ref = await addDoc(collection(db,'userData',currentUser.uid,colName), data);
     item.id = ref.id;
-  }
-  // 把每張照片存成獨立文件
-  const col = collection(db,'userData',currentUser.uid,'items',item.id,'photos');
-  const existing = await getDocs(col);
-  existing.docs.forEach(d=>deleteDoc(d.ref));
-  for(let i=0;i<(photos||[]).length;i++){
-    await setDoc(doc(col,String(i).padStart(4,'0')),{data:photos[i],idx:i});
   }
 }
 
-async function saveShopItemWithPhotos(item) {
-  if(viewingUid) return;
-  const {id, photos, ...data} = item;
-  data.photoCount = (photos||[]).length;
-  if(id && typeof id === 'string' && id.length > 5) {
-    await setDoc(doc(db,'userData',currentUser.uid,'shopItems',id), data);
-  } else {
-    const ref = await addDoc(collection(db,'userData',currentUser.uid,'shopItems'), data);
-    item.id = ref.id;
-  }
-  const col = collection(db,'userData',currentUser.uid,'shopItems',item.id,'photos');
+// 新增照片（只追加，不刪舊的）
+async function appendPhotosToCol(uid, colName, itemId, newPhotos) {
+  const col = collection(db,'userData',uid,colName,itemId,'photos');
   const existing = await getDocs(col);
-  existing.docs.forEach(d=>deleteDoc(d.ref));
-  for(let i=0;i<(photos||[]).length;i++){
-    await setDoc(doc(col,String(i).padStart(4,'0')),{data:photos[i],idx:i});
-  }
+  const startIdx = existing.size;
+  await Promise.all(newPhotos.map((data, i) =>
+    setDoc(doc(col, String(startIdx + i).padStart(6,'0')), {data, idx: startIdx + i, t: Date.now()})
+  ));
 }
+
+// 刪除特定位置的照片
+async function deletePhotoFromCol(uid, colName, itemId, displayIdx) {
+  const col = collection(db,'userData',uid,colName,itemId,'photos');
+  const snap = await getDocs(col);
+  const sorted = snap.docs.sort((a,b)=>a.data().idx-b.data().idx);
+  if(sorted[displayIdx]) await deleteDoc(sorted[displayIdx].ref);
+}
+
+// 相容舊版（供 delPhoto 呼叫）
+async function saveItemWithPhotos(item) { await saveItemMainDoc(item,'items'); }
+async function saveShopItemWithPhotos(item) { await saveItemMainDoc(item,'shopItems'); }
 
 async function loadItemPhotos(uid, itemId, colName) {
   const col = collection(db,'userData',uid,colName,itemId,'photos');
@@ -940,7 +951,13 @@ window.viewFriend = async function(uid) {
 
   // Load friend items (realtime)
   const itemsUnsub = onSnapshot(collection(db,'userData',uid,'items'), (snap) => {
-    items = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const existingPhotos = {};
+    items.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
+    items = snap.docs.map(d=>{
+      const item = {id:d.id,...d.data()};
+      item.photos = existingPhotos[d.id] || item.photos || [];
+      return item;
+    });
     if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
   });
   friendListeners.push(itemsUnsub);
@@ -1116,14 +1133,23 @@ window.addMediaType = function(id, type, mediaKind) {
       } else { d = await compressImage(f); }
       done++; showP(); return d;
     }));
+
     document.getElementById('pageContent').innerHTML =
       `<div class="loading">儲存中...<br><span style="font-size:12px;color:var(--muted)">請稍候</span></div>`;
-    if(type==='item') {
-      const item = items.find(i=>i.id===id);
-      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...newData); await saveItemWithPhotos(item); }
-    } else {
-      const item = shopItems.find(i=>i.id===id);
-      if(item) { if(!item.photos) item.photos=[]; item.photos.push(...newData); await saveShopItemWithPhotos(item); }
+
+    const colName = type==='item' ? 'items' : 'shopItems';
+    const arr = type==='item' ? items : shopItems;
+    const item = arr.find(i=>i.id===id);
+    if(item) {
+      // 先確保 item.id 存在
+      if(!item.id || item.id.length <= 5) await saveItemMainDoc(item, colName);
+      // 追加照片到子集合（不刪舊的）
+      await appendPhotosToCol(currentUser.uid, colName, item.id, newData);
+      // 更新記憶體
+      if(!item.photos) item.photos = [];
+      item.photos.push(...newData);
+      // 更新 photoCount
+      await saveItemMainDoc(item, colName);
     }
     e.target.value = '';
     render();
@@ -1136,14 +1162,15 @@ window.addPhoto = window.addMediaType;
 
 window.delPhoto = async function(id, type) {
   const swiper = document.getElementById('swiper_'+id);
-  const idx = swiper?parseInt(swiper.dataset.idx)||0:0;
+  const idx = swiper ? parseInt(swiper.dataset.idx)||0 : 0;
   if(!confirm('刪除這張照片？')) return;
-  if(type==='item') {
-    const item = items.find(i=>i.id===id);
-    if(item&&item.photos) { item.photos.splice(idx,1); await saveItemWithPhotos(item); }
-  } else {
-    const item = shopItems.find(i=>i.id===id);
-    if(item&&item.photos) { item.photos.splice(idx,1); await saveShopItemWithPhotos(item); }
+  const colName = type==='item' ? 'items' : 'shopItems';
+  const arr = type==='item' ? items : shopItems;
+  const item = arr.find(i=>i.id===id);
+  if(item && item.photos) {
+    await deletePhotoFromCol(currentUser.uid, colName, id, idx);
+    item.photos.splice(idx, 1);
+    await saveItemMainDoc(item, colName);
   }
   render();
 };
