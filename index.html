@@ -410,7 +410,8 @@ async function saveUserData() {
 
 async function saveItem(item) {
   if(viewingUid) return;
-  const {id, photos, ...data} = item; // 照片另存，不放在主文件
+  const {id, photos, ...data} = item;
+  data.photoCount = (photos||[]).length; // 必須保留 photoCount！
   if(id && typeof id === 'string' && id.length > 5) {
     await setDoc(doc(db,'userData',currentUser.uid,'items',id), data);
   } else {
@@ -425,6 +426,7 @@ async function deleteItemDB(id) {
 async function saveShopItem(item) {
   if(viewingUid) return;
   const {id, photos, ...data} = item;
+  data.photoCount = (photos||[]).length; // 必須保留 photoCount！
   if(id && typeof id === 'string' && id.length > 5) {
     await setDoc(doc(db,'userData',currentUser.uid,'shopItems',id), data);
   } else {
@@ -1027,14 +1029,20 @@ window.viewFriend = async function(uid) {
   friendListeners.push(dataUnsub);
 
   // Load friend items (realtime)
-  const itemsUnsub = onSnapshot(collection(db,'userData',uid,'items'), (snap) => {
+  const itemsUnsub = onSnapshot(collection(db,'userData',uid,'items'), async (snap) => {
     const existingPhotos = {};
     items.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
-    items = snap.docs.map(d=>{
+    items = await Promise.all(snap.docs.map(async d=>{
       const item = {id:d.id,...d.data()};
-      item.photos = existingPhotos[d.id] || item.photos || [];
+      if(existingPhotos[d.id]) {
+        item.photos = existingPhotos[d.id];
+      } else if(item.photoCount > 0) {
+        item.photos = await loadItemPhotos(uid, d.id, 'items');
+      } else {
+        item.photos = [];
+      }
       return item;
-    });
+    }));
     if(nav.page !== 'detail' && nav.page !== 'shopdetail') render();
   });
   friendListeners.push(itemsUnsub);
@@ -1512,26 +1520,44 @@ function fixAmbiguousTime(open, close, raw) {
   if(open && close && !/[上下]午|晚|午夜|凌晨|中午/.test(raw||'')) {
     const oh = parseInt(open.split(':')[0]);
     const ch = parseInt(close.split(':')[0]);
-    if((ch > 12 || ch === 0) && oh < 12) return `${oh+12}:${open.split(':')[1]}`;
+    // 只有當開始時間很小（<8）才推斷為下午，避免把11:30誤判為23:30
+    if((ch > 12 || ch === 0) && oh < 8) return `${oh+12}:${open.split(':')[1]}`;
   }
   return open;
 }
 
-// 文字前處理：統一各種破折號、全形符號
+// 文字前處理：統一各種破折號、全形符號，並把 tab 展開為換行
 function normalizeText(text) {
   return text
     .replace(/[－ー−‐‑‒–—―]/g, '-') // 統一所有破折號
     .replace(/　/g, ' ')              // 全形空格
-    .replace(/（/g, '(').replace(/）/g, ')'); // 全形括號
+    .replace(/（/g, '(').replace(/）/g, ')') // 全形括號
+    .replace(/\t/g, '\n');            // tab 變換行，讓同行的星期+時間/休息被分開處理
 }
 
 function parseHoursFromText(rawText) {
   const text = normalizeText(rawText);
-  const lines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>0);
-  const SKIP = /新增或編輯|評論|最新動態|關於|菜單|相片|總覽|展開/;
+  // 先把每行再拆分：有時候星期和時間在同一行（空格分隔）
+  const rawLines = text.split(/[\n\r]+/).map(l=>l.trim()).filter(l=>l.length>0);
+  const lines = [];
   const dayRegex = /星期[一二三四五六日天]|週[一二三四五六日天]|周[一二三四五六日天]/;
   const TP = '(中午|[上下]午\\s*\\d{1,2}(?::\\d{2})?(?:\\s*[時时])?|午夜|凌晨\\s*\\d{1,2}(?::\\d{2})?(?:\\s*[時时])?|\\d{1,2}:\\d{2})';
   const timeReg = new RegExp(TP + '\\s*-\\s*' + TP);
+  const CLOSED = /公休|休息中|休息|不營業|已關閉/;
+
+  for(const line of rawLines) {
+    // 若同一行有星期又有時間/休息，拆成兩行
+    if(dayRegex.test(line) && (timeReg.test(line) || CLOSED.test(line))) {
+      const dayM = line.match(dayRegex);
+      lines.push(dayM[0]); // 星期單獨一行
+      const rest = line.replace(dayRegex,'').trim();
+      if(rest) lines.push(rest); // 剩餘部分單獨一行
+    } else {
+      lines.push(line);
+    }
+  }
+
+  const SKIP = /新增或編輯|評論|最新動態|關於|菜單|相片|總覽|展開/;
 
   // 偵測格式：交錯 vs 星期全在前
   let firstDay = false, format = 'interleaved';
@@ -1540,18 +1566,19 @@ function parseHoursFromText(rawText) {
     if(dayRegex.test(line)) {
       if(firstDay) { format = 'days-first'; break; }
       firstDay = true;
-    } else if(firstDay && (timeReg.test(line) || /休息中|公休/.test(line))) {
+    } else if(firstDay && (timeReg.test(line) || CLOSED.test(line))) {
       format = 'interleaved'; break;
     }
   }
 
   return format === 'interleaved'
-    ? parseInterleaved(lines, dayRegex, timeReg, SKIP)
-    : parseDaysFirst(lines, dayRegex, timeReg, SKIP);
+    ? parseInterleaved(lines, dayRegex, timeReg, SKIP, CLOSED)
+    : parseDaysFirst(lines, dayRegex, timeReg, SKIP, CLOSED);
 }
 
 // 格式二：星期和時間交錯排列（支援成對對應）
-function parseInterleaved(lines, dayRegex, timeReg, SKIP) {
+function parseInterleaved(lines, dayRegex, timeReg, SKIP, CLOSED) {
+  CLOSED = CLOSED || /公休|休息中|休息|不營業|已關閉/;
   const results = [], dayOrder = [], daysData = {};
 
   // 第一步：把所有行解析成結構化列表
@@ -1567,7 +1594,7 @@ function parseInterleaved(lines, dayRegex, timeReg, SKIP) {
       const close = parseChineseTime(m[2]);
       open = fixAmbiguousTime(open, close, m[1]);
       if(open && close) tokens.push({type:'time', open, close});
-    } else if(/公休|休息中|不營業|已關閉/.test(line)) {
+    } else if(CLOSED.test(line)) {
       tokens.push({type:'closed'});
     } else if(/營業時間可能不同/.test(line)) {
       tokens.push({type:'note', note:'營業時間可能不同'});
@@ -1634,7 +1661,8 @@ function parseInterleaved(lines, dayRegex, timeReg, SKIP) {
 }
 
 // 格式一：星期全在前，時間全在後
-function parseDaysFirst(lines, dayRegex, timeReg, SKIP) {
+function parseDaysFirst(lines, dayRegex, timeReg, SKIP, CLOSED) {
+  CLOSED = CLOSED || /公休|休息中|休息|不營業|已關閉/;
   const results = [], dayNames = [], groups = [];
   let curTimes = [], foundFirstTime = false;
   for(const line of lines) {
@@ -1647,7 +1675,7 @@ function parseDaysFirst(lines, dayRegex, timeReg, SKIP) {
     if(/營業時間可能不同/.test(line)) {
       if(curTimes.length) { groups.push({times:[...curTimes],note:'營業時間可能不同'}); curTimes=[]; }
       else if(groups.length) groups[groups.length-1].note='營業時間可能不同';
-    } else if(/公休|休息中|不營業|已關閉/.test(line)) {
+    } else if(CLOSED.test(line)) {
       if(curTimes.length) { groups.push({times:[...curTimes],note:''}); curTimes=[]; }
       groups.push({times:[],note:'公休'});
     } else if(timeReg.test(line)) {
