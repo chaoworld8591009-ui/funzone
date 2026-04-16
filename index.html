@@ -736,10 +736,10 @@ async function renderPage() {
     'triplist': renderTripList,
     'tripdetail': renderTripDetail,
     'tripitem': renderTripItem,
-    'tripexpense': renderTripExpense,
-    'trippack': renderTripPack,
-    'tripshop': renderTripShop,
-    'tripmember': renderTripMember,
+    'tripexpense': ()=>currentTrip?renderTripDetail():'',
+    'trippack': ()=>currentTrip?renderTripDetail():'',
+    'tripshop': ()=>currentTrip?renderTripDetail():'',
+    'tripmember': ()=>currentTrip?renderTripDetail():'',
     'admin': renderAdmin,
     'profile': renderProfile,
   };
@@ -766,7 +766,7 @@ function renderBottomNav() {
   const btns = [
     {ico:'🌏',lbl:'收藏',pages:['countries','regions','cats','list','alllist','detail']},
     {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
-    {ico:'✈️',lbl:'旅遊',pages:['triplist','tripdetail','tripitem','tripexpense','trippack','tripshop','tripmember']},
+    {ico:'✈️',lbl:'旅遊',pages:['triplist','tripdetail','tripitem']},
     {ico:'👥',lbl:'好友',pages:['friends']},
     {ico:'💬',lbl:'訊息',pages:['chatlist','chatroom']},
     {ico:'👤',lbl:'我的',pages:['profile']},
@@ -1708,7 +1708,7 @@ function setupTripListener(tripId) {
     const idx = trips.findIndex(t=>t.id===tripId);
     if(idx>-1) trips[idx]=updated; else trips.push(updated);
     if(currentTrip?.id===tripId) currentTrip=updated;
-    if(['tripdetail','tripexpense','trippack','tripshop','tripmember'].includes(nav.page)) renderPage();
+    if(['tripdetail','tripitem'].includes(nav.page)) renderPage();
   });
 }
 
