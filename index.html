@@ -165,7 +165,32 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 /* 長按刪除 */
 .list-item.pressing{background:var(--red-bg) !important;transition:background 0.15s;}
 
-/* 營業時間 */
+/* 聊天 */
+.chat-list-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.chat-avatar{width:46px;height:46px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;position:relative;}
+.chat-avatar img{width:100%;height:100%;object-fit:cover;}
+.chat-unread{position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.chat-body{flex:1;min-width:0;}
+.chat-name{font-size:15px;font-weight:600;}
+.chat-preview{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-time{font-size:11px;color:var(--muted2);flex-shrink:0;}
+.chat-room{display:flex;flex-direction:column;height:100%;}
+.chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.chat-bubble-row{display:flex;align-items:flex-end;gap:8px;}
+.chat-bubble-row.me{flex-direction:row-reverse;}
+.chat-bubble{max-width:72%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;}
+.chat-bubble.me{background:var(--amber);color:#000;border-bottom-right-radius:4px;}
+.chat-bubble.them{background:var(--card2);color:var(--text);border-bottom-left-radius:4px;}
+.chat-bubble img,.chat-bubble video{max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:4px;cursor:pointer;}
+.chat-meta{font-size:10px;color:var(--muted2);margin-top:2px;display:flex;align-items:center;gap:4px;}
+.chat-meta.me{justify-content:flex-end;}
+.chat-read{color:var(--blue);font-size:11px;}
+.chat-input-bar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:0.5px solid var(--border);background:var(--bg);flex-shrink:0;}
+.chat-input{flex:1;background:var(--card2);border:0.5px solid var(--border2);border-radius:20px;padding:9px 14px;font-size:14px;color:var(--text);font-family:inherit;outline:none;max-height:100px;resize:none;}
+.chat-input::placeholder{color:var(--muted2);}
+.chat-send-btn{width:36px;height:36px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border:none;font-size:16px;}
+.chat-media-btn{width:36px;height:36px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;border:none;}
+
 .hours-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
 .hours-days{flex:1.2;background:var(--card2);border:0.5px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text);font-family:inherit;}
 .hours-time{width:72px;background:var(--card2);border:0.5px solid var(--border2);border-radius:8px;padding:8px 6px;font-size:13px;color:var(--text);font-family:inherit;text-align:center;}
@@ -215,8 +240,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, getDocs, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAkHCehPV2vA6npTAXnENIfX07GqmZRDio",
@@ -240,12 +265,12 @@ let countries = [];
 let shopCats = [];
 let CATS = [{id:'eat',label:'好吃',emoji:'🍜',cls:'tag-eat'},{id:'play',label:'好玩',emoji:'🏞',cls:'tag-play'},{id:'buy',label:'好買',emoji:'🏪',cls:'tag-buy'},{id:'go',label:'想去',emoji:'📍',cls:'tag-go'}];
 let friends = [];
-let friendRequests = [];
 let viewingUid = null; // null = own, uid = friend's
 let nav = {page:'countries',country:null,region:null,cat:null,filter:'all',shopCat:null,prevPage:null,itemId:null,sort:'stars',search:''};
 let pickStars=0, pickEmoji='🌏', pickPhotos=[], editingId=null;
 const EMOJIS=['🇹🇼','🇯🇵','🇰🇷','🇺🇸','🇬🇧','🇫🇷','🇮🇹','🇩🇪','🇹🇭','🇸🇬','🇦🇺','🇨🇳','🍜','🍕','🍣','🍦','🧋','☕','🍺','🌮','🥗','🏖','🏞','🎬','🎵','🎮','🎨','🛍','👗','👟','💄','💍','📍','🌏','🏨','🚗','✈️','🏔','⭐','🎁'];
-const DEFAULT_COUNTRIES = [{id:'tw',name:'台灣',emoji:'🇹🇼',regions:['台中','台北','高雄']},{id:'jp',name:'日本',emoji:'🇯🇵',regions:['東京','大阪','京都']}];
+const ADMIN_EMAIL = 'chaoworld8591008@gmail.com';
+function isAdmin() { return currentUser && currentUser.email === ADMIN_EMAIL; }
 const DEFAULT_SHOPCATS = [{id:'clothes',label:'衣服',emoji:'👗'},{id:'shoes',label:'鞋子',emoji:'👟'},{id:'beauty',label:'美妝',emoji:'💄'},{id:'food',label:'食品',emoji:'🍜'},{id:'other',label:'其他',emoji:'📦'}];
 
 // ===== AUTH =====
@@ -529,9 +554,18 @@ function showLoginPage() {
 window.loginGoogle = async function() {
   try {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    // 手機用 redirect，桌面用 popup
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      await signInWithPopup(auth, provider);
+    }
   } catch(e) { alert('登入失敗：'+e.message); }
 };
+
+// 處理 redirect 回來的結果
+getRedirectResult(auth).catch(e=>{ if(e.code!=='auth/null-user') console.log(e); });
 
 window.showEmailLogin = function() {
   openModal(`<div class="modal-title">Email 登入 / 註冊</div>
@@ -565,6 +599,8 @@ function showMainApp() {
   document.getElementById('bottomNav').style.display='flex';
   setupOwnListeners();
   setupFriendProfileListeners();
+  setupChatListeners();
+  setupFriendRequestListener();
   render();
 }
 
@@ -594,6 +630,9 @@ function renderHeader() {
     'shopalllist': ['全部網購', ()=>{nav.page='shop';render();}, isReadOnly()?null:'＋', ()=>openAddShop()],
     'shopdetail': ['詳細', ()=>{nav.page=nav.prevPage||'shopcat';render();}, isReadOnly()?null:'編輯', ()=>openEditShop(nav.itemId)],
     'friends': ['好友收藏', null, '＋ 新增', ()=>openAddFriend()],
+    'chatlist': ['💬 訊息', null, null, null],
+    'chatroom': ['', ()=>{nav.page='chatlist';render();}, null, null],
+    'admin': ['⚙️ 管理員', null, null, null],
     'profile': ['我的帳號', null, null, null],
   };
 
@@ -617,7 +656,7 @@ function renderHeader() {
   if(cfg[2]) { action.textContent=cfg[2]; action.onclick=cfg[3]; }
 }
 
-function renderPage() {
+async function renderPage() {
   const p = document.getElementById('pageContent');
   const pages = {
     'countries': renderCountries,
@@ -631,10 +670,28 @@ function renderPage() {
     'shopalllist': renderShopAllList,
     'shopdetail': renderShopDetail,
     'friends': renderFriends,
+    'chatlist': renderChatList,
+    'chatroom': renderChatRoom,
+    'admin': renderAdmin,
     'profile': renderProfile,
   };
-  p.innerHTML = (pages[nav.page]||renderCountries)();
+  const fn = pages[nav.page] || renderCountries;
+  const result = fn();
+  // 若是 async（renderAdmin），等待它完成
+  if(result && typeof result.then === 'function') {
+    await result;
+  } else {
+    p.innerHTML = result;
+  }
   setTimeout(initSwipers, 50);
+  if(nav.page==='chatroom') {
+    setTimeout(()=>{
+      const msgs = document.getElementById('chatMessages');
+      if(msgs) msgs.scrollTop = msgs.scrollHeight;
+      const inp = document.getElementById('chatInput');
+      if(inp) inp.focus();
+    }, 100);
+  }
 }
 
 function renderBottomNav() {
@@ -642,14 +699,25 @@ function renderBottomNav() {
     {ico:'🌏',lbl:'收藏',pages:['countries','regions','cats','list','alllist','detail']},
     {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
     {ico:'👥',lbl:'好友',pages:['friends']},
+    {ico:'💬',lbl:'訊息',pages:['chatlist','chatroom']},
     {ico:'👤',lbl:'我的',pages:['profile']},
   ];
+  if(isAdmin()) btns.push({ico:'⚙️',lbl:'管理',pages:['admin']});
   document.getElementById('bottomNav').innerHTML = btns.map(b=>{
     const active = b.pages.includes(nav.page);
-    return `<div class="nav-btn${active?' active':''}" onclick="goNav('${b.pages[0]}')">
-      <div class="nav-ico">${b.ico}</div>
-      <div class="nav-lbl">${b.lbl}</div>
-    </div>`;
+    let badge = '';
+    if(b.pages[0]==='friends' && incomingRequests.length>0) {
+      badge = `<div style="position:absolute;top:2px;right:6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center">${incomingRequests.length}</div>`;
+    }
+    if(b.pages[0]==='chatlist') {
+      const unread = getTotalUnread();
+      if(unread>0) badge = `<div style="position:absolute;top:2px;right:6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center">${unread>9?'9+':unread}</div>`;
+    }
+    return '<div class="nav-btn'+(active?' active':'')+'" onclick="goNav(\''+b.pages[0]+'\')" style="position:relative">'+
+      '<div class="nav-ico">'+b.ico+'</div>'+
+      badge+
+      '<div class="nav-lbl">'+b.lbl+'</div>'+
+      '</div>';
   }).join('');
 }
 
@@ -784,7 +852,23 @@ function renderAllList() {
   return h + f.map(i=>renderListItem(i,'alllist')).join('');
 }
 
-function isVideo(url) { return url && (url.startsWith('data:video') || /\.(mp4|mov|webm|avi)$/i.test(url)); }
+function renderHoursDisplay(hours) {
+  if(!hours||!hours.length) return '';
+  const groups = [];
+  hours.forEach(h=>{
+    const last = groups[groups.length-1];
+    if(last && last.day===h.days) last.slots.push(h);
+    else groups.push({day:h.days, slots:[h]});
+  });
+  return '<div class="hours-display">'+groups.map(g=>{
+    const slotsHtml = g.slots.map(s=>{
+      const timeStr = s.open&&s.close ? s.open+' – '+s.close : (s.note||'公休');
+      const noteSpan = s.note&&s.open ? '<span class="hours-slot-note">'+esc(s.note)+'</span>' : '';
+      return '<div class="hours-group-slot">'+timeStr+noteSpan+'</div>';
+    }).join('');
+    return '<div class="hours-group"><div class="hours-group-day">'+esc(g.day)+'</div><div class="hours-group-slots">'+slotsHtml+'</div></div>';
+  }).join('')+'</div>';
+}
 
 function makeSlide(p, idx, itemId) {
   if(isVideo(p)) {
@@ -816,7 +900,12 @@ function renderDetail() {
     ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" id="coverBtn_${item.id}" onclick="setCover('${item.id}','item')">⭐ 設封面</div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
   </div>`;
-  const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setItemStar('${item.id}',${v})`)}">★</span>`).join('');
+  const starClick = isReadOnly() ? '' : 'setItemStar';
+  const starsHtml = [1,2,3,4,5].map(v=>{
+    const on = v<=(item.stars||0) ? ' on' : '';
+    const click = starClick ? 'onclick="'+starClick+'(\''+item.id+'\','+v+')"' : '';
+    return '<span class="detail-star'+on+'" '+click+'>★</span>';
+  }).join('');
   h += `<div class="detail-body">
     <div class="detail-tags">
       ${c?`<span class="tag" style="background:#1a1a1a;color:var(--muted)">${c.emoji} ${c.name}</span>`:''}
@@ -826,18 +915,7 @@ function renderDetail() {
     <div class="detail-name">${item.name}</div>
     <div class="detail-stars-row">${starsHtml}</div>
     ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
-    ${item.hours&&item.hours.length?`<div class="detail-section">🕐 營業時間</div><div class="hours-display">${(()=>{
-      const groups=[];
-      item.hours.forEach(h=>{
-        const last=groups[groups.length-1];
-        if(last&&last.day===h.days) last.slots.push(h);
-        else groups.push({day:h.days,slots:[h]});
-      });
-      return groups.map(g=>`<div class="hours-group">
-        <div class="hours-group-day">${esc(g.day)}</div>
-        <div class="hours-group-slots">${g.slots.map(s=>`<div class="hours-group-slot">${s.open&&s.close?s.open+' – '+s.close:(s.note||'公休')}${s.note&&s.open?`<span class="hours-slot-note">${esc(s.note)}</span>`:''}</div>`).join('')}</div>
-      </div>`).join('');
-    })()}</div>`:''}
+    ${item.hours&&item.hours.length?`<div class="detail-section">🕐 營業時間</div>`+renderHoursDisplay(item.hours):''}
     ${item.address?`<div class="detail-section">地址</div><div class="detail-val">${item.address}</div>`:''}
     ${item.phone?`<div class="detail-section">電話</div><div class="detail-val"><a href="tel:${esc(item.phone)}" style="color:var(--green);text-decoration:none">📞 ${esc(item.phone)}</a></div>`:''}
     ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
@@ -919,7 +997,12 @@ function renderShopDetail() {
     ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" onclick="setCover('${item.id}','shop')">⭐ 設封面</div>`:''}
     ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
   </div>`;
-  const starsHtml = [1,2,3,4,5].map(v=>`<span class="detail-star${v<=(item.stars||0)?' on':''}" onclick="${isReadOnly()?'':(`setShopStar('${item.id}',${v})`)}">★</span>`).join('');
+  const starClick2 = isReadOnly() ? '' : 'setShopStar';
+  const starsHtml = [1,2,3,4,5].map(v=>{
+    const on = v<=(item.stars||0) ? ' on' : '';
+    const click = starClick2 ? 'onclick="'+starClick2+'(\''+item.id+'\','+v+')"' : '';
+    return '<span class="detail-star'+on+'" '+click+'>★</span>';
+  }).join('');
   h += `<div class="detail-body">
     <div class="detail-tags"><span class="tag tag-shop">🛒 網購</span>${sc?`<span class="tag" style="background:var(--blue-bg);color:var(--blue)">${sc.emoji} ${sc.label}</span>`:''}</div>
     <div class="detail-name">${item.name}</div>
@@ -937,12 +1020,44 @@ function renderShopDetail() {
 }
 
 // ===== FRIENDS =====
+let incomingRequests = []; // 收到的好友邀請
+
+function setupFriendRequestListener() {
+  if(!currentUser) return;
+  // 監聽收到的好友邀請
+  const q = query(collection(db,'friendRequests'), where('to','==',currentUser.uid), where('status','==','pending'));
+  return onSnapshot(q, snap=>{
+    incomingRequests = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(nav.page==='friends') renderPage();
+    else renderBottomNav(); // 更新紅點
+  });
+}
+
 function renderFriends() {
   let h = '';
+
+  // 好友邀請區
+  if(incomingRequests.length > 0) {
+    h += `<div class="section-hdr">— 好友邀請 ${incomingRequests.length} 個 —</div>`;
+    incomingRequests.forEach(req=>{
+      h += `<div class="friend-card" style="background:var(--amber-bg)">
+        <div class="friend-avatar">${req.fromPhoto?`<img src="${req.fromPhoto}"/>`:'👤'}</div>
+        <div class="friend-body">
+          <div class="friend-name">${esc(req.fromName)}</div>
+          <div class="friend-sub">想加你為好友</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div style="background:var(--green);color:#000;font-size:12px;font-weight:700;padding:6px 12px;border-radius:10px;cursor:pointer" onclick="acceptFriendRequest('${req.id}')">確認</div>
+          <div style="background:var(--card2);color:var(--muted);font-size:12px;padding:6px 12px;border-radius:10px;cursor:pointer" onclick="declineFriendRequest('${req.id}')">拒絕</div>
+        </div>
+      </div>`;
+    });
+  }
+
   if(friends.length===0) {
-    h = '<div class="empty">還沒有好友<br>按右上角 ＋ 新增好友！</div>';
+    h += '<div class="empty">還沒有好友<br>按右上角 ＋ 新增好友！</div>';
   } else {
-    h = '<div class="section-hdr">— 好友列表 —</div>';
+    h += '<div class="section-hdr">— 好友列表 —</div>';
     friends.forEach(f=>{
       h += `<div class="friend-card" onclick="viewFriend('${f.uid}')">
         <div class="friend-avatar">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>
@@ -954,6 +1069,7 @@ function renderFriends() {
       </div>`;
     });
   }
+
   // My friend code
   h += `<div style="margin:20px;background:var(--card);border-radius:16px;padding:16px;text-align:center;">
     <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">我的好友代碼（讓朋友輸入這個）</div>
@@ -969,7 +1085,7 @@ window.openAddFriend = function() {
     <input class="modal-input" id="mFriendCode" placeholder="例：AB12CD" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px;"/>
     <div class="modal-btns">
       <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
-      <div class="modal-btn modal-btn-ok" onclick="doAddFriend()">新增</div>
+      <div class="modal-btn modal-btn-ok" onclick="doAddFriend()">送出邀請</div>
     </div>`);
 };
 
@@ -983,14 +1099,62 @@ window.doAddFriend = async function() {
     const friendData = snap.docs[0].data();
     if(friendData.uid === currentUser.uid) { alert('不能加自己為好友 😅'); return; }
     if(friends.find(f=>f.uid===friendData.uid)) { alert('這個人已經是你的好友了！'); return; }
-    const newFriend = {uid:friendData.uid, name:friendData.name, email:friendData.email, photo:friendData.photo||''};
+
+    // 檢查是否已送過邀請
+    const existing = query(collection(db,'friendRequests'),
+      where('from','==',currentUser.uid), where('to','==',friendData.uid), where('status','==','pending'));
+    const existingSnap = await getDocs(existing);
+    if(!existingSnap.empty) { alert('已送出邀請，等待對方確認中！'); closeModal(); return; }
+
+    // 送出好友邀請
+    await addDoc(collection(db,'friendRequests'), {
+      from: currentUser.uid,
+      to: friendData.uid,
+      fromName: userProfile.name || currentUser.displayName || '用戶',
+      fromPhoto: userProfile.photo || currentUser.photoURL || '',
+      fromEmail: currentUser.email || '',
+      status: 'pending',
+      t: Date.now()
+    });
+
+    closeModal();
+    alert(`✅ 已送出好友邀請給 ${friendData.name}，等待對方確認！`);
+  } catch(e) { alert('送出失敗：'+e.message); }
+};
+
+window.acceptFriendRequest = async function(reqId) {
+  const req = incomingRequests.find(r=>r.id===reqId);
+  if(!req) return;
+  try {
+    // 雙方互加好友
+    const newFriend = {uid:req.from, name:req.fromName, email:req.fromEmail||'', photo:req.fromPhoto||''};
     friends.push(newFriend);
     userProfile.friends = friends;
     await setDoc(doc(db,'users',currentUser.uid), userProfile);
-    closeModal();
+
+    // 對方也加我為好友
+    const theirDoc = await getDoc(doc(db,'users',req.from));
+    if(theirDoc.exists()) {
+      const theirData = theirDoc.data();
+      const theirFriends = theirData.friends||[];
+      if(!theirFriends.find(f=>f.uid===currentUser.uid)) {
+        theirFriends.push({uid:currentUser.uid, name:userProfile.name, email:currentUser.email||'', photo:userProfile.photo||''});
+        await setDoc(doc(db,'users',req.from), {...theirData, friends:theirFriends});
+      }
+    }
+
+    // 更新邀請狀態
+    await setDoc(doc(db,'friendRequests',reqId), {status:'accepted'}, {merge:true});
+
+    setupChatListeners();
     render();
-    alert('✅ 成功加入好友：'+friendData.name);
-  } catch(e) { alert('新增失敗：'+e.message); }
+    alert(`✅ 已確認好友：${req.fromName}`);
+  } catch(e) { alert('確認失敗：'+e.message); }
+};
+
+window.declineFriendRequest = async function(reqId) {
+  if(!confirm('確定拒絕這個好友邀請？')) return;
+  await setDoc(doc(db,'friendRequests',reqId), {status:'declined'}, {merge:true});
 };
 
 let friendListeners = []; // store unsubscribe functions
@@ -1058,10 +1222,418 @@ window.viewFriend = async function(uid) {
   render();
 };
 
+// ===== 聊天功能 =====
+let chatListeners = {};
+let chatMessages = {};
+let chatUnread = {};
+let currentChatUid = null;
+
+function getChatId(uid1, uid2) {
+  return [uid1, uid2].sort().join('_');
+}
+
+function getTotalUnread() {
+  return Object.values(chatUnread).reduce((a,b)=>a+b, 0);
+}
+
+function setupChatListeners() {
+  friends.forEach(f => {
+    const chatId = getChatId(currentUser.uid, f.uid);
+    if(chatListeners[chatId]) return;
+    const col = collection(db, 'chats', chatId, 'messages');
+    // 只載入最近 50 則，避免載太多
+    const q2 = query(col, orderBy('t', 'desc'), limit(50));
+    chatListeners[chatId] = onSnapshot(q2, snap => {
+      const msgs = snap.docs.map(d=>({id:d.id,...d.data()})).reverse();
+      chatMessages[chatId] = msgs;
+      chatUnread[chatId] = msgs.filter(m=>m.from!==currentUser.uid&&!m.readBy?.[currentUser.uid]).length;
+      if(nav.page==='chatlist') renderPage();
+      else if(nav.page==='chatroom' && currentChatUid===f.uid) {
+        renderPage();
+        markChatRead(chatId);
+        // 自動滾到底部
+        setTimeout(()=>{ const el=document.getElementById('chatMessages'); if(el) el.scrollTop=el.scrollHeight; },50);
+      } else {
+        renderBottomNav();
+      }
+    });
+  });
+}
+
+async function markChatRead(chatId) {
+  const msgs = chatMessages[chatId]||[];
+  const unread = msgs.filter(m=>m.from!==currentUser.uid&&!m.readBy?.[currentUser.uid]);
+  if(!unread.length) return;
+  await Promise.all(unread.map(m=>
+    setDoc(doc(db,'chats',chatId,'messages',m.id), {readBy:{[currentUser.uid]:Date.now()}}, {merge:true})
+  ));
+  chatUnread[chatId] = 0;
+}
+
+function renderChatList() {
+  if(!friends.length) return '<div class="empty">還沒有好友<br>去「好友」頁面新增好友！</div>';
+  let h = '';
+  friends.forEach(f => {
+    const chatId = getChatId(currentUser.uid, f.uid);
+    const msgs = chatMessages[chatId]||[];
+    const last = msgs[msgs.length-1];
+    const unread = chatUnread[chatId]||0;
+    let preview = '點擊開始聊天';
+    if(last) {
+      if(last.recalled) preview = '訊息已收回';
+      else if(last.deletedBy && last.deletedBy.includes(currentUser.uid)) {
+        // 自己刪的，找上一則
+        const visible = msgs.filter(m=>!(m.deletedBy&&m.deletedBy.includes(currentUser.uid)));
+        const prev = visible[visible.length-1];
+        preview = prev ? (prev.recalled?'訊息已收回':prev.img?'📷 圖片':prev.video?'🎥 影片':prev.text||'') : '點擊開始聊天';
+      }
+      else if(last.img) preview = '📷 圖片';
+      else if(last.video) preview = '🎥 影片';
+      else preview = last.text||'';
+    }
+    const timeStr = last ? formatChatTime(last.t) : '';
+    h += `<div class="chat-list-item" onclick="openChat('${f.uid}')">
+      <div class="chat-avatar" style="position:relative">
+        ${f.photo?`<img src="${f.photo}"/>`:'👤'}
+        ${unread>0?`<div class="chat-unread">${unread>9?'9+':unread}</div>`:''}
+      </div>
+      <div class="chat-body">
+        <div class="chat-name">${esc(f.name)}</div>
+        <div class="chat-preview" style="${unread>0?'color:var(--text);font-weight:600':''}">${esc(preview.slice(0,30))}</div>
+      </div>
+      ${timeStr?`<div class="chat-time">${timeStr}</div>`:''}
+    </div>`;
+  });
+  return h;
+}
+
+function formatChatTime(ts) {
+  if(!ts) return '';
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if(diff < 60000) return '剛剛';
+  if(diff < 3600000) return Math.floor(diff/60000)+'分前';
+  if(diff < 86400000) return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+function renderChatRoom() {
+  const f = friends.find(x=>x.uid===currentChatUid);
+  if(!f) return '<div class="empty">找不到對話</div>';
+  const chatId = getChatId(currentUser.uid, f.uid);
+  const msgs = chatMessages[chatId]||[];
+
+  const bubblesHtml = msgs.map(m => {
+    const isMe = m.from === currentUser.uid;
+    const time = formatChatTime(m.t);
+
+    // 只有自己刪除的 → 自己看不到，直接跳過
+    if(m.deletedBy && m.deletedBy.includes(currentUser.uid)) return '';
+
+    // 收回訊息 → 雙方都看到「訊息已收回」
+    if(m.recalled) {
+      return `<div class="chat-bubble-row ${isMe?'me':'them'}">
+        ${!isMe?`<div class="chat-avatar" style="width:32px;height:32px;font-size:14px;flex-shrink:0">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>`:''}
+        <div>
+          <div class="chat-bubble ${isMe?'me':'them'}" style="opacity:0.45;font-style:italic">訊息已收回</div>
+          <div class="chat-meta ${isMe?'me':''}"><span>${time}</span></div>
+        </div>
+      </div>`;
+    }
+
+    let content = '';
+    if(m.text) content += `<div>${esc(m.text)}</div>`;
+    if(m.img) content += `<img src="${m.img}" onclick="openChatMedia('${m.id}','img')" style="max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:${m.text?'6':'0'}px;cursor:pointer"/>`;
+    if(m.video) content += `<video src="${m.video}" style="max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:${m.text?'6':'0'}px" controls playsinline></video>`;
+
+    const readMark = isMe
+      ? (m.readBy && Object.keys(m.readBy).some(k=>k!==currentUser.uid) ? '✓✓' : '✓')
+      : '';
+
+    const longPressAttr = `ontouchstart="startMsgLongPress('${m.id}','${isMe}',this)" ontouchend="cancelMsgLongPress()" ontouchmove="cancelMsgLongPress()"`;
+
+    return `<div class="chat-bubble-row ${isMe?'me':'them'}">
+      ${!isMe?`<div class="chat-avatar" style="width:32px;height:32px;font-size:14px;flex-shrink:0">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>`:''}
+      <div ${longPressAttr}>
+        <div class="chat-bubble ${isMe?'me':'them'}">${content}</div>
+        <div class="chat-meta ${isMe?'me':''}">
+          <span>${time}</span>
+          ${isMe?`<span class="chat-read">${readMark}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const emptyMsg = `<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0">開始和 ${esc(f.name)} 聊天吧！</div>`;
+
+  return `<div class="chat-room">
+    <div class="chat-messages" id="chatMessages">${bubblesHtml||emptyMsg}</div>
+    <div class="chat-input-bar">
+      <button class="chat-media-btn" onclick="sendChatMedia('img')">📷</button>
+      <button class="chat-media-btn" onclick="sendChatMedia('video')">🎥</button>
+      <textarea class="chat-input" id="chatInput" placeholder="輸入訊息..." rows="1"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
+      <button class="chat-send-btn" onclick="sendChatMsg()">➤</button>
+    </div>
+  </div>`;
+}
+
+// 長按訊息選單
+let _msgLpTimer = null;
+window.startMsgLongPress = function(msgId, isMe, el) {
+  _msgLpTimer = setTimeout(()=>{
+    if(navigator.vibrate) navigator.vibrate(40);
+    const chatId = getChatId(currentUser.uid, currentChatUid);
+    const msg = (chatMessages[chatId]||[]).find(m=>m.id===msgId);
+    if(!msg) return;
+
+    // 建立選單
+    const menu = document.createElement('div');
+    menu.id = 'chatMsgMenu';
+    menu.style.cssText = 'position:fixed;inset:0;z-index:150;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.5)';
+    let btns = '';
+    if(isMe==='true') {
+      btns += `<div onclick="recallChatMsg('${msgId}')" style="width:100%;padding:16px;text-align:center;font-size:16px;border-bottom:0.5px solid var(--border);cursor:pointer;color:var(--red)">收回訊息</div>`;
+    }
+    btns += `<div onclick="deleteChatMsg('${msgId}')" style="width:100%;padding:16px;text-align:center;font-size:16px;border-bottom:0.5px solid var(--border);cursor:pointer;color:var(--red)">刪除訊息（只有自己看不到）</div>`;
+    btns += `<div onclick="closeChatMenu()" style="width:100%;padding:16px;text-align:center;font-size:16px;cursor:pointer;color:var(--muted)">取消</div>`;
+    menu.innerHTML = `<div style="background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px">${btns}</div>`;
+    menu.onclick = (e)=>{ if(e.target===menu) closeChatMenu(); };
+    document.body.appendChild(menu);
+  }, 550);
+};
+window.cancelMsgLongPress = function() {
+  if(_msgLpTimer){ clearTimeout(_msgLpTimer); _msgLpTimer=null; }
+};
+window.closeChatMenu = function() {
+  const m = document.getElementById('chatMsgMenu');
+  if(m) m.remove();
+};
+
+// 收回：雙方都看到「訊息已收回」
+window.recallChatMsg = async function(msgId) {
+  closeChatMenu();
+  const chatId = getChatId(currentUser.uid, currentChatUid);
+  await setDoc(doc(db,'chats',chatId,'messages',msgId), {recalled:true, text:'', img:'', video:''}, {merge:true});
+};
+
+// 刪除：只有自己看不到，對方不受影響
+window.deleteChatMsg = async function(msgId) {
+  closeChatMenu();
+  const chatId = getChatId(currentUser.uid, currentChatUid);
+  const msg = (chatMessages[chatId]||[]).find(m=>m.id===msgId);
+  if(!msg) return;
+  const deletedBy = msg.deletedBy || [];
+  if(!deletedBy.includes(currentUser.uid)) deletedBy.push(currentUser.uid);
+  await setDoc(doc(db,'chats',chatId,'messages',msgId), {deletedBy}, {merge:true});
+};
+
+// (舊版 renderChatList/formatChatTime/renderChatRoom 已移除)
+
+window.openChat = async function(uid) {
+  currentChatUid = uid;
+  const f = friends.find(x=>x.uid===uid);
+  nav.page = 'chatroom';
+  const chatId = getChatId(currentUser.uid, uid);
+  render();
+  // 聊天室 header 顯示好友名字
+  document.getElementById('headerTitle').textContent = f ? esc(f.name) : '聊天';
+  await markChatRead(chatId);
+  renderBottomNav();
+};
+
+window.sendChatMsg = async function() {
+  const inp = document.getElementById('chatInput');
+  const text = inp ? inp.value.trim() : '';
+  if(!text || !currentChatUid) return;
+  inp.value = ''; inp.style.height='auto';
+  const chatId = getChatId(currentUser.uid, currentChatUid);
+  await addDoc(collection(db,'chats',chatId,'messages'), {
+    from: currentUser.uid,
+    text,
+    t: Date.now(),
+    readBy: {}
+  });
+  // 滾到底部
+  setTimeout(()=>{ const el=document.getElementById('chatMessages'); if(el) el.scrollTop=el.scrollHeight; },100);
+};
+
+window.sendChatMedia = function(kind) {
+  const inp = document.getElementById('photoInput');
+  inp.accept = kind==='video' ? 'video/*' : 'image/*';
+  inp.multiple = false;
+  inp.onchange = async function(e) {
+    const file = e.target.files[0]; if(!file) return;
+    const chatId = getChatId(currentUser.uid, currentChatUid);
+    let data;
+    if(kind==='video') {
+      data = await new Promise(res=>{ const r=new FileReader(); r.onload=ev=>res(ev.target.result); r.readAsDataURL(file); });
+    } else {
+      // 照片也壓縮，避免太大
+      data = await compressImage(file);
+    }
+    const msgData = {from:currentUser.uid, t:Date.now(), readBy:{}};
+    if(kind==='video') msgData.video = data;
+    else msgData.img = data;
+    await addDoc(collection(db,'chats',chatId,'messages'), msgData);
+    e.target.value='';
+    // 滾到底部
+    setTimeout(()=>{ const el=document.getElementById('chatMessages'); if(el) el.scrollTop=el.scrollHeight; },100);
+  };
+  inp.click();
+};
+
+window.openChatMedia = function(msgId, type) {
+  const chatId = getChatId(currentUser.uid, currentChatUid);
+  const msg = (chatMessages[chatId]||[]).find(m=>m.id===msgId);
+  if(!msg) return;
+  const lb = document.getElementById('lightbox');
+  lb.classList.remove('hidden');
+  const med = document.getElementById('lightboxMedia');
+  const src = type==='video' ? msg.video : msg.img;
+  if(type==='video') {
+    med.innerHTML = `<video class="lightbox-media" src="${src}" controls autoplay playsinline></video>`;
+  } else {
+    med.innerHTML = `<img class="lightbox-media" src="${src}" style="max-width:100vw;max-height:85vh;object-fit:contain;"/>`;
+  }
+  document.getElementById('lbCount').textContent='';
+  document.getElementById('lbPrev').style.display='none';
+  document.getElementById('lbNext').style.display='none';
+
+  // 移除舊工具列
+  const existing = document.getElementById('lbSaveBtn');
+  if(existing) existing.remove();
+  const existingBar = document.getElementById('lbToolbar');
+  if(existingBar) existingBar.remove();
+
+  // 底部工具列（像 LINE）
+  const isMe = msg.from === currentUser.uid;
+  const toolbar = document.createElement('div');
+  toolbar.id = 'lbToolbar';
+  toolbar.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:16px 30px 32px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(transparent,rgba(0,0,0,0.7));';
+  toolbar.innerHTML = `
+    <div onclick="deleteChatMedia('${msgId}','${type}')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#fff;opacity:${isMe?'1':'0.3'};pointer-events:${isMe?'auto':'none'}">
+      <div style="font-size:26px">🗑</div>
+      <div style="font-size:11px">刪除</div>
+    </div>
+    <div onclick="shareChatMedia('${src}','${type}')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#fff;">
+      <div style="font-size:26px">⬆️</div>
+      <div style="font-size:11px">分享</div>
+    </div>
+    <div onclick="saveChatMedia('${src}','${type}')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#fff;">
+      <div style="font-size:26px">⬇️</div>
+      <div style="font-size:11px">儲存</div>
+    </div>`;
+  lb.appendChild(toolbar);
+};
+
+window.saveChatMedia = async function(src, type) {
+  try {
+    // 轉成 blob
+    const res = await fetch(src);
+    const blob = await res.blob();
+    const fileName = type==='video' ? 'video.mp4' : 'photo.jpg';
+    const file = new File([blob], fileName, {type: blob.type});
+
+    if(navigator.canShare && navigator.canShare({files:[file]})) {
+      // iOS/Android：用分享選單，可以選「儲存到照片」
+      await navigator.share({files:[file], title:fileName});
+    } else {
+      // 桌面：直接下載
+      const a = document.createElement('a');
+      a.href = src;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  } catch(e) {
+    if(e.name !== 'AbortError') alert('儲存失敗，請長按照片後選擇儲存');
+  }
+};
+
+window.shareChatMedia = function(src, type) {
+  if(navigator.share) {
+    fetch(src).then(r=>r.blob()).then(blob=>{
+      const file = new File([blob], type==='video'?'video.mp4':'photo.jpg', {type: blob.type});
+      navigator.share({files:[file]}).catch(()=>{});
+    }).catch(()=>{ navigator.share({text:'分享媒體'}).catch(()=>{}); });
+  } else {
+    saveChatMedia(src, type);
+  }
+};
+
+window.deleteChatMedia = async function(msgId, type) {
+  if(!confirm('確定刪除這則訊息？\n（只有自己看不到）')) return;
+  const chatId = getChatId(currentUser.uid, currentChatUid);
+  const msg = (chatMessages[chatId]||[]).find(m=>m.id===msgId);
+  if(!msg) return;
+  const deletedBy = msg.deletedBy || [];
+  if(!deletedBy.includes(currentUser.uid)) deletedBy.push(currentUser.uid);
+  await setDoc(doc(db,'chats',chatId,'messages',msgId), {deletedBy}, {merge:true});
+  closeLightbox();
+};
+
+// 關閉燈箱時移除工具列（已整合到 closeLightbox）
+
+// ===== ADMIN PAGE =====
+async function renderAdmin() {
+  if(!isAdmin()) return '<div class="empty">無權限</div>';
+
+  // 載入所有用戶
+  let usersHtml = '<div class="loading">載入中...</div>';
+  document.getElementById('pageContent').innerHTML = `<div class="section-hdr">⚙️ 管理員專屬頁面</div>${usersHtml}`;
+
+  try {
+    const snap = await getDocs(collection(db,'users'));
+    const users = snap.docs.map(d=>d.data());
+    const totalItems = (await getDocs(collection(db,'userData'))).size;
+
+    let h = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px;">
+      <div style="background:var(--card);border-radius:14px;padding:14px;text-align:center;">
+        <div style="font-size:28px;font-weight:700;color:var(--amber)">${users.length}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">總用戶數</div>
+      </div>
+      <div style="background:var(--card);border-radius:14px;padding:14px;text-align:center;">
+        <div style="font-size:28px;font-weight:700;color:var(--green)">${totalItems}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">收藏用戶數</div>
+      </div>
+    </div>
+    <div class="section-hdr">— 用戶列表 ${users.length} 人 —</div>`;
+
+    users.forEach(u=>{
+      h += `<div class="list-item">
+        <div class="list-icon" style="background:var(--card2);font-size:20px">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px"/>`:'👤'}</div>
+        <div class="list-body">
+          <div class="list-name">${esc(u.name||'未命名')}</div>
+          <div class="list-sub">
+            <span style="font-size:11px">${esc(u.email||'')}</span>
+          </div>
+          <div class="list-sub">
+            <span style="font-size:10px;color:var(--muted2)">代碼：${u.friendCode||''} · 好友 ${(u.friends||[]).length} 人</span>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    document.getElementById('pageContent').innerHTML = h;
+  } catch(e) {
+    document.getElementById('pageContent').innerHTML = '<div class="empty">載入失敗：'+e.message+'</div>';
+  }
+  return '';
+}
+
 // ===== PROFILE =====
 function renderProfile() {
   return `<div class="profile-section">
-    <div class="profile-avatar">${userProfile?.photo?`<img src="${userProfile.photo}"/>`:'👤'}</div>
+    <div class="profile-avatar" onclick="changeProfilePhoto()" style="cursor:pointer;position:relative;">
+      ${userProfile?.photo?`<img src="${userProfile.photo}"/>`:'👤'}
+      <div style="position:absolute;bottom:0;right:0;background:var(--amber);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--bg)">📷</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px">點頭像更換照片</div>
     <div class="profile-name">${userProfile?.name||'用戶'}</div>
     <div class="profile-email">${currentUser?.email||''}</div>
     <div class="profile-id">好友代碼：${userProfile?.friendCode||''}</div>
@@ -1075,6 +1647,24 @@ function renderProfile() {
   </div>`;
 }
 
+window.changeProfilePhoto = function() {
+  const inp = document.getElementById('photoInput');
+  inp.accept = 'image/*';
+  inp.multiple = false;
+  inp.onchange = async function(e) {
+    const file = e.target.files[0]; if(!file) return;
+    document.getElementById('pageContent').innerHTML = '<div class="loading">上傳中...</div>';
+    const compressed = await compressImage(file);
+    userProfile.photo = compressed;
+    await setDoc(doc(db,'users',currentUser.uid), userProfile);
+    // 同步更新好友清單中自己的頭像
+    await updateProfile(currentUser, {photoURL: ''});
+    e.target.value = '';
+    render();
+  };
+  inp.click();
+};
+
 // ===== 全局搜尋 =====
 // ===== 從好友收藏複製到自己 =====
 window.copyFromFriend = function(itemId) {
@@ -1084,7 +1674,7 @@ window.copyFromFriend = function(itemId) {
   openModal(`<div class="modal-title">複製到我的收藏</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:12px;text-align:center">「${esc(item.name)}」將複製到你的收藏</div>
     <label class="modal-label">存到哪個國家</label>
-    <select class="modal-input" id="cpCountry" onchange="updateCopyRegions()">${countryOpts}</select>
+    <select class="modal-input" id="cpCountry">${countryOpts}</select>
     <label class="modal-label">地區</label>
     <input class="modal-input" id="cpRegion" placeholder="例：台中" value="${esc(item.region||'')}"/>
     <label class="modal-label">分類</label>
@@ -1293,6 +1883,11 @@ window.closeLightbox = function() {
   document.getElementById('lightbox').classList.add('hidden');
   document.getElementById('lightboxMedia').innerHTML = '';
   lightboxPhotos = [];
+  // 移除聊天媒體工具列
+  const bar = document.getElementById('lbToolbar');
+  if(bar) bar.remove();
+  const btn = document.getElementById('lbSaveBtn');
+  if(btn) btn.remove();
 };
 
 // 燈箱手指左右滑動
