@@ -21,7 +21,7 @@
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Microsoft JhengHei","PingFang TC",sans-serif;overflow:hidden;}
 .app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;}
-.header{padding:16px 20px 10px;display:flex;align-items:center;gap:12px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.header{padding:env(safe-area-inset-top, 16px) 20px 10px;padding-top:max(env(safe-area-inset-top), 16px);display:flex;align-items:center;gap:12px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
 .header-back{color:var(--amber);font-size:16px;cursor:pointer;padding:4px 8px 4px 0;}
 .header-title{flex:1;font-size:18px;font-weight:700;}
 .header-action{color:var(--amber);font-size:14px;cursor:pointer;}
@@ -3836,6 +3836,34 @@ window.deleteShopCat = async function(id) {
 };
 
 // ===== SWIPER =====
+// ===== 右滑返回 =====
+(function setupSwipeBack() {
+  let startX = 0, startY = 0, startTime = 0;
+  const EDGE = 40; // 只有從左邊緣40px開始才觸發
+
+  document.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    startTime = Date.now();
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = Math.abs(t.clientY - startY);
+    const dt = Date.now() - startTime;
+    // 條件：從左緣開始、向右滑超過80px、垂直位移少、速度夠快
+    if(startX < EDGE && dx > 80 && dy < 80 && dt < 400) {
+      // 找當前頁的返回函式
+      const back = document.getElementById('headerBack');
+      if(back && back.style.display !== 'none' && back.onclick) {
+        back.onclick();
+      }
+    }
+  }, {passive: true});
+})();
+
 function initSwipers() {
   document.querySelectorAll('.photo-swiper').forEach(sw=>{
     const track = sw.querySelector('.photo-swiper-track'); if(!track) return;
