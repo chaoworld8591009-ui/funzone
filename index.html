@@ -919,10 +919,10 @@ function renderCountries() {
   if(!countries.length) return '<div class="empty">還沒有國家<br>'+(isReadOnly()?'':'按右上角開始新增！')+'</div>';
   countries.forEach(c=>{
     const cnt = items.filter(i=>i.country===c.id&&!i.done).length;
-    h += `<div class="list-item" onclick="goRegions('${c.id}')">
-      <div class="list-icon" style="background:#1a1a1a;font-size:28px">${c.emoji}</div>
-      <div class="list-body"><div class="list-name">${c.name}</div><div class="list-sub">${cnt} 筆收藏</div></div>
-      <div class="list-arrow">›</div></div>`;
+    h += '<div class="list-item" onclick="goRegions(\''+c.id+'\')">'+
+      '<div class="list-icon" style="background:#1a1a1a;font-size:28px">'+c.emoji+'</div>'+
+      '<div class="list-body"><div class="list-name">'+c.name+'</div><div class="list-sub">'+cnt+' 筆收藏</div></div>'+
+      '<div class="list-arrow">›</div></div>';
   });
   return h;
 }
@@ -930,18 +930,18 @@ function renderCountries() {
 function renderRegions() {
   const c = countries.find(x=>x.id===nav.country); if(!c) return '';
   const allCnt = items.filter(i=>i.country===c.id&&!i.done).length;
-  let h = `<div class="list-item" style="background:var(--yellow-bg)" onclick="goAllList()">
-    <div class="list-icon" style="background:var(--yellow-bg);font-size:22px">📋</div>
-    <div class="list-body"><div class="list-name" style="color:var(--yellow)">${c.name}全部收藏</div>
-    <div class="list-sub" style="color:var(--muted)">不分地區 · ${allCnt} 筆</div></div>
-    <div class="list-arrow" style="color:var(--yellow)">›</div></div>`;
+  let h = '<div class="list-item" style="background:var(--yellow-bg)" onclick="goAllList()">'+
+    '<div class="list-icon" style="background:var(--yellow-bg);font-size:22px">📋</div>'+
+    '<div class="list-body"><div class="list-name" style="color:var(--yellow)">'+c.name+'全部收藏</div>'+
+    '<div class="list-sub" style="color:var(--muted)">不分地區 · '+allCnt+' 筆</div></div>'+
+    '<div class="list-arrow" style="color:var(--yellow)">›</div></div>';
   h += '<div class="section-hdr">— 依地區 —</div>';
   (c.regions||[]).forEach(r=>{
     const cnt = items.filter(i=>i.country===c.id&&i.region===r&&!i.done).length;
-    h += `<div class="list-item" onclick="goCats('${r}')">
-      <div class="list-icon" style="background:var(--blue-bg);font-size:20px">📍</div>
-      <div class="list-body"><div class="list-name">${r}</div><div class="list-sub">${cnt} 筆</div></div>
-      <div class="list-arrow">›</div></div>`;
+    h += '<div class="list-item" onclick="goCats(\''+r+'\')">'+
+      '<div class="list-icon" style="background:var(--blue-bg);font-size:20px">📍</div>'+
+      '<div class="list-body"><div class="list-name">'+r+'</div><div class="list-sub">'+cnt+' 筆</div></div>'+
+      '<div class="list-arrow">›</div></div>';
   });
   return h;
 }
@@ -949,10 +949,10 @@ function renderRegions() {
 function renderCats() {
   return CATS.map(cat=>{
     const cnt = items.filter(i=>i.country===nav.country&&i.region===nav.region&&i.cat===cat.id&&!i.done).length;
-    return `<div class="list-item" onclick="goList('${cat.id}')">
-      <div class="list-icon" style="background:${getCatBg(cat.id)};font-size:22px">${cat.emoji}</div>
-      <div class="list-body"><div class="list-name">${cat.label}</div><div class="list-sub">${cnt} 筆</div></div>
-      <div class="list-arrow">›</div></div>`;
+    return '<div class="list-item" onclick="goList(\''+cat.id+'\')">'+
+      '<div class="list-icon" style="background:'+getCatBg(cat.id)+';font-size:22px">'+cat.emoji+'</div>'+
+      '<div class="list-body"><div class="list-name">'+cat.label+'</div><div class="list-sub">'+cnt+' 筆</div></div>'+
+      '<div class="list-arrow">›</div></div>';
   }).join('');
 }
 
@@ -978,21 +978,21 @@ function getFilteredItems() {
 function renderListItem(item, from) {
   const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
   const starsStr = '★'.repeat(item.stars||0);
-  let sub = `<span class="stars" style="font-size:11px">${starsStr}</span>`;
-  if(from==='alllist') sub += ` <span class="tag tag-loc">📍${item.region}</span><span class="tag ${cat.cls}">${cat.label}</span>`;
-  if(item.note) sub += ` <span style="color:var(--muted);font-size:11px">${item.note.slice(0,15)}${item.note.length>15?'…':''}</span>`;
+  let sub = '<span class="stars" style="font-size:11px">'+starsStr+'</span>';
+  if(from==='alllist') sub += ' <span class="tag tag-loc">📍'+item.region+'</span><span class="tag '+cat.cls+'">'+cat.label+'</span>';
+  if(item.note) sub += ' <span style="color:var(--muted);font-size:11px">'+item.note.slice(0,15)+(item.note.length>15?'…':'')+'</span>';
   const hasPhoto = item.photos&&item.photos.length;
-  const thumb = hasPhoto?`background:var(--card2);`:`background:${getCatBg(item.cat)};`;
+  const thumb = hasPhoto?'background:var(--card2);':'background:'+getCatBg(item.cat)+';';
   const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
-  const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
-  return `<div class="list-item" 
-    ontouchstart="${!isReadOnly()?`startLongPress('${item.id}',this,event)`:''}" 
-    ontouchend="${!isReadOnly()?'cancelLongPress()':''}" 
-    ontouchmove="${!isReadOnly()?'cancelLongPress()':''}"
-    onclick="goDetail('${item.id}','${from}')">
-    <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
-    <div class="list-body"><div class="list-name">${item.name}</div><div class="list-sub">${sub}</div></div>
-    <div class="list-arrow">›</div></div>`;
+  const icon = coverImg?'<img src="'+coverImg+'" style="width:100%;height:100%;object-fit:cover;"/>':cat.emoji;
+  const lpStart = !isReadOnly() ? 'startLongPress(\''+item.id+'\',this,event)' : '';
+  const lpEnd = !isReadOnly() ? 'cancelLongPress()' : '';
+  return '<div class="list-item"'+
+    (lpStart?' ontouchstart="'+lpStart+'" ontouchend="'+lpEnd+'" ontouchmove="'+lpEnd+'"':'')+
+    ' onclick="goDetail(\''+item.id+'\',\''+from+'\')">' +
+    '<div class="list-icon" style="'+thumb+'font-size:22px">'+icon+'</div>'+
+    '<div class="list-body"><div class="list-name">'+item.name+'</div><div class="list-sub">'+sub+'</div></div>'+
+    '<div class="list-arrow">›</div></div>';
 }
 
 function renderList() {
@@ -1109,18 +1109,18 @@ function renderDetail() {
 // ===== SHOP =====
 function renderShop() {
   const allCnt = shopItems.filter(i=>!i.done).length;
-  let h = `<div class="list-item" style="background:var(--blue-bg)" onclick="goShopAllList()">
-    <div class="list-icon" style="background:rgba(77,166,255,0.15);font-size:22px">📋</div>
-    <div class="list-body"><div class="list-name" style="color:var(--blue)">全部網購清單</div>
-    <div class="list-sub" style="color:var(--muted)">${allCnt} 筆</div></div>
-    <div class="list-arrow" style="color:var(--blue)">›</div></div>`;
+  let h = '<div class="list-item" style="background:var(--blue-bg)" onclick="goShopAllList()">'+
+    '<div class="list-icon" style="background:rgba(77,166,255,0.15);font-size:22px">📋</div>'+
+    '<div class="list-body"><div class="list-name" style="color:var(--blue)">全部網購清單</div>'+
+    '<div class="list-sub" style="color:var(--muted)">'+allCnt+' 筆</div></div>'+
+    '<div class="list-arrow" style="color:var(--blue)">›</div></div>';
   h += '<div class="section-hdr">— 依分類 —</div>';
   shopCats.forEach(cat=>{
     const cnt = shopItems.filter(i=>i.shopCat===cat.id&&!i.done).length;
-    h += `<div class="list-item" onclick="goShopCat('${cat.id}')">
-      <div class="list-icon" style="background:var(--blue-bg);font-size:22px">${cat.emoji}</div>
-      <div class="list-body"><div class="list-name">${cat.label}</div><div class="list-sub">${cnt} 筆</div></div>
-      <div class="list-arrow">›</div></div>`;
+    h += '<div class="list-item" onclick="goShopCat(\''+cat.id+'\')">'+
+      '<div class="list-icon" style="background:var(--blue-bg);font-size:22px">'+cat.emoji+'</div>'+
+      '<div class="list-body"><div class="list-name">'+cat.label+'</div><div class="list-sub">'+cnt+' 筆</div></div>'+
+      '<div class="list-arrow">›</div></div>';
   });
   return h;
 }
@@ -1130,27 +1130,28 @@ function shopListItem(item) {
   const hasPhoto = item.photos&&item.photos.length;
   const thumb = hasPhoto?'background:var(--card2);':'background:var(--blue-bg);';
   const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
-  const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:sc?sc.emoji:'🛒';
+  const icon = coverImg?'<img src="'+coverImg+'" style="width:100%;height:100%;object-fit:cover;"/>':(sc?sc.emoji:'🛒');
   const starsStr = '★'.repeat(item.stars||0);
-  return `<div class="list-item" onclick="goShopDetail('${item.id}')">
-    <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
-    <div class="list-body"><div class="list-name">${item.name}</div>
-    <div class="list-sub"><span class="stars" style="font-size:11px">${starsStr}</span>
-    ${sc?`<span class="tag tag-shop" style="font-size:9px">${sc.emoji} ${sc.label}</span>`:''}
-    ${item.note?`<span style="color:var(--muted);font-size:11px">${item.note.slice(0,20)}</span>`:''}
-    </div></div><div class="list-arrow">›</div></div>`;
+  let sub = '<span class="stars" style="font-size:11px">'+starsStr+'</span>';
+  if(sc) sub += ' <span class="tag tag-shop" style="font-size:9px">'+sc.emoji+' '+sc.label+'</span>';
+  if(item.note) sub += ' <span style="color:var(--muted);font-size:11px">'+item.note.slice(0,20)+'</span>';
+  return '<div class="list-item" onclick="goShopDetail(\''+item.id+'\')">'+
+    '<div class="list-icon" style="'+thumb+'font-size:22px">'+icon+'</div>'+
+    '<div class="list-body"><div class="list-name">'+item.name+'</div>'+
+    '<div class="list-sub">'+sub+'</div></div>'+
+    '<div class="list-arrow">›</div></div>';
 }
 
 function renderShopCat() {
   const f = shopItems.filter(i=>i.shopCat===nav.shopCat&&!i.done);
-  if(!f.length) return `<div class="empty">這個分類還沒有網購${isReadOnly()?'':('<br>按右上角 ＋ 新增！')}</div>`;
-  return `<div class="section-hdr">— 共 ${f.length} 筆 —</div>`+f.map(shopListItem).join('');
+  if(!f.length) return '<div class="empty">這個分類還沒有網購'+(isReadOnly()?'':'<br>按右上角 ＋ 新增！')+'</div>';
+  return '<div class="section-hdr">— 共 '+f.length+' 筆 —</div>'+f.map(shopListItem).join('');
 }
 
 function renderShopAllList() {
   const f = shopItems.filter(i=>!i.done);
   if(!f.length) return '<div class="empty">網購清單是空的</div>';
-  return `<div class="section-hdr">— 全部 ${f.length} 筆 —</div>`+f.map(shopListItem).join('');
+  return '<div class="section-hdr">— 全部 '+f.length+' 筆 —</div>'+f.map(shopListItem).join('');
 }
 
 function renderShopDetail() {
