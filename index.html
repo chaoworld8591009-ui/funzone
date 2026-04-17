@@ -20,17 +20,17 @@
   --yellow:#FFD60A;--yellow-bg:#1a1500;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Microsoft JhengHei","PingFang TC",sans-serif;overflow:hidden;}
-.app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;}
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;}
 .header{padding:env(safe-area-inset-top, 16px) 20px 10px;padding-top:max(env(safe-area-inset-top), 16px);display:flex;align-items:center;gap:12px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
 .header-back{color:var(--amber);font-size:16px;cursor:pointer;padding:4px 8px 4px 0;}
 .header-title{flex:1;font-size:18px;font-weight:700;}
 .header-action{color:var(--amber);font-size:14px;cursor:pointer;}
 .page{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;}
 .page.chat-page{overflow:hidden;}
-.bottom-nav{background:var(--card);border-top:0.5px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom, 0px);}
-.nav-btn{flex:1;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
-.nav-ico{font-size:18px;line-height:1;}
-.nav-lbl{font-size:10px;color:var(--muted);}
+.bottom-nav{background:var(--card);border-top:0.5px solid var(--border);display:flex;flex-shrink:0;padding-bottom:max(env(safe-area-inset-bottom,0px),8px);}
+.nav-btn{flex:1;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-width:0;}
+.nav-ico{font-size:20px;line-height:1;flex-shrink:0;}
+.nav-lbl{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .nav-btn.active .nav-lbl{color:var(--amber);}
 .list-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;}
 .list-item:active{background:var(--card);}
@@ -238,14 +238,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .chat-preview{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .chat-time{font-size:11px;color:var(--muted2);flex-shrink:0;}
 .chat-room{display:flex;flex-direction:column;flex:1;overflow:hidden;width:100%;}
-.chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0;display:block;width:100%;}
-.chat-bubble-row{display:flex;align-items:flex-end;gap:8px;padding:3px 12px;width:100%;box-sizing:border-box;}
-.chat-bubble-row.me{justify-content:flex-end;}
-.chat-bubble-row.them{justify-content:flex-start;}
-.chat-bubble-wrap{max-width:72%;display:flex;flex-direction:column;}
+.chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0;}
+.chat-bubble-row{display:flex;align-items:flex-end;gap:8px;padding:3px 12px;box-sizing:border-box;}
+.chat-bubble-row.me{flex-direction:row-reverse;}
+.chat-bubble-wrap{max-width:75%;min-width:0;display:flex;flex-direction:column;}
 .chat-bubble-wrap.me{align-items:flex-end;}
 .chat-bubble-wrap.them{align-items:flex-start;}
-.chat-bubble{padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.6;word-break:break-all;white-space:pre-wrap;display:block;width:fit-content;max-width:100%;}
+.chat-bubble{padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.6;word-wrap:break-word;overflow-wrap:break-word;word-break:break-word;}
 .chat-bubble.me{background:var(--amber);color:#000;border-bottom-right-radius:4px;}
 .chat-bubble.them{background:var(--card2);color:var(--text);border-bottom-left-radius:4px;}
 .chat-bubble img,.chat-bubble video{max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:4px;cursor:pointer;}
@@ -727,8 +726,16 @@ window.doEmailRegister = async function() {
   if(pwd.length < 6) { alert('密碼至少需要 6 位'); return; }
   if(pwd2El && pwd !== pwd2El.value) { alert('兩次密碼不一致，請重新輸入'); return; }
   try {
-    await createUserWithEmailAndPassword(auth, email, pwd);
-    closeModal();
+    const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+    // 註冊成功，直接關 modal，onAuthStateChanged 會接手進 App
+    document.getElementById('modal')?.remove();
+    // 若 onAuthStateChanged 沒觸發就手動進入
+    if(cred.user) {
+      currentUser = cred.user;
+      await loadUserProfile();
+      await loadUserData();
+      showMainApp();
+    }
   }
   catch(e) { alert(friendlyAuthError(e.code)); }
 };
@@ -979,8 +986,10 @@ function renderListItem(item, from) {
   const coverImg = hasPhoto ? item.photos[item.coverIdx||0]||item.photos[0] : null;
   const icon = coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover;"/>`:cat.emoji;
   return `<div class="list-item" 
-    onclick="goDetail('${item.id}','${from}')"
-    ${!isReadOnly()?`ontouchstart="startLongPress('${item.id}',this,event)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()"`:''}>
+    ontouchstart="${!isReadOnly()?`startLongPress('${item.id}',this,event)`:''}" 
+    ontouchend="${!isReadOnly()?'cancelLongPress()':''}" 
+    ontouchmove="${!isReadOnly()?'cancelLongPress()':''}"
+    onclick="goDetail('${item.id}','${from}')">
     <div class="list-icon" style="${thumb}font-size:22px">${icon}</div>
     <div class="list-body"><div class="list-name">${item.name}</div><div class="list-sub">${sub}</div></div>
     <div class="list-arrow">›</div></div>`;
@@ -1045,7 +1054,8 @@ function makeSlide(p, idx, itemId) {
 }
 
 function renderDetail() {
-  const item = items.find(i=>i.id===nav.itemId); if(!item) return '<div class="empty">找不到</div>';
+  const item = items.find(i=>i.id===nav.itemId);
+  if(!item) return '<div class="empty" style="padding:40px">找不到收藏<br><br><div style="font-size:13px;color:var(--muted2)">可能正在載入，請稍候...</div></div>';
   const cat = CATS.find(c=>c.id===item.cat)||CATS[0];
   const c = countries.find(x=>x.id===item.country);
   const photos = item.photos||[];
@@ -3060,7 +3070,12 @@ window.goRegions = function(cid) { nav.country=cid; nav.page='regions'; render()
 window.goCats = function(r) { nav.region=r; nav.page='cats'; render(); };
 window.goList = function(cat) { nav.cat=cat; nav.page='list'; render(); };
 window.goAllList = function() { nav.page='alllist'; nav.filter='all'; render(); };
-window.goDetail = function(id,from) { nav.prevPage=from; nav.itemId=id; nav.page='detail'; render(); };
+window.goDetail = function(id, from) {
+  nav.prevPage = from;
+  nav.itemId = id;
+  nav.page = 'detail';
+  render();
+};
 window.goShopCat = function(id) { nav.shopCat=id; nav.page='shopcat'; render(); };
 window.goShopAllList = function() { nav.page='shopalllist'; render(); };
 window.goShopDetail = function(id) { nav.prevPage='shopcat'; nav.itemId=id; nav.page='shopdetail'; render(); };
