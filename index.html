@@ -1460,6 +1460,12 @@ function renderPinPad(title, sub) {
     var oc = "onclick=\"secretPinPress('"+n+"')\" ";
     h += '<div class="pinkey" '+ts+oc+'>'+n+'</div>';
   });
+  var hasPinUnlock = (!!getSecretPin()) && secretMode==='unlock';
+  h += hasPinUnlock
+    ? '<div class="pinkey" ontouchstart="event.preventDefault();tryFaceId()" onclick="tryFaceId()" style="font-size:11px;color:var(--blue);font-weight:700;">Face<br>ID</div>'
+    : '<div></div>';
+  h += '<div class="pinkey" ontouchstart="event.preventDefault();secretPinPress(\'0\')" onclick="secretPinPress(\'0\')">0</div>';
+  h += '<div class="pinkey del" ontouchstart="event.preventDefault();secretPinDel()" onclick="secretPinDel()">⌫</div>';
   h += '</div>';
   return h;
 }
