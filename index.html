@@ -445,29 +445,41 @@ function setupOwnListeners() {
   ownListeners.forEach(u=>u()); ownListeners=[];
   const uid = currentUser.uid;
   
-  // Listen to own items - 保留記憶體中的照片，不被 snapshot 蓋掉
-  ownListeners.push(onSnapshot(collection(db,'userData',uid,'items'), snap=>{
+  // Listen to own items - 新裝置也要從 Firestore 載入照片
+  ownListeners.push(onSnapshot(collection(db,'userData',uid,'items'), async snap=>{
     if(viewingUid) return;
     const existingPhotos = {};
     items.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
-    items = snap.docs.map(d=>{
+    items = await Promise.all(snap.docs.map(async d=>{
       const item = {id:d.id,...d.data()};
-      item.photos = existingPhotos[d.id] || item.photos || [];
+      if(existingPhotos[d.id]) {
+        item.photos = existingPhotos[d.id]; // 記憶體有就用記憶體的
+      } else if(item.photoCount>0) {
+        item.photos = await loadItemPhotos(uid,d.id,'items'); // 新裝置從 Firestore 載
+      } else {
+        item.photos = [];
+      }
       return item;
-    });
+    }));
     if(nav.page !== 'detail') render();
   }));
-  
+
   // Listen to own shopItems
-  ownListeners.push(onSnapshot(collection(db,'userData',uid,'shopItems'), snap=>{
+  ownListeners.push(onSnapshot(collection(db,'userData',uid,'shopItems'), async snap=>{
     if(viewingUid) return;
     const existingPhotos = {};
     shopItems.forEach(i=>{ if(i.photos&&i.photos.length) existingPhotos[i.id]=i.photos; });
-    shopItems = snap.docs.map(d=>{
+    shopItems = await Promise.all(snap.docs.map(async d=>{
       const item = {id:d.id,...d.data()};
-      item.photos = existingPhotos[d.id] || item.photos || [];
+      if(existingPhotos[d.id]) {
+        item.photos = existingPhotos[d.id];
+      } else if(item.photoCount>0) {
+        item.photos = await loadItemPhotos(uid,d.id,'shopItems');
+      } else {
+        item.photos = [];
+      }
       return item;
-    });
+    }));
     if(nav.page !== 'shopdetail') render();
   }));
   
