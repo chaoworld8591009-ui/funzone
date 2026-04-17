@@ -217,6 +217,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Micros
 .filter-tabs::-webkit-scrollbar{display:none;}
 .ftab{font-size:11px;padding:4px 10px;border-radius:20px;white-space:nowrap;cursor:pointer;border:0.5px solid var(--border2);color:var(--muted);}
 .ftab.on{background:var(--amber);color:#000;border-color:var(--amber);font-weight:700;}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 24px;}
+.pinkey{background:var(--card2);border-radius:14px;padding:16px;text-align:center;font-size:22px;color:var(--text);cursor:pointer;user-select:none;-webkit-user-select:none;}
+.pinkey:active{opacity:0.5;}
+.pinkey.del{background:var(--red-bg);color:var(--red);font-size:16px;}
+.pindots{display:flex;gap:16px;justify-content:center;margin:20px 0 24px;}
+.pindot{width:14px;height:14px;border-radius:50%;border:2px solid var(--muted2);}
+.pindot.on{background:var(--amber);border-color:var(--amber);}
+.secret-msg-row{display:flex;align-items:flex-end;gap:8px;padding:4px 16px;}
+.secret-bubble{max-width:78%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;background:var(--amber);color:#000;border-bottom-right-radius:4px;}
+.secret-note{background:var(--card);border:0.5px solid var(--amber);border-radius:14px;padding:10px 14px;max-width:78%;}
 
 .chat-list-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;}
 .chat-avatar{width:46px;height:46px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;position:relative;}
@@ -685,6 +695,7 @@ function renderHeader() {
     'friends': ['好友收藏', null, '＋ 新增', ()=>openAddFriend()],
     'chatlist': ['💬 訊息', null, null, null],
     'chatroom': ['', ()=>{nav.page='chatlist';render();}, null, null],
+    'secretchat': ['', ()=>closeSecretChat(), null, null],
     'triplist': ['✈️ 旅遊規劃', null, '＋', ()=>openAddTrip()],
     'tripdetail': ['', ()=>{nav.page='triplist';render();}, canEditTrip()?'＋':null, ()=>openAddItinItem()],
     'tripitem': ['行程詳細', ()=>{nav.page='tripdetail';nav.tripTab='itinerary';render();}, canEditTrip()?'編輯':null, ()=>openEditItinItem(nav.tripItemId)],
@@ -733,6 +744,7 @@ async function renderPage() {
     'friends': renderFriends,
     'chatlist': renderChatList,
     'chatroom': renderChatRoom,
+    'secretchat': renderSecretChat,
     'triplist': renderTripList,
     'tripdetail': renderTripDetail,
     'tripitem': renderTripItem,
@@ -768,7 +780,7 @@ function renderBottomNav() {
     {ico:'🛒',lbl:'網購',pages:['shop','shopcat','shopalllist','shopdetail']},
     {ico:'✈️',lbl:'旅遊',pages:['triplist','tripdetail','tripitem']},
     {ico:'👥',lbl:'好友',pages:['friends']},
-    {ico:'💬',lbl:'訊息',pages:['chatlist','chatroom']},
+    {ico:'💬',lbl:'訊息',pages:['chatlist','chatroom','secretchat']},
     {ico:'👤',lbl:'我的',pages:['profile']},
   ];
   if(isAdmin()) btns.push({ico:'⚙️',lbl:'管理',pages:['admin']});
@@ -1291,7 +1303,223 @@ window.viewFriend = async function(uid) {
   render();
 };
 
-// ===== 聊天功能 =====
+// ===== 隱藏聊天室 =====
+// 概念：隱藏特定好友的聊天，不顯示在正常訊息頁
+let secretUnlocked = false;
+let secretPinInput = '';
+let secretMode = 'unlock'; // 'setup' | 'unlock' | 'confirm'
+let secretPinTemp = '';
+
+function getSecretPin() { return userProfile?.secretPin||null; }
+function hashPin(pin) {
+  let h = 0;
+  for(let i=0;i<pin.length;i++) h = (h*31+pin.charCodeAt(i))&0xffffffff;
+  return h.toString(36)+'_'+pin.length;
+}
+function getHiddenUids() { return userProfile?.hiddenChats||[]; }
+function isHidden(uid) { return getHiddenUids().includes(uid); }
+
+async function saveHiddenChats(uids) {
+  userProfile.hiddenChats = uids;
+  await setDoc(doc(db,'users',currentUser.uid), userProfile);
+}
+
+window.hideChat = async function(uid) {
+  const uids = [...getHiddenUids()];
+  if(!uids.includes(uid)) uids.push(uid);
+  await saveHiddenChats(uids);
+  render();
+};
+
+window.unhideChat = async function(uid) {
+  const uids = getHiddenUids().filter(u=>u!==uid);
+  await saveHiddenChats(uids);
+  if(nav.page==='secretchat') renderPage();
+};
+
+window.openSecretChat = function() {
+  secretPinInput = '';
+  secretMode = getSecretPin() ? 'unlock' : 'setup';
+  secretPinTemp = '';
+  nav.page = 'secretchat';
+  render();
+  document.getElementById('headerTitle').textContent = '🔐';
+  document.getElementById('headerBack').style.display='block';
+  document.getElementById('headerBack').onclick = closeSecretChat;
+};
+
+window.closeSecretChat = function() {
+  secretUnlocked = false;
+  nav.page='chatlist';
+  render();
+};
+
+window.secretPinPress = function(val) {
+  if(secretPinInput.length>=4) return;
+  secretPinInput += val;
+  updatePinDots();
+  if(secretPinInput.length===4) setTimeout(()=>processPin(), 150);
+};
+window.secretPinDel = function() {
+  secretPinInput = secretPinInput.slice(0,-1);
+  updatePinDots();
+};
+function updatePinDots() {
+  document.querySelectorAll('.pindot').forEach((d,i)=>d.classList.toggle('on',i<secretPinInput.length));
+}
+
+async function processPin() {
+  if(secretMode==='setup') {
+    secretPinTemp = secretPinInput; secretPinInput='';
+    secretMode='confirm'; renderPage();
+    document.getElementById('headerTitle').textContent='🔐';
+    return;
+  }
+  if(secretMode==='confirm') {
+    if(secretPinInput!==secretPinTemp) {
+      secretPinInput=''; secretPinTemp=''; secretMode='setup'; renderPage();
+      return;
+    }
+    userProfile.secretPin = hashPin(secretPinInput);
+    await setDoc(doc(db,'users',currentUser.uid),userProfile);
+    secretUnlocked=true; secretPinInput=''; renderPage(); return;
+  }
+  if(secretMode==='unlock') {
+    if(hashPin(secretPinInput)===getSecretPin()) {
+      secretUnlocked=true; secretPinInput=''; renderPage();
+    } else {
+      secretPinInput=''; updatePinDots();
+      const el=document.querySelector('.pin-error');
+      if(el){el.style.display='block';setTimeout(()=>{if(el)el.style.display='none';},1500);}
+    }
+  }
+}
+
+async function tryFaceId() {
+  try {
+    if(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) {
+      await navigator.credentials.get({publicKey:{challenge:new Uint8Array(32),timeout:60000,userVerification:'required'}});
+      secretUnlocked=true; renderPage(); return;
+    }
+  } catch(e) {}
+  alert('Face ID 不可用，請輸入密碼');
+}
+
+function renderPinPad(title, sub) {
+  const hasPin = !!getSecretPin();
+  let h = '<div style="display:flex;flex-direction:column;align-items:center;padding:30px 20px 16px;gap:4px;">';
+  h += '<div style="font-size:38px;margin-bottom:6px;">🔐</div>';
+  h += '<div style="font-size:16px;font-weight:700;color:var(--text)">'+title+'</div>';
+  if(sub) h += '<div style="font-size:11px;color:var(--muted);margin-top:4px;text-align:center">'+sub+'</div>';
+  h += '<div class="pindots" id="pinDots">'+[0,1,2,3].map(i=>'<div class="pindot'+(i<secretPinInput.length?' on':'')+'"></div>').join('')+'</div>';
+  h += '<div class="pin-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:4px;">密碼錯誤，請再試一次</div>';
+  h += '</div>';
+  h += '<div class="pinpad">';
+  [1,2,3,4,5,6,7,8,9].forEach(n=>{var k='<div class="pinkey" onclick="secretPinPress('+JSON.stringify(String(n))+')">'  +n+'</div>'; h+=k;});
+  h += (hasPin&&secretMode==='unlock'?'<div class="pinkey" onclick="tryFaceId()" style="font-size:11px;color:var(--blue);font-weight:700;">Face<br>ID</div>':'<div></div>');
+  h += '<div class="pinkey" onclick="secretPinPress('+JSON.stringify('0')+')">'+'0'+'</div>';
+  h += '<div class="pinkey del" onclick="secretPinDel()">⌫</div>';
+  h += '</div>';
+  return h;
+}
+
+function renderSecretChat() {
+  if(!secretUnlocked) {
+    if(secretMode==='setup') return renderPinPad('設定 4 位數密碼','設定後每次進入都需要輸入');
+    if(secretMode==='confirm') return renderPinPad('再次輸入確認','');
+    return renderPinPad('輸入密碼','');
+  }
+
+  // 已解鎖：顯示隱藏的好友聊天列表
+  const hiddenUids = getHiddenUids();
+  const hiddenFriends = friends.filter(f=>hiddenUids.includes(f.uid));
+
+  let h = '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px 6px;">';
+  h += '<div style="font-size:12px;color:var(--muted)">隱藏的對話</div>';
+  h += '<div style="font-size:12px;color:var(--amber);cursor:pointer" onclick="openHideSettings()">⚙️ 管理隱藏</div>';
+  h += '</div>';
+
+  if(!hiddenFriends.length) {
+    h += '<div class="empty" style="padding:30px">還沒有隱藏任何對話<br><br>';
+    h += '<div style="font-size:12px;color:var(--muted2)">在訊息頁長按好友<br>可選擇隱藏對話</div></div>';
+    return h;
+  }
+
+  hiddenFriends.forEach(f=>{
+    const chatId = getChatId(currentUser.uid, f.uid);
+    const msgs = chatMessages[chatId]||[];
+    const last = msgs[msgs.length-1];
+    const unread = chatUnread[chatId]||0;
+    let preview = '點擊開始聊天';
+    if(last) {
+      if(last.recalled) preview='訊息已收回';
+      else if(last.deletedBy&&last.deletedBy.includes(currentUser.uid)) preview='訊息已刪除';
+      else if(last.img) preview='📷 圖片';
+      else if(last.video) preview='🎥 影片';
+      else preview=last.text||'';
+    }
+    const timeStr = last?formatChatTime(last.t):'';
+    h += '<div class="chat-list-item" style="position:relative;">';
+    h += '<div onclick="openChat(\'' +f.uid+ '\')" style="display:flex;align-items:center;gap:12px;flex:1;">';
+    h += '<div class="chat-avatar" style="position:relative">';
+    h += (f.photo?'<img src="'+f.photo+'"/>':(f.name?.[0]||'👤'));
+    if(unread>0) h += '<div class="chat-unread">'+(unread>9?'9+':unread)+'</div>';
+    h += '</div>';
+    h += '<div class="chat-body"><div class="chat-name">'+esc(f.name)+'</div>';
+    h += '<div class="chat-preview">'+esc(preview.slice(0,30))+'</div></div>';
+    if(timeStr) h += '<div class="chat-time">'+timeStr+'</div>';
+    h += '</div>';
+    h += '<div onclick="unhideChat(\'+f.uid+\'" style="padding:8px 12px;color:var(--muted2);font-size:18px;cursor:pointer;">👁</div>';
+    h += '</div>';
+  });
+  return h;
+}
+
+// 管理隱藏：哪些好友被隱藏
+window.openHideSettings = function() {
+  const hiddenUids = getHiddenUids();
+  const list = friends.map(f=>{
+    const hidden = hiddenUids.includes(f.uid);
+    const bg = hidden?'var(--green-bg)':'var(--red-bg)';
+    const col = hidden?'var(--green)':'var(--muted)';
+    const lbl = hidden?'已隱藏 👁':'顯示中';
+    return '<div class="list-item">'+
+      '<div class="friend-avatar">'+(f.photo?'<img src="'+f.photo+'"/>':(f.name?.[0]||'👤'))+'</div>'+
+      '<div class="list-body"><div class="list-name">'+esc(f.name)+'</div></div>'+
+      '<div onclick="toggleHideChat(\''+f.uid+'\')" style="padding:4px 12px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;background:'+bg+';color:'+col+'">'+lbl+'</div>'+
+      '</div>';
+  }).join('');
+  openModal('<div class="modal-title">管理隱藏對話</div>'+
+    '<div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px">點擊切換顯示／隱藏</div>'+
+    list+
+    '<div style="height:10px"></div>'+
+    '<div class="modal-btn modal-btn-cancel" style="margin:0 0 4px" onclick="closeModal()">完成</div>');
+};
+
+window.toggleHideChat = async function(uid) {
+  const uids = getHiddenUids();
+  const newUids = uids.includes(uid)?uids.filter(u=>u!==uid):[...uids,uid];
+  await saveHiddenChats(newUids);
+  closeModal();
+  openHideSettings(); // 重開更新狀態
+};
+
+// 雙擊偵測（只有管理員帳號才有隱藏聊天室功能）
+let _lastTap=0;
+function setupDoubleTap() {
+  if(!isAdmin()) return; // 只有管理員帳號才有這個功能
+  const page=document.getElementById('pageContent');
+  if(!page||page._dtSetup) return;
+  page._dtSetup=true;
+  page.addEventListener('touchend',e=>{
+    if(nav.page!=='chatlist') return;
+    const now=Date.now();
+    if(now-_lastTap<350){e.preventDefault();_lastTap=0;openSecretChat();}
+    else _lastTap=now;
+  },{passive:false});
+}
+
+// ===== 聊天功能 =====// ===== 聊天功能 =====
 let chatListeners = {};
 let chatMessages = {};
 let chatUnread = {};
@@ -1340,9 +1568,12 @@ async function markChatRead(chatId) {
 }
 
 function renderChatList() {
-  if(!friends.length) return '<div class="empty">還沒有好友<br>去「好友」頁面新增好友！</div>';
+  setTimeout(setupDoubleTap, 50);
+  const visibleFriends = friends.filter(f=>!isHidden(f.uid));
+  if(!visibleFriends.length && !friends.length) return '<div class="empty">還沒有好友<br>去「好友」頁面新增好友！</div>';
+  if(!visibleFriends.length) return '<div class="empty" style="padding:40px">所有對話都已隱藏</div>';
   let h = '';
-  friends.forEach(f => {
+  visibleFriends.forEach(f => {
     const chatId = getChatId(currentUser.uid, f.uid);
     const msgs = chatMessages[chatId]||[];
     const last = msgs[msgs.length-1];
@@ -1361,20 +1592,32 @@ function renderChatList() {
       else preview = last.text||'';
     }
     const timeStr = last ? formatChatTime(last.t) : '';
-    h += `<div class="chat-list-item" onclick="openChat('${f.uid}')">
-      <div class="chat-avatar" style="position:relative">
-        ${f.photo?`<img src="${f.photo}"/>`:'👤'}
-        ${unread>0?`<div class="chat-unread">${unread>9?'9+':unread}</div>`:''}
-      </div>
-      <div class="chat-body">
-        <div class="chat-name">${esc(f.name)}</div>
-        <div class="chat-preview" style="${unread>0?'color:var(--text);font-weight:600':''}">${esc(preview.slice(0,30))}</div>
-      </div>
-      ${timeStr?`<div class="chat-time">${timeStr}</div>`:''}
-    </div>`;
+    h += '<div class="chat-list-item" onclick="openChat(\''+f.uid+'\')" ontouchstart="startChatLongPress(\''+f.uid+'\',this)" ontouchend="cancelChatLongPress()" ontouchmove="cancelChatLongPress()">';
+    h += '<div class="chat-avatar" style="position:relative">';
+    h += (f.photo?'<img src="'+f.photo+'"/>':(f.name?.[0]||'👤'));
+    if(unread>0) h += '<div class="chat-unread">'+(unread>9?'9+':unread)+'</div>';
+    h += '</div><div class="chat-body">';
+    h += '<div class="chat-name">'+esc(f.name)+'</div>';
+    h += '<div class="chat-preview" style="'+(unread>0?'color:var(--text);font-weight:600':'')+'"">'+esc(preview.slice(0,30))+'</div>';
+    h += '</div>';
+    if(timeStr) h += '<div class="chat-time">'+timeStr+'</div>';
+    h += '</div>';
   });
   return h;
 }
+
+// 長按聊天列表項目 → 隱藏選項
+let _chatLpTimer=null;
+window.startChatLongPress=function(uid,el){
+  _chatLpTimer=setTimeout(()=>{
+    if(navigator.vibrate)navigator.vibrate(40);
+    const f=friends.find(x=>x.uid===uid); if(!f) return;
+    openModal('<div class="modal-title">'+esc(f.name)+'</div>'+
+      '<div class="modal-btn" style="background:var(--red-bg);color:var(--red);margin-bottom:8px" onclick="hideChat(\''+uid+'\');closeModal()">🔐 隱藏此對話</div>'+
+      '<div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>');
+  },550);
+};
+window.cancelChatLongPress=function(){if(_chatLpTimer){clearTimeout(_chatLpTimer);_chatLpTimer=null;}};
 
 function formatChatTime(ts) {
   if(!ts) return '';
@@ -1718,15 +1961,37 @@ function renderTripList() {
   if(!trips.length) return '<div class="empty">還沒有旅遊計畫<br>按右上角 ＋ 新增！</div>';
   trips.forEach(t=>{
     const days = t.days||1;
+    const isOwner = t.ownerId===currentUser.uid;
+    const isPublic = t.isPublic===true;
     const statusTag = t.status==='done'?'<span class="tag tag-play">已完成</span>':'<span class="tag tag-eat">規劃中</span>';
+    const privTag = isPublic
+      ? '<span class="tag" style="background:var(--green-bg);color:var(--green)">🌐 公開</span>'
+      : '<span class="tag" style="background:var(--card2);color:var(--muted2)">🔒 不公開</span>';
     h += '<div class="trip-card" onclick="openTrip(\''+t.id+'\')">';
-    h += '<div class="trip-cover" style="background:'+getCoverGradient(t.emoji)+'"><div class="trip-cover-grad"></div><div class="trip-cover-emoji">'+t.emoji+'</div><div class="trip-info"><div class="trip-name">'+esc(t.title)+'</div></div></div>';
+    h += '<div class="trip-cover" style="background:'+getCoverGradient(t.emoji)+'">'+
+         '<div class="trip-cover-grad"></div>'+
+         '<div class="trip-cover-emoji">'+t.emoji+'</div>'+
+         '<div class="trip-info"><div class="trip-name">'+esc(t.title)+'</div></div>';
+    if(isOwner) {
+      h += '<div onclick="event.stopPropagation();toggleTripPublic(\''+t.id+'\')" style="position:absolute;top:8px;left:10px;background:rgba(0,0,0,0.5);border-radius:8px;padding:3px 8px;font-size:10px;color:'+(isPublic?'#30D158':'#aaa')+';">'+(isPublic?'🌐 公開':'🔒 不公開')+'</div>';
+    }
+    h += '</div>';
     h += '<div class="trip-body"><div class="trip-meta-row">'+statusTag+'<span class="tag tag-loc">'+days+'天</span>';
     if(t.startDate) h += '<span style="font-size:10px;color:var(--muted)">'+t.startDate+'</span>';
     h += '</div></div></div>';
   });
   return h;
 }
+
+window.toggleTripPublic = async function(id) {
+  const t = trips.find(x=>x.id===id); if(!t) return;
+  if(t.ownerId!==currentUser.uid) return;
+  const newVal = !t.isPublic;
+  await updateDoc(getTripDoc(id), {isPublic: newVal});
+  t.isPublic = newVal;
+  if(currentTrip?.id===id) currentTrip.isPublic = newVal;
+  render();
+};
 
 function getCoverGradient(emoji) {
   const map={'🇯🇵':'linear-gradient(135deg,#1a2a1a,#0d3b2a)','🇰🇷':'linear-gradient(135deg,#1a1a2a,#0d1a3b)','🇺🇸':'linear-gradient(135deg,#1a0a0a,#2a0d0d)','🇹🇼':'linear-gradient(135deg,#1a1a1a,#0d0d2a)','🇹🇭':'linear-gradient(135deg,#1a2a1a,#2a1a0a)'};
@@ -2037,7 +2302,13 @@ function renderMemberTab() {
     h += '<div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="copyTripLink()">🔗 複製連結</div>';
     h += '</div>';
   }
-  h += '<div class="section-hdr" style="margin-top:4px">分享行程</div>';
+  h += '<div class="section-hdr">📤 分享行程</div>';
+  const isPublic = currentTrip.isPublic===true;
+  h += '<div style="padding:8px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--card2);margin:0 14px 8px;border-radius:10px;border:0.5px solid var(--border)">';
+  h += '<div><div style="font-size:13px;color:var(--text);font-weight:600)">'+(isPublic?'🌐 公開':'🔒 不公開')+'</div>';
+  h += '<div style="font-size:11px;color:var(--muted);margin-top:2px">'+(isPublic?'任何有連結的人都可以查看':'只有同行人員可以查看')+'</div></div>';
+  if(isTripOwner()) h += '<div onclick="toggleTripPublic(\''+currentTrip.id+'\')" style="padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;background:'+(isPublic?'var(--red-bg)':'var(--green-bg)')+';color:'+(isPublic?'var(--red)':'var(--green)')+'">'+(isPublic?'設為不公開':'設為公開')+'</div>';
+  h += '</div>';
   h += '<div style="padding:0 16px 8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   h += '<div class="detail-btn" style="background:var(--purple-bg);color:var(--purple)" onclick="copyTripLink()">📋 複製連結</div>';
   h += '<div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareTripPlan()">📤 系統分享</div>';
