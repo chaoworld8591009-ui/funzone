@@ -2058,27 +2058,112 @@ function renderMemberTab() {
 }
 
 // ===== Trip 操作函式 =====
+const ALL_COUNTRIES = [
+  {e:'🇯🇵',n:'日本'},{e:'🇰🇷',n:'韓國'},{e:'🇨🇳',n:'中國'},{e:'🇹🇼',n:'台灣'},{e:'🇭🇰',n:'香港'},
+  {e:'🇲🇴',n:'澳門'},{e:'🇸🇬',n:'新加坡'},{e:'🇹🇭',n:'泰國'},{e:'🇻🇳',n:'越南'},{e:'🇲🇾',n:'馬來西亞'},
+  {e:'🇵🇭',n:'菲律賓'},{e:'🇮🇩',n:'印尼'},{e:'🇧🇳',n:'汶萊'},{e:'🇲🇲',n:'緬甸'},{e:'🇰🇭',n:'柬埔寨'},
+  {e:'🇱🇦',n:'寮國'},{e:'🇹🇱',n:'東帝汶'},{e:'🇮🇳',n:'印度'},{e:'🇵🇰',n:'巴基斯坦'},{e:'🇧🇩',n:'孟加拉'},
+  {e:'🇱🇰',n:'斯里蘭卡'},{e:'🇳🇵',n:'尼泊爾'},{e:'🇧🇹',n:'不丹'},{e:'🇲🇻',n:'馬爾地夫'},{e:'🇦🇫',n:'阿富汗'},
+  {e:'🇺🇸',n:'美國'},{e:'🇨🇦',n:'加拿大'},{e:'🇲🇽',n:'墨西哥'},{e:'🇧🇷',n:'巴西'},{e:'🇦🇷',n:'阿根廷'},
+  {e:'🇨🇱',n:'智利'},{e:'🇨🇴',n:'哥倫比亞'},{e:'🇵🇪',n:'秘魯'},{e:'🇻🇪',n:'委內瑞拉'},{e:'🇪🇨',n:'厄瓜多'},
+  {e:'🇧🇴',n:'玻利維亞'},{e:'🇵🇾',n:'巴拉圭'},{e:'🇺🇾',n:'烏拉圭'},{e:'🇬🇾',n:'蓋亞那'},{e:'🇸🇷',n:'蘇利南'},
+  {e:'🇬🇧',n:'英國'},{e:'🇫🇷',n:'法國'},{e:'🇩🇪',n:'德國'},{e:'🇮🇹',n:'義大利'},{e:'🇪🇸',n:'西班牙'},
+  {e:'🇵🇹',n:'葡萄牙'},{e:'🇳🇱',n:'荷蘭'},{e:'🇧🇪',n:'比利時'},{e:'🇨🇭',n:'瑞士'},{e:'🇦🇹',n:'奧地利'},
+  {e:'🇸🇪',n:'瑞典'},{e:'🇳🇴',n:'挪威'},{e:'🇩🇰',n:'丹麥'},{e:'🇫🇮',n:'芬蘭'},{e:'🇮🇸',n:'冰島'},
+  {e:'🇮🇪',n:'愛爾蘭'},{e:'🇵🇱',n:'波蘭'},{e:'🇨🇿',n:'捷克'},{e:'🇸🇰',n:'斯洛伐克'},{e:'🇭🇺',n:'匈牙利'},
+  {e:'🇷🇴',n:'羅馬尼亞'},{e:'🇧🇬',n:'保加利亞'},{e:'🇭🇷',n:'克羅埃西亞'},{e:'🇸🇮',n:'斯洛維尼亞'},{e:'🇷🇸',n:'塞爾維亞'},
+  {e:'🇧🇦',n:'波士尼亞'},{e:'🇲🇪',n:'蒙特內哥羅'},{e:'🇲🇰',n:'北馬其頓'},{e:'🇦🇱',n:'阿爾巴尼亞'},{e:'🇽🇰',n:'科索沃'},
+  {e:'🇬🇷',n:'希臘'},{e:'🇨🇾',n:'賽普勒斯'},{e:'🇲🇹',n:'馬爾他'},{e:'🇱🇺',n:'盧森堡'},{e:'🇲🇨',n:'摩納哥'},
+  {e:'🇱🇮',n:'列支敦斯登'},{e:'🇦🇩',n:'安道爾'},{e:'🇸🇲',n:'聖馬利諾'},{e:'🇻🇦',n:'梵蒂岡'},{e:'🇪🇪',n:'愛沙尼亞'},
+  {e:'🇱🇻',n:'拉脫維亞'},{e:'🇱🇹',n:'立陶宛'},{e:'🇧🇾',n:'白俄羅斯'},{e:'🇺🇦',n:'烏克蘭'},{e:'🇲🇩',n:'摩爾多瓦'},
+  {e:'🇷🇺',n:'俄羅斯'},{e:'🇬🇪',n:'喬治亞'},{e:'🇦🇲',n:'亞美尼亞'},{e:'🇦🇿',n:'亞塞拜然'},{e:'🇰🇿',n:'哈薩克'},
+  {e:'🇺🇿',n:'烏茲別克'},{e:'🇹🇲',n:'土庫曼'},{e:'🇰🇬',n:'吉爾吉斯'},{e:'🇹🇯',n:'塔吉克'},{e:'🇲🇳',n:'蒙古'},
+  {e:'🇹🇷',n:'土耳其'},{e:'🇮🇱',n:'以色列'},{e:'🇯🇴',n:'約旦'},{e:'🇱🇧',n:'黎巴嫩'},{e:'🇸🇾',n:'敘利亞'},
+  {e:'🇮🇶',n:'伊拉克'},{e:'🇮🇷',n:'伊朗'},{e:'🇸🇦',n:'沙烏地阿拉伯'},{e:'🇦🇪',n:'阿聯'},{e:'🇶🇦',n:'卡達'},
+  {e:'🇰🇼',n:'科威特'},{e:'🇧🇭',n:'巴林'},{e:'🇴🇲',n:'阿曼'},{e:'🇾🇪',n:'葉門'},{e:'🇵🇸',n:'巴勒斯坦'},
+  {e:'🇪🇬',n:'埃及'},{e:'🇲🇦',n:'摩洛哥'},{e:'🇩🇿',n:'阿爾及利亞'},{e:'🇹🇳',n:'突尼西亞'},{e:'🇱🇾',n:'利比亞'},
+  {e:'🇸🇩',n:'蘇丹'},{e:'🇸🇸',n:'南蘇丹'},{e:'🇪🇹',n:'衣索比亞'},{e:'🇪🇷',n:'厄利垂亞'},{e:'🇩🇯',n:'吉布地'},
+  {e:'🇸🇴',n:'索馬利亞'},{e:'🇰🇪',n:'肯亞'},{e:'🇹🇿',n:'坦尚尼亞'},{e:'🇺🇬',n:'烏干達'},{e:'🇷🇼',n:'盧安達'},
+  {e:'🇧🇮',n:'蒲隆地'},{e:'🇳🇬',n:'奈及利亞'},{e:'🇬🇭',n:'迦納'},{e:'🇿🇦',n:'南非'},{e:'🇿🇲',n:'尚比亞'},
+  {e:'🇿🇼',n:'辛巴威'},{e:'🇲🇿',n:'莫三比克'},{e:'🇲🇼',n:'馬拉威'},{e:'🇲🇬',n:'馬達加斯加'},{e:'🇦🇴',n:'安哥拉'},
+  {e:'🇨🇩',n:'剛果民主共和國'},{e:'🇨🇬',n:'剛果共和國'},{e:'🇨🇲',n:'喀麥隆'},{e:'🇨🇫',n:'中非'},{e:'🇹🇩',n:'查德'},
+  {e:'🇳🇪',n:'尼日'},{e:'🇲🇱',n:'馬利'},{e:'🇧🇫',n:'布吉納法索'},{e:'🇸🇳',n:'塞內加爾'},{e:'🇬🇳',n:'幾內亞'},
+  {e:'🇸🇱',n:'獅子山'},{e:'🇱🇷',n:'賴比瑞亞'},{e:'🇨🇮',n:'象牙海岸'},{e:'🇧🇯',n:'貝南'},{e:'🇹🇬',n:'多哥'},
+  {e:'🇬🇧',n:'甘比亞'},{e:'🇬🇼',n:'幾內亞比索'},{e:'🇨🇻',n:'維德角'},{e:'🇸🇹',n:'聖多美普林西比'},{e:'🇬🇶',n:'赤道幾內亞'},
+  {e:'🇬🇦',n:'加彭'},{e:'🇰🇲',n:'葛摩'},{e:'🇸🇨',n:'塞席爾'},{e:'🇲🇺',n:'模里西斯'},{e:'🇦🇺',n:'澳洲'},
+  {e:'🇳🇿',n:'紐西蘭'},{e:'🇫🇯',n:'斐濟'},{e:'🇵🇬',n:'巴布亞紐幾內亞'},{e:'🇸🇧',n:'索羅門群島'},{e:'🇻🇺',n:'萬那杜'},
+  {e:'🇼🇸',n:'薩摩亞'},{e:'🇹🇴',n:'東加'},{e:'🇰🇮',n:'吉里巴斯'},{e:'🇫🇲',n:'密克羅尼西亞'},{e:'🇵🇼',n:'帛琉'},
+  {e:'🇲🇭',n:'馬紹爾群島'},{e:'🇳🇷',n:'諾魯'},{e:'🇹🇻',n:'吐瓦魯'},{e:'🇨🇺',n:'古巴'},{e:'🇯🇲',n:'牙買加'},
+  {e:'🇭🇹',n:'海地'},{e:'🇩🇴',n:'多明尼加'},{e:'🇹🇹',n:'千里達及托巴哥'},{e:'🇧🇧',n:'巴貝多'},{e:'🇬🇩',n:'格瑞那達'},
+  {e:'🇻🇨',n:'聖文森'},{e:'🇱🇨',n:'聖露西亞'},{e:'🇩🇲',n:'多米尼克'},{e:'🇦🇬',n:'安地卡及巴布達'},{e:'🇰🇳',n:'聖克里斯多福'},
+  {e:'🇧🇸',n:'巴哈馬'},{e:'🇧🇿',n:'貝里斯'},{e:'🇬🇹',n:'瓜地馬拉'},{e:'🇭🇳',n:'宏都拉斯'},{e:'🇸🇻',n:'薩爾瓦多'},
+  {e:'🇳🇮',n:'尼加拉瓜'},{e:'🇨🇷',n:'哥斯大黎加'},{e:'🇵🇦',n:'巴拿馬'},{e:'🇰🇵',n:'北韓'},{e:'🇵🇷',n:'波多黎各'},
+  {e:'🌍',n:'非洲'},{e:'🌎',n:'美洲'},{e:'🌏',n:'其他'}
+];
+
+window._tripCountry = {e:'🌏',n:'其他'};
+
 window.openAddTrip = function() {
-  const emojis = ['🇯🇵','🇰🇷','🇺🇸','🇹🇼','🇹🇭','🇸🇬','🇦🇺','🇬🇧','🇫🇷','🇮🇹','🇩🇪','🇭🇰','🇲🇴','🇻🇳','🇲🇾','🌏'];
-  pickEmoji='🌏';
-  openModal('<div class="modal-title">新增旅遊計畫</div>'+
-    '<div class="emoji-grid">'+emojis.map(e=>'<span class="emoji-opt'+(e===pickEmoji?' sel':'')+'" onclick="pickE(\''+e+'\')">'+e+'</span>').join('')+'</div>'+
+  window._tripCountry = {e:'🌏',n:'其他'};
+  openModal(
+    '<div class="modal-title">新增旅遊計畫</div>'+
+    '<label class="modal-label">目的地國家</label>'+
+    '<div style="position:relative;margin-bottom:10px;">'+
+      '<input class="modal-input" id="mCountrySearch" placeholder="搜尋國家..." oninput="filterCountries(this.value)" style="margin-bottom:0;padding-right:40px"/>'+
+      '<div id="mCountrySel" style="background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--amber);margin-top:6px;display:flex;align-items:center;gap:6px;">'+
+        '<span id="mCountrySelEmoji">🌏</span><span id="mCountrySelName">其他</span>'+
+      '</div>'+
+      '<div id="mCountryList" style="max-height:160px;overflow-y:auto;background:var(--card2);border:0.5px solid var(--border2);border-radius:10px;margin-top:4px;display:none;"></div>'+
+    '</div>'+
     '<label class="modal-label">旅遊名稱</label>'+
     '<input class="modal-input" id="mTripTitle" placeholder="例：日本關西之旅"/>'+
     '<label class="modal-label">開始日期</label>'+
     '<input class="modal-input" id="mTripStart" type="date"/>'+
     '<label class="modal-label">天數</label>'+
-    '<input class="modal-input" id="mTripDays" type="number" min="1" max="30" value="5"/>'+
-    '<div class="modal-btns"><div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>'+
-    '<div class="modal-btn modal-btn-ok" onclick="doAddTrip()">新增</div></div>');
+    '<input class="modal-input" id="mTripDays" type="number" min="1" max="90" value="5"/>'+
+    '<div class="modal-btns">'+
+      '<div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>'+
+      '<div class="modal-btn modal-btn-ok" onclick="doAddTrip()">新增</div>'+
+    '</div>'
+  );
+  filterCountries('');
+};
+
+window.filterCountries = function(q) {
+  const list = document.getElementById('mCountryList');
+  if(!list) return;
+  const filtered = q ? ALL_COUNTRIES.filter(c=>c.n.includes(q)) : ALL_COUNTRIES;
+  list.style.display = 'block';
+  list.innerHTML = filtered.map(c=>
+    '<div onclick="selectTripCountry(\''+c.e+'\',\''+c.n+'\')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:0.5px solid var(--border2);cursor:pointer;">'+
+    '<span style="font-size:18px">'+c.e+'</span>'+
+    '<span style="font-size:13px;color:var(--text)">'+c.n+'</span>'+
+    '</div>'
+  ).join('') || '<div style="padding:10px;text-align:center;color:var(--muted);font-size:12px">找不到國家</div>';
+};
+
+window.selectTripCountry = function(emoji, name) {
+  window._tripCountry = {e:emoji, n:name};
+  const el = document.getElementById('mCountrySelEmoji');
+  const nl = document.getElementById('mCountrySelName');
+  if(el) el.textContent = emoji;
+  if(nl) nl.textContent = name;
+  const list = document.getElementById('mCountryList');
+  if(list) list.style.display='none';
+  const inp = document.getElementById('mCountrySearch');
+  if(inp) inp.value='';
+  // 自動填入旅遊名稱
+  const title = document.getElementById('mTripTitle');
+  if(title && !title.value) title.value = name+'之旅';
 };
 
 window.doAddTrip = async function() {
   const title = document.getElementById('mTripTitle').value.trim(); if(!title) return;
   const startDate = document.getElementById('mTripStart').value;
   const days = parseInt(document.getElementById('mTripDays').value)||5;
+  const country = window._tripCountry||{e:'🌏',n:'其他'};
   const trip = {
-    title, emoji:pickEmoji, startDate, days,
+    title, emoji:country.e, country:country.n, startDate, days,
     ownerId: currentUser.uid,
     memberUids: [currentUser.uid],
     members:[{uid:currentUser.uid,name:userProfile.name,photo:userProfile.photo||'',role:'owner'}],
