@@ -840,13 +840,17 @@ async function renderPage() {
     'admin': renderAdmin,
     'profile': renderProfile,
   };
-  const fn = pages[nav.page] || renderCountries;
-  const result = fn();
-  // 若是 async（renderAdmin），等待它完成
-  if(result && typeof result.then === 'function') {
-    await result;
-  } else {
-    p.innerHTML = result;
+  try {
+    const fn = pages[nav.page] || renderCountries;
+    const result = fn();
+    if(result && typeof result.then === 'function') {
+      await result;
+    } else {
+      p.innerHTML = result||'';
+    }
+  } catch(e) {
+    p.innerHTML = '<div class="empty" style="padding:40px">頁面載入錯誤<br><div style="font-size:11px;color:var(--muted2);margin-top:8px">'+e.message+'</div></div>';
+    console.error('renderPage error:', e);
   }
   setTimeout(initSwipers, 50);
   if(nav.page==='chatroom' || nav.page==='secretchat') {
@@ -1155,38 +1159,38 @@ function renderShopDetail() {
   const sc = shopCats.find(c=>c.id===item.shopCat);
   const photos = item.photos||[];
   const slides = photos.length ? photos.map((p,i)=>makeSlide(p,i,item.id)).join('') :
-    `<div class="photo-swiper-slide"><div class="slide-emoji">🛒</div></div>`;
-  const dots = photos.length>1 ? photos.map((_,i)=>`<div class="photo-dot${i===0?' on':''}"></div>`).join('') : '';
-  let h = `<div class="photo-swiper" id="swiper_${item.id}" data-idx="0" data-count="${photos.length}" data-id="${item.id}" data-type="shop">
-    <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
-    <div class="photo-swiper-overlay"></div>
-    ${dots?'<div class="photo-dots">'+dots+'</div>':''}
-    ${!isReadOnly()?`<div class="photo-btn-row">
-      <div class="photo-add-btn" onclick="addMediaType('${item.id}','shop','image')">📷 ＋照片</div>
-      
-    </div>`:''}
-    ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" onclick="setCover('${item.id}','shop')">⭐ 設封面</div>`:''}
-    ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','shop')">🗑 刪除此張</div>`:''}
-  </div>`;
+    '<div class="photo-swiper-slide"><div class="slide-emoji">🛒</div></div>';
+  const dots = photos.length>1 ? photos.map((_,i)=>'<div class="photo-dot'+(i===0?' on':'')+'"></div>').join('') : '';
+  let h = '<div class="photo-swiper" id="swiper_'+item.id+'" data-idx="0" data-count="'+photos.length+'" data-id="'+item.id+'" data-type="shop">'+
+    '<div class="photo-swiper-track" id="track_'+item.id+'">'+slides+'</div>'+
+    '<div class="photo-swiper-overlay"></div>'+
+    (dots?'<div class="photo-dots">'+dots+'</div>':'');
+  if(!isReadOnly()) {
+    h += '<div class="photo-btn-row"><div class="photo-add-btn" onclick="addMediaType(\''+item.id+'\',\'shop\',\'image\')">📷 ＋照片</div></div>';
+    if(photos.length>1) h += '<div class="photo-cover-btn" onclick="setCover(\''+item.id+'\',\'shop\')">⭐ 設封面</div>';
+    if(photos.length) h += '<div class="photo-del-btn" onclick="delPhoto(\''+item.id+'\',\'shop\')">🗑 刪除此張</div>';
+  }
+  h += '</div>';
   const starClick2 = isReadOnly() ? '' : 'setShopStar';
   const starsHtml = [1,2,3,4,5].map(v=>{
     const on = v<=(item.stars||0) ? ' on' : '';
     const click = starClick2 ? 'onclick="'+starClick2+'(\''+item.id+'\','+v+')"' : '';
     return '<span class="detail-star'+on+'" '+click+'>★</span>';
   }).join('');
-  h += `<div class="detail-body">
-    <div class="detail-tags"><span class="tag tag-shop">🛒 網購</span>${sc?`<span class="tag" style="background:var(--blue-bg);color:var(--blue)">${sc.emoji} ${sc.label}</span>`:''}</div>
-    <div class="detail-name">${item.name}</div>
-    <div class="detail-stars-row">${starsHtml}</div>
-    ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
-    ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
-    <div class="detail-btns">
-      ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
-      ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditShop('${item.id}')">✏️ 編輯</div>`:''}
-      ${!isReadOnly()?`<div class="detail-btn btn-done" onclick="markShopDone('${item.id}')">✓ 完成</div>`:''}
-      ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteShopItem('${item.id}')">🗑 刪除</div>`:''}
-    </div>
-  </div>`;
+  h += '<div class="detail-body">';
+  h += '<div class="detail-tags"><span class="tag tag-shop">🛒 網購</span>';
+  if(sc) h += '<span class="tag" style="background:var(--blue-bg);color:var(--blue)">'+sc.emoji+' '+sc.label+'</span>';
+  h += '</div>';
+  h += '<div class="detail-name">'+esc(item.name)+'</div>';
+  h += '<div class="detail-stars-row">'+starsHtml+'</div>';
+  if(item.note) h += '<div class="detail-section">備註</div><div class="detail-val">'+esc(item.note)+'</div>';
+  if(item.link) h += '<div class="detail-section">連結</div><div class="detail-link" onclick="openLink(\''+item.link+'\')">'+esc(item.link)+'</div>';
+  h += '<div class="detail-btns">';
+  if(item.link) h += '<div class="detail-btn btn-link" onclick="openLink(\''+item.link+'\')">🔗 連結</div>';
+  if(!isReadOnly()) h += '<div class="detail-btn btn-edit" onclick="openEditShop(\''+item.id+'\')">✏️ 編輯</div>';
+  if(!isReadOnly()) h += '<div class="detail-btn btn-done" onclick="markShopDone(\''+item.id+'\')">✓ 完成</div>';
+  if(!isReadOnly()) h += '<div class="detail-btn btn-del" onclick="deleteShopItem(\''+item.id+'\')">🗑 刪除</div>';
+  h += '</div></div>';
   return h;
 }
 
@@ -1779,50 +1783,45 @@ function renderChatRoom() {
 
     // 收回訊息 → 雙方都看到「訊息已收回」
     if(m.recalled) {
-      return `<div class="chat-bubble-row ${isMe?'me':'them'}">
-        ${!isMe?`<div class="chat-avatar" style="width:32px;height:32px;font-size:14px;flex-shrink:0">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>`:''}
-        <div class="chat-bubble-wrap ${isMe?'me':'them'}">
-          <div class="chat-bubble ${isMe?'me':'them'}" style="opacity:0.45;font-style:italic">訊息已收回</div>
-          <div class="chat-meta ${isMe?'me':''}"><span>${time}</span></div>
-        </div>
-      </div>`;
+      const avatarHtml = !isMe ? '<div class="chat-avatar" style="width:32px;height:32px;font-size:14px;flex-shrink:0">'+(f.photo?'<img src="'+f.photo+'"/>':"👤")+'</div>' : '';
+      return '<div class="chat-bubble-row '+(isMe?'me':'them')+'">'+avatarHtml+
+        '<div class="chat-bubble-wrap '+(isMe?'me':'them')+'">'+
+        '<div class="chat-bubble '+(isMe?'me':'them')+'" style="opacity:0.45;font-style:italic">訊息已收回</div>'+
+        '<div class="chat-meta '+(isMe?'me':'')+'"><span>'+time+'</span></div>'+
+        '</div></div>';
     }
 
     let content = '';
-    if(m.text) content += `<div>${esc(m.text)}</div>`;
-    if(m.img) content += `<img src="${m.img}" onclick="openChatMedia('${m.id}','img')" style="max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:${m.text?'6':'0'}px;cursor:pointer"/>`;
-    if(m.video) content += `<video src="${m.video}" style="max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:${m.text?'6':'0'}px" controls playsinline></video>`;
+    if(m.text) content += '<div>'+esc(m.text)+'</div>';
+    if(m.img) content += '<img src="'+m.img+'" onclick="openChatMedia(\''+m.id+'\',\'img\')" style="max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:'+(m.text?'6':'0')+'px;cursor:pointer"/>';
+    if(m.video) content += '<video src="'+m.video+'" style="max-width:200px;max-height:200px;border-radius:10px;display:block;margin-top:'+(m.text?'6':'0')+'px" controls playsinline></video>';
 
     const readMark = isMe
       ? (m.readBy && Object.keys(m.readBy).some(k=>k!==currentUser.uid) ? '✓✓' : '✓')
       : '';
 
-    const longPressAttr = `ontouchstart="startMsgLongPress('${m.id}','${isMe}',this)" ontouchend="cancelMsgLongPress()" ontouchmove="cancelMsgLongPress()"`;
+    const longPressAttr = 'ontouchstart="startMsgLongPress(\''+m.id+'\',\''+isMe+'\',this)" ontouchend="cancelMsgLongPress()" ontouchmove="cancelMsgLongPress()"';
+    const avatarHtml2 = !isMe ? '<div class="chat-avatar" style="width:32px;height:32px;font-size:14px;flex-shrink:0">'+(f.photo?'<img src="'+f.photo+'"/>':"👤")+'</div>' : '';
 
-    return `<div class="chat-bubble-row ${isMe?'me':'them'}">
-      ${!isMe?`<div class="chat-avatar" style="width:32px;height:32px;font-size:14px;flex-shrink:0">${f.photo?`<img src="${f.photo}"/>`:'👤'}</div>`:''}
-      <div class="chat-bubble-wrap ${isMe?'me':'them'}" ${longPressAttr}>
-        <div class="chat-bubble ${isMe?'me':'them'}">${content}</div>
-        <div class="chat-meta ${isMe?'me':''}">
-          <span>${time}</span>
-          ${isMe?`<span class="chat-read">${readMark}</span>`:''}
-        </div>
-      </div>
-    </div>`;
+    return '<div class="chat-bubble-row '+(isMe?'me':'them')+'">'+avatarHtml2+
+      '<div class="chat-bubble-wrap '+(isMe?'me':'them')+'" '+longPressAttr+'>'+
+      '<div class="chat-bubble '+(isMe?'me':'them')+'">'+content+'</div>'+
+      '<div class="chat-meta '+(isMe?'me':'')+'"><span>'+time+'</span>'+
+      (isMe?'<span class="chat-read">'+readMark+'</span>':'')+
+      '</div></div></div>';
   }).join('');
 
-  const emptyMsg = `<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0">開始和 ${esc(f.name)} 聊天吧！</div>`;
+  const emptyMsg = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0">開始和 '+esc(f.name)+' 聊天吧！</div>';
 
-  return `<div class="chat-room">
-    <div class="chat-messages" id="chatMessages">${bubblesHtml||emptyMsg}</div>
-    <div class="chat-input-bar">
-      <button class="chat-media-btn" onclick="sendChatMedia()">📷</button>
-            <textarea class="chat-input" id="chatInput" placeholder="輸入訊息..." rows="1"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
-      <button class="chat-send-btn" onclick="sendChatMsg()">➤</button>
-    </div>
-  </div>`;
+  return '<div class="chat-room">'+
+    '<div class="chat-messages" id="chatMessages">'+(bubblesHtml||emptyMsg)+'</div>'+
+    '<div class="chat-input-bar">'+
+    '<button class="chat-media-btn" onclick="sendChatMedia()">📷</button>'+
+    '<textarea class="chat-input" id="chatInput" placeholder="輸入訊息..." rows="1"'+
+    ' oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\'"'+
+    ' onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>'+
+    '<button class="chat-send-btn" onclick="sendChatMsg()">➤</button>'+
+    '</div></div>';
 }
 
 // 長按訊息選單
@@ -2912,7 +2911,7 @@ async function renderAdmin() {
 
     users.forEach(u=>{
       h += `<div class="list-item">
-        <div class="list-icon" style="background:var(--card2);font-size:20px">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px"/>`:'👤'}</div>
+        <div class="list-icon" style="background:var(--card2);font-size:20px">'+(u.photo?'<img src="'+u.photo+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px"/>':'👤')+'</div>
         <div class="list-body">
           <div class="list-name">${esc(u.name||'未命名')}</div>
           <div class="list-sub">
@@ -2936,7 +2935,7 @@ async function renderAdmin() {
 function renderProfile() {
   return `<div class="profile-section">
     <div class="profile-avatar" onclick="changeProfilePhoto()" style="cursor:pointer;position:relative;">
-      ${userProfile?.photo?`<img src="${userProfile.photo}"/>`:'👤'}
+      '+(userProfile?.photo?'<img src="'+userProfile.photo+'"/>':'👤')+'
       <div style="position:absolute;bottom:0;right:0;background:var(--amber);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--bg)">📷</div>
     </div>
     <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px">點頭像更換照片</div>
@@ -2983,7 +2982,7 @@ window.copyFromFriend = function(itemId) {
     <label class="modal-label">地區</label>
     <input class="modal-input" id="cpRegion" placeholder="例：台中" value="${esc(item.region||'')}"/>
     <label class="modal-label">分類</label>
-    <select class="modal-input" id="cpCat">${CATS.map(c=>`<option value="${c.id}"${c.id===item.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <select class="modal-input" id="cpCat">'+CATS.map(c=>'<option value="'+c.id+'"'+(c.id===item.cat?' selected':'')+'>'+c.emoji+' '+c.label+'</option>').join('')+'</select>
     <div class="modal-btns">
       <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
       <div class="modal-btn modal-btn-ok" onclick="doCopyFromFriend('${itemId}')">複製過來</div>
@@ -3319,9 +3318,9 @@ window.openAddItem = function() {
     <label class="modal-label">名稱</label>
     <input class="modal-input" id="mName" placeholder="例：青木原拉麵"/>
     <label class="modal-label">分類</label>
-    <select class="modal-input" id="mCat">${CATS.map(c=>`<option value="${c.id}"${c.id===nav.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <select class="modal-input" id="mCat">'+CATS.map(c=>'<option value="'+c.id+'"'+(c.id===nav.cat?' selected':'')+'>'+c.emoji+' '+c.label+'</option>').join('')+'</select>
     <label class="modal-label">星星評分</label>
-    <div class="star-picker" id="starPick">${[1,2,3,4,5].map(v=>`<span class="star-pick" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <div class="star-picker" id="starPick">'+[1,2,3,4,5].map(v=>'<span class="star-pick" onclick="setPickStar('+v+')">★</span>').join('')+'</div>
     <label class="modal-label">備註（選填）</label>
     <input class="modal-input" id="mNote" placeholder="例：必點乾麵"/>
     <label class="modal-label">🕐 營業時間（選填）</label>
@@ -3390,7 +3389,7 @@ function renderHoursWrap() {
       <span class="hours-sep">–</span>
       <input class="hours-time" type="time" value="${h.close}" oninput="pickHours[${i}].close=this.value"/>
       <button class="hours-del" onclick="removeHourRow(${i})">✕</button>
-    </div>${h.note?`<div style="font-size:11px;color:var(--muted);margin:-4px 0 6px 4px">📝 ${esc(h.note)}</div>`:''}`).join('');
+    </div>'+(h.note?'<div style="font-size:11px;color:var(--muted);margin:-4px 0 6px 4px">📝 '+esc(h.note)+'</div>':'')+'`).join('');
 }
 
 window.addHourRow = function() {
@@ -3670,9 +3669,9 @@ window.openEditItem = function(id) {
     <label class="modal-label">名稱</label>
     <input class="modal-input" id="mName" value="${esc(item.name)}"/>
     <label class="modal-label">分類</label>
-    <select class="modal-input" id="mCat">${CATS.map(c=>`<option value="${c.id}"${c.id===item.cat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <select class="modal-input" id="mCat">'+CATS.map(c=>'<option value="'+c.id+'"'+(c.id===item.cat?' selected':'')+'>'+c.emoji+' '+c.label+'</option>').join('')+'</select>
     <label class="modal-label">星星評分</label>
-    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>`<span class="star-pick${i<pickStars?' on':''}" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>'<span class="star-pick'+(i<pickStars?' on':'')+'" onclick="setPickStar('+v+')">★</span>').join('')}</div>
     <label class="modal-label">備註</label>
     <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
     <label class="modal-label">🕐 營業時間</label>
@@ -3714,9 +3713,9 @@ window.openAddShop = function() {
     <label class="modal-label">名稱</label>
     <input class="modal-input" id="mName" placeholder="例：Nike Air Max"/>
     <label class="modal-label">分類</label>
-    <select class="modal-input" id="mShopCat">${shopCats.map(c=>`<option value="${c.id}"${c.id===defaultCat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <select class="modal-input" id="mShopCat">'+shopCats.map(c=>'<option value="'+c.id+'"'+(c.id===defaultCat?' selected':'')+'>'+c.emoji+' '+c.label+'</option>').join('')+'</select>
     <label class="modal-label">星星評分</label>
-    <div class="star-picker" id="starPick">${[1,2,3,4,5].map(v=>`<span class="star-pick" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <div class="star-picker" id="starPick">'+[1,2,3,4,5].map(v=>'<span class="star-pick" onclick="setPickStar('+v+')">★</span>').join('')+'</div>
     <label class="modal-label">備註（選填）</label>
     <input class="modal-input" id="mNote" placeholder="例：尺寸US10"/>
     <label class="modal-label">連結（選填）</label>
@@ -3744,9 +3743,9 @@ window.openEditShop = function(id) {
     <label class="modal-label">名稱</label>
     <input class="modal-input" id="mName" value="${esc(item.name)}"/>
     <label class="modal-label">分類</label>
-    <select class="modal-input" id="mShopCat">${shopCats.map(c=>`<option value="${c.id}"${c.id===item.shopCat?' selected':''}>${c.emoji} ${c.label}</option>`).join('')}</select>
+    <select class="modal-input" id="mShopCat">'+shopCats.map(c=>'<option value="'+c.id+'"'+(c.id===item.shopCat?' selected':'')+'>'+c.emoji+' '+c.label+'</option>').join('')+'</select>
     <label class="modal-label">星星評分</label>
-    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>`<span class="star-pick${i<pickStars?' on':''}" onclick="setPickStar(${v})">★</span>`).join('')}</div>
+    <div class="star-picker" id="starPick">${[1,2,3,4,5].map((v,i)=>'<span class="star-pick'+(i<pickStars?' on':'')+'" onclick="setPickStar('+v+')">★</span>').join('')}</div>
     <label class="modal-label">備註</label>
     <input class="modal-input" id="mNote" value="${esc(item.note||'')}"/>
     <label class="modal-label">連結</label>
@@ -3772,7 +3771,7 @@ window.openEditCountries = function() {
     const canDel = !items.some(i=>i.country===c.id);
     h += `<div class="edit-list-item"><span style="font-size:20px">${c.emoji}</span>
       <span class="edit-list-name">${c.name}</span>
-      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteCountry('${c.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      '+(canDel?'<button class="edit-btn edit-btn-del" onclick="deleteCountry(\''+c.id+'\')" >刪除</button>':'<span style="font-size:10px;color:var(--muted2)">有收藏</span>')+'
       </div>`;
   });
   h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddCountry()">＋ 新增國家</div></div>
@@ -3783,7 +3782,7 @@ window.openEditCountries = function() {
 window.openAddCountry = function() {
   pickEmoji='🌏';
   openModal(`<div class="modal-title">新增國家</div>
-    <div class="emoji-grid">${EMOJIS.slice(0,20).map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <div class="emoji-grid">${EMOJIS.slice(0,20).map(e=>'<span class="emoji-opt'+(e===pickEmoji?' sel':'')+' onclick="pickE(\''+e+'\')">' +e+'</span>').join('')}</div>
     <input class="modal-input" id="mName" placeholder="國家名稱（例：法國）"/>
     <div class="modal-btns">
       <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
@@ -3809,7 +3808,7 @@ window.openEditRegions = function() {
   (c.regions||[]).forEach(r=>{
     const canDel = !items.some(i=>i.country===c.id&&i.region===r);
     h += `<div class="edit-list-item"><span>📍</span><span class="edit-list-name">${r}</span>
-      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteRegion('${r}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      '+(canDel?'<button class="edit-btn edit-btn-del" onclick="deleteRegion(\''+r+'\')" >刪除</button>':'<span style="font-size:10px;color:var(--muted2)">有收藏</span>')+'
       </div>`;
   });
   h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddRegion()">＋ 新增地區</div></div>
@@ -3847,7 +3846,7 @@ window.openEditCats = function() {
     const canDel = !items.some(i=>i.cat===cat.id);
     h += `<div class="edit-list-item"><span style="font-size:20px">${cat.emoji}</span>
       <span class="edit-list-name">${cat.label}</span>
-      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteCat('${cat.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      '+(canDel?'<button class="edit-btn edit-btn-del" onclick="deleteCat(\''+cat.id+'\')" >刪除</button>':'<span style="font-size:10px;color:var(--muted2)">有收藏</span>')+'
       </div>`;
   });
   h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddCat()">＋ 新增分類</div></div>
@@ -3859,7 +3858,7 @@ window.openAddCat = function() {
   pickEmoji='⭐';
   const catEmojis=['🍜','🍕','🍣','🧋','☕','🏖','🏞','🎬','🎵','🎮','🎨','🛍','👗','👟','📍','⭐','🎁','🏛','🌸','📚'];
   openModal(`<div class="modal-title">新增分類</div>
-    <div class="emoji-grid" id="epick">${catEmojis.map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <div class="emoji-grid" id="epick">${catEmojis.map(e=>'<span class="emoji-opt'+(e===pickEmoji?' sel':'')+' onclick="pickE(\''+e+'\')">' +e+'</span>').join('')}</div>
     <input class="modal-input" id="mName" placeholder="分類名稱（例：好住）"/>
     <div class="modal-btns">
       <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
@@ -3885,7 +3884,7 @@ window.openEditShopCats = function() {
     const canDel = !shopItems.some(i=>i.shopCat===cat.id);
     h += `<div class="edit-list-item"><span style="font-size:20px">${cat.emoji}</span>
       <span class="edit-list-name">${cat.label}</span>
-      ${canDel?`<button class="edit-btn edit-btn-del" onclick="deleteShopCat('${cat.id}')">刪除</button>`:'<span style="font-size:10px;color:var(--muted2)">有收藏</span>'}
+      '+(canDel?'<button class="edit-btn edit-btn-del" onclick="deleteShopCat(\''+cat.id+'\')" >刪除</button>':'<span style="font-size:10px;color:var(--muted2)">有收藏</span>')+'
       </div>`;
   });
   h += `<div style="margin-top:12px"><div class="modal-btn modal-btn-ok" onclick="closeModal();openAddShopCat()">＋ 新增分類</div></div>
@@ -3897,7 +3896,7 @@ window.openAddShopCat = function() {
   pickEmoji='📦';
   const catEmojis=['👗','👟','💄','💍','👜','🧢','⌚','📱','💻','🎮','🍜','🍕','🧴','🏠','📚','⭐','🎁','🛒','📦','🔧'];
   openModal(`<div class="modal-title">新增網購分類</div>
-    <div class="emoji-grid" id="epick">${catEmojis.map(e=>`<span class="emoji-opt${e===pickEmoji?' sel':''}" onclick="pickE('${e}')">${e}</span>`).join('')}</div>
+    <div class="emoji-grid" id="epick">${catEmojis.map(e=>'<span class="emoji-opt'+(e===pickEmoji?' sel':'')+' onclick="pickE(\''+e+'\')">' +e+'</span>').join('')}</div>
     <input class="modal-input" id="mName" placeholder="分類名稱（例：保養品）"/>
     <div class="modal-btns">
       <div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>
