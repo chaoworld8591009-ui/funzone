@@ -1056,49 +1056,49 @@ function renderDetail() {
   const c = countries.find(x=>x.id===item.country);
   const photos = item.photos||[];
   const slides = photos.length ? photos.map((p,i)=>makeSlide(p,i,item.id)).join('') :
-    `<div class="photo-swiper-slide"><div class="slide-emoji">${cat.emoji}</div></div>`;
-  const dots = photos.length>1 ? photos.map((_,i)=>`<div class="photo-dot${i===0?' on':''}" id="dot_${item.id}_${i}"></div>`).join('') : '';
-  const count = photos.length>1 ? `<div class="photo-count">1 / ${photos.length}</div>` : '';
-  let h = `<div class="photo-swiper" id="swiper_${item.id}" data-idx="0" data-count="${photos.length}" data-id="${item.id}" data-type="item">
-    <div class="photo-swiper-track" id="track_${item.id}">${slides}</div>
-    <div class="photo-swiper-overlay"></div>
-    ${dots?'<div class="photo-dots">'+dots+'</div>':''}${count}
-    ${!isReadOnly()?`<div class="photo-btn-row">
-      <div class="photo-add-btn" onclick="addMediaType('${item.id}','item','image')">📷 ＋照片</div>
-      
-    </div>`:''}
-    ${!isReadOnly()&&photos.length>1?`<div class="photo-cover-btn" id="coverBtn_${item.id}" onclick="setCover('${item.id}','item')">⭐ 設封面</div>`:''}
-    ${!isReadOnly()&&photos.length?`<div class="photo-del-btn" onclick="delPhoto('${item.id}','item')">🗑 刪除此張</div>`:''}
-  </div>`;
+    '<div class="photo-swiper-slide"><div class="slide-emoji">'+cat.emoji+'</div></div>';
+  const dots = photos.length>1 ? photos.map((_,i)=>'<div class="photo-dot'+(i===0?' on':'')+'" id="dot_'+item.id+'_'+i+'"></div>').join('') : '';
+  const count = photos.length>1 ? '<div class="photo-count">1 / '+photos.length+'</div>' : '';
+  let h = '<div class="photo-swiper" id="swiper_'+item.id+'" data-idx="0" data-count="'+photos.length+'" data-id="'+item.id+'" data-type="item">'+
+    '<div class="photo-swiper-track" id="track_'+item.id+'">'+slides+'</div>'+
+    '<div class="photo-swiper-overlay"></div>'+
+    (dots?'<div class="photo-dots">'+dots+'</div>':'')+count;
+  if(!isReadOnly()) {
+    h += '<div class="photo-btn-row"><div class="photo-add-btn" onclick="addMediaType(\''+item.id+'\',\'item\',\'image\')">📷 ＋照片</div></div>';
+    if(photos.length>1) h += '<div class="photo-cover-btn" id="coverBtn_'+item.id+'" onclick="setCover(\''+item.id+'\',\'item\')">⭐ 設封面</div>';
+    if(photos.length) h += '<div class="photo-del-btn" onclick="delPhoto(\''+item.id+'\',\'item\')">🗑 刪除此張</div>';
+  }
+  h += '</div>';
+
   const starClick = isReadOnly() ? '' : 'setItemStar';
   const starsHtml = [1,2,3,4,5].map(v=>{
     const on = v<=(item.stars||0) ? ' on' : '';
     const click = starClick ? 'onclick="'+starClick+'(\''+item.id+'\','+v+')"' : '';
     return '<span class="detail-star'+on+'" '+click+'>★</span>';
   }).join('');
-  h += `<div class="detail-body">
-    <div class="detail-tags">
-      ${c?`<span class="tag" style="background:#1a1a1a;color:var(--muted)">${c.emoji} ${c.name}</span>`:''}
-      <span class="tag tag-loc">📍 ${item.region}</span>
-      <span class="tag ${cat.cls}">${cat.label}</span>
-    </div>
-    <div class="detail-name">${item.name}</div>
-    <div class="detail-stars-row">${starsHtml}</div>
-    ${item.note?`<div class="detail-section">備註</div><div class="detail-val">${item.note}</div>`:''}
-    ${item.hours&&item.hours.length?`<div class="detail-section">🕐 營業時間</div>`+renderHoursDisplay(item.hours):''}
-    ${item.address?`<div class="detail-section">地址</div><div class="detail-val">${item.address}</div>`:''}
-    ${item.phone?`<div class="detail-section">電話</div><div class="detail-val"><a href="tel:${esc(item.phone)}" style="color:var(--green);text-decoration:none">📞 ${esc(item.phone)}</a></div>`:''}
-    ${item.link?`<div class="detail-section">連結</div><div class="detail-link" onclick="openLink('${item.link}')">${item.link}</div>`:''}
-    <div class="detail-btns">
-      ${item.address?`<div class="detail-btn btn-nav" onclick="openMap('${item.address}')">🧭 導航</div>`:''}
-      ${item.phone?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="window.location='tel:${esc(item.phone)}'">📞 致電</div>`:''}
-      ${item.link?`<div class="detail-btn btn-link" onclick="openLink('${item.link}')">🔗 連結</div>`:''}
-      <div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareItem('${item.id}')">📤 分享</div>
-      ${isReadOnly()?`<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="copyFromFriend('${item.id}')">➕ 複製到我的</div>`:''}
-      ${!isReadOnly()?`<div class="detail-btn btn-edit" onclick="openEditItem('${item.id}')">✏️ 編輯</div>`:''}
-      ${!isReadOnly()?`<div class="detail-btn btn-del" onclick="deleteItem('${item.id}')">🗑 刪除</div>`:''}
-    </div>
-  </div>`;
+
+  h += '<div class="detail-body">';
+  h += '<div class="detail-tags">';
+  if(c) h += '<span class="tag" style="background:#1a1a1a;color:var(--muted)">'+c.emoji+' '+c.name+'</span>';
+  h += '<span class="tag tag-loc">📍 '+item.region+'</span>';
+  h += '<span class="tag '+cat.cls+'">'+cat.label+'</span>';
+  h += '</div>';
+  h += '<div class="detail-name">'+item.name+'</div>';
+  h += '<div class="detail-stars-row">'+starsHtml+'</div>';
+  if(item.note) h += '<div class="detail-section">備註</div><div class="detail-val">'+esc(item.note)+'</div>';
+  if(item.hours&&item.hours.length) h += '<div class="detail-section">🕐 營業時間</div>'+renderHoursDisplay(item.hours);
+  if(item.address) h += '<div class="detail-section">地址</div><div class="detail-val">'+esc(item.address)+'</div>';
+  if(item.phone) h += '<div class="detail-section">電話</div><div class="detail-val"><a href="tel:'+esc(item.phone)+'" style="color:var(--green);text-decoration:none">📞 '+esc(item.phone)+'</a></div>';
+  if(item.link) h += '<div class="detail-section">連結</div><div class="detail-link" onclick="openLink(\''+item.link+'\')">'+esc(item.link)+'</div>';
+  h += '<div class="detail-btns">';
+  if(item.address) h += '<div class="detail-btn btn-nav" onclick="openMap(\''+esc(item.address)+'\')">🧭 導航</div>';
+  if(item.phone) h += '<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="window.location=\'tel:'+esc(item.phone)+'\'">📞 致電</div>';
+  if(item.link) h += '<div class="detail-btn btn-link" onclick="openLink(\''+item.link+'\')">🔗 連結</div>';
+  h += '<div class="detail-btn" style="background:var(--blue-bg);color:var(--blue)" onclick="shareItem(\''+item.id+'\')">📤 分享</div>';
+  if(isReadOnly()) h += '<div class="detail-btn" style="background:var(--green-bg);color:var(--green)" onclick="copyFromFriend(\''+item.id+'\')">➕ 複製到我的</div>';
+  if(!isReadOnly()) h += '<div class="detail-btn btn-edit" onclick="openEditItem(\''+item.id+'\')">✏️ 編輯</div>';
+  if(!isReadOnly()) h += '<div class="detail-btn btn-del" onclick="deleteItem(\''+item.id+'\')">🗑 刪除</div>';
+  h += '</div></div>';
   return h;
 }
 
