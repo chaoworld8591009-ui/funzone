@@ -1378,6 +1378,7 @@ async function processPin() {
   if(secretMode==='confirm') {
     if(secretPinInput!==secretPinTemp) {
       secretPinInput=''; secretPinTemp=''; secretMode='setup'; renderPage();
+      setTimeout(()=>{ const el=document.querySelector('.pin-error'); if(el){el.textContent='兩次密碼不一致，請重新設定';el.style.display='block';} },50);
       return;
     }
     userProfile.secretPin = hashPin(secretPinInput);
@@ -1415,9 +1416,9 @@ function renderPinPad(title, sub) {
   h += '<div class="pin-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:4px;">密碼錯誤，請再試一次</div>';
   h += '</div>';
   h += '<div class="pinpad">';
-  [1,2,3,4,5,6,7,8,9].forEach(n=>{var k='<div class="pinkey" onclick="secretPinPress('+JSON.stringify(String(n))+')">'  +n+'</div>'; h+=k;});
+  [1,2,3,4,5,6,7,8,9].forEach(n=>{h+='<div class="pinkey" onclick="secretPinPress(\'+n+\')">'  +n+'</div>';});
   h += (hasPin&&secretMode==='unlock'?'<div class="pinkey" onclick="tryFaceId()" style="font-size:11px;color:var(--blue);font-weight:700;">Face<br>ID</div>':'<div></div>');
-  h += '<div class="pinkey" onclick="secretPinPress('+JSON.stringify('0')+')">'+'0'+'</div>';
+  h += '<div class="pinkey" onclick="secretPinPress(\'0\')">0</div>';
   h += '<div class="pinkey del" onclick="secretPinDel()">⌫</div>';
   h += '</div>';
   return h;
