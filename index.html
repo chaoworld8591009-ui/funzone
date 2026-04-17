@@ -617,11 +617,37 @@ function showLoginPage() {
     '<div class="login-logo">🗂</div>'+
     '<div class="login-title">我的收藏</div>'+
     '<div class="login-sub">記錄你的好吃、好玩、好買<br>還可以看朋友的收藏！</div>'+
-    '<button class="login-btn login-btn-email" onclick="showEmailLogin()">'+
-    '📧 用 Email 登入 / 註冊'+
-    '</button>'+
+    '<button class="login-btn login-btn-email" onclick="showEmailLogin()">登入</button>'+
+    '<div class="login-divider">— 第一次使用？ —</div>'+
+    '<button class="login-btn" style="background:var(--card2);color:var(--text);border:0.5px solid var(--border)" onclick="showEmailRegister()">建立新帳號</button>'+
     '</div>';
 }
+
+window.showEmailLogin = function() {
+  openModal('<div class="modal-title">登入</div>'+
+    '<label class="modal-label">Email</label>'+
+    '<input class="modal-input" id="mEmail" type="email" placeholder="your@email.com" autocomplete="email"/>'+
+    '<label class="modal-label">密碼</label>'+
+    '<input class="modal-input" id="mPwd" type="password" placeholder="••••••" autocomplete="current-password"/>'+
+    '<div class="modal-btns">'+
+    '<div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>'+
+    '<div class="modal-btn modal-btn-ok" onclick="doEmailLogin()">登入</div>'+
+    '</div>');
+};
+
+window.showEmailRegister = function() {
+  openModal('<div class="modal-title">建立新帳號</div>'+
+    '<label class="modal-label">Email</label>'+
+    '<input class="modal-input" id="mEmail" type="email" placeholder="your@email.com" autocomplete="email"/>'+
+    '<label class="modal-label">設定密碼（至少 6 位）</label>'+
+    '<input class="modal-input" id="mPwd" type="password" placeholder="••••••" autocomplete="new-password"/>'+
+    '<label class="modal-label">再次輸入密碼</label>'+
+    '<input class="modal-input" id="mPwd2" type="password" placeholder="••••••" autocomplete="new-password"/>'+
+    '<div class="modal-btns">'+
+    '<div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>'+
+    '<div class="modal-btn modal-btn-ok" onclick="doEmailRegister()">建立帳號</div>'+
+    '</div>');
+};
 
 window.loginGoogle = async function() {
   try {
@@ -640,16 +666,35 @@ window.loginGoogle = async function() {
 getRedirectResult(auth).catch(e=>{ if(e.code!=='auth/null-user') console.log(e); });
 
 window.showEmailLogin = function() {
-  openModal('<div class="modal-title">Email 登入 / 註冊</div>'+
+  openModal(
+    '<div class="modal-title">登入</div>'+
     '<label class="modal-label">Email</label>'+
     '<input class="modal-input" id="mEmail" type="email" placeholder="your@email.com" autocomplete="email"/>'+
-    '<label class="modal-label">密碼（至少 6 位）</label>'+
+    '<label class="modal-label">密碼</label>'+
     '<input class="modal-input" id="mPwd" type="password" placeholder="••••••" autocomplete="current-password"/>'+
     '<div class="modal-btns">'+
-    '<div class="modal-btn modal-btn-cancel" onclick="doEmailLogin()">登入</div>'+
-    '<div class="modal-btn modal-btn-ok" onclick="doEmailRegister()">第一次？點我註冊</div>'+
-    '</div>'+
-    '<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px;">第一次使用請點「第一次？點我註冊」</div>');
+    '<div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>'+
+    '<div class="modal-btn modal-btn-ok" onclick="doEmailLogin()">登入</div>'+
+    '</div>'
+  );
+  setTimeout(()=>{ const el=document.getElementById('mEmail'); if(el) el.focus(); },200);
+};
+
+window.showEmailRegister = function() {
+  openModal(
+    '<div class="modal-title">建立新帳號</div>'+
+    '<label class="modal-label">Email</label>'+
+    '<input class="modal-input" id="mEmail" type="email" placeholder="your@email.com" autocomplete="email"/>'+
+    '<label class="modal-label">設定密碼（至少 6 位）</label>'+
+    '<input class="modal-input" id="mPwd" type="password" placeholder="••••••" autocomplete="new-password"/>'+
+    '<label class="modal-label">再次輸入密碼確認</label>'+
+    '<input class="modal-input" id="mPwd2" type="password" placeholder="••••••" autocomplete="new-password"/>'+
+    '<div class="modal-btns">'+
+    '<div class="modal-btn modal-btn-cancel" onclick="closeModal()">取消</div>'+
+    '<div class="modal-btn modal-btn-ok" onclick="doEmailRegister()">建立帳號</div>'+
+    '</div>'
+  );
+  setTimeout(()=>{ const el=document.getElementById('mEmail'); if(el) el.focus(); },200);
 };
 
 function friendlyAuthError(code) {
@@ -677,9 +722,14 @@ window.doEmailLogin = async function() {
 window.doEmailRegister = async function() {
   const email = document.getElementById('mEmail').value.trim();
   const pwd = document.getElementById('mPwd').value;
+  const pwd2El = document.getElementById('mPwd2');
   if(!email || !pwd) { alert('請輸入 Email 和密碼'); return; }
   if(pwd.length < 6) { alert('密碼至少需要 6 位'); return; }
-  try { await createUserWithEmailAndPassword(auth, email, pwd); closeModal(); }
+  if(pwd2El && pwd !== pwd2El.value) { alert('兩次密碼不一致，請重新輸入'); return; }
+  try {
+    await createUserWithEmailAndPassword(auth, email, pwd);
+    closeModal();
+  }
   catch(e) { alert(friendlyAuthError(e.code)); }
 };
 
