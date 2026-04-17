@@ -1053,6 +1053,8 @@ function makeSlide(p, idx, itemId) {
   return `<div class="photo-swiper-slide" data-open-idx="${idx}" data-open-id="${itemId}"><img src="${p}" style="pointer-events:none;"/></div>`;
 }
 
+function isVideo(url) { return url && (url.startsWith('data:video') || /\.(mp4|mov|webm|avi)$/i.test(url) || url.includes('video')); }
+
 function renderDetail() {
   const item = items.find(i=>i.id===nav.itemId);
   if(!item) return '<div class="empty" style="padding:40px">找不到收藏<br><br><div style="font-size:13px;color:var(--muted2)">可能正在載入，請稍候...</div></div>';
